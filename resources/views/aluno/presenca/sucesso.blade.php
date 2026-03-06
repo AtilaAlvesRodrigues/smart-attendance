@@ -2,49 +2,52 @@
 
 @section('title', 'Presença Confirmada! - Smart Attendance')
 
-@section('body-class', 'bg-gray-100')
-
-@push('styles')
-<style>
-    .bg-gradient { background: linear-gradient(135deg, #10b981, #34d399); }
-</style>
-@endpush
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <div class="flex-grow flex items-center justify-center p-4">
+    <div class="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-        <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+        <div class="glass p-12 rounded-[3rem] border border-white/10 max-w-md w-full text-center relative z-10 animate-reveal">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-green-500/10 blur-3xl"></div>
             
-            <div class="mb-6 flex justify-center">
-                <div class="bg-green-100 p-4 rounded-full">
-                    <svg class="w-16 h-16 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <div class="mb-10 relative inline-block group">
+                <div class="absolute -inset-4 bg-green-500/20 rounded-full blur-2xl group-hover:bg-green-500/30 transition-all duration-500"></div>
+                <div class="relative w-24 h-24 bg-green-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-green-500/40 rotate-12 transition-transform group-hover:rotate-0">
+                    <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
             </div>
 
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">Presença Confirmada!</h1>
-            <p class="text-gray-500 mb-6">{{ $mensagem ?? 'Sua presença foi registrada com sucesso.' }}</p>
+            <h1 class="text-4xl font-black text-white tracking-tighter mb-4 italic">Presença Confirmada!</h1>
+            <p class="text-white/40 font-medium leading-relaxed mb-10">{{ $mensagem ?? 'Sua presença foi registrada com sucesso no sistema.' }}</p>
 
             @if(isset($materia) && isset($presenca))
-                <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left border border-gray-200">
-                    <p class="text-sm text-gray-500 mb-1">Disciplina</p>
-                    <p class="font-bold text-gray-800 text-lg">{{ $materia->nome }}</p>
+                <div class="glass p-6 rounded-2xl border border-white/5 mb-10 text-left relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     
-                    <div class="mt-3 flex justify-between">
+                    <span class="text-[9px] font-black text-green-400 uppercase tracking-widest block mb-1">Disciplina</span>
+                    <p class="font-black text-white text-xl tracking-tight leading-tight mb-4">{{ $materia->nome }}</p>
+                    
+                    <div class="flex justify-between items-end">
                         <div>
-                            <p class="text-xs text-gray-500">Data</p>
-                            <p class="font-medium text-gray-700">{{ \Carbon\Carbon::parse($presenca->data_aula)->format('d/m/Y') }}</p>
+                            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest block mb-0.5">Data</span>
+                            <span class="text-white font-bold text-sm">{{ \Carbon\Carbon::parse($presenca->data_aula)->format('d/m/Y') }}</span>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs text-gray-500">Horário</p>
-                            <p class="font-medium text-gray-700">{{ $presenca->created_at->format('H:i') }}</p>
+                            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest block mb-0.5">Horário</span>
+                            <span class="text-white font-bold text-sm bg-white/5 px-2 py-1 rounded-lg">{{ $presenca->created_at->format('H:i') }}</span>
                         </div>
                     </div>
                 </div>
             @endif
 
-            <a href="{{ route('dashboard.aluno') }}" class="block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+            <a href="{{ route('dashboard.aluno') }}" 
+               class="block w-full bg-white text-dark_purple hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-xl text-lg shadow-2xl">
                 Voltar ao Início
             </a>
         </div>

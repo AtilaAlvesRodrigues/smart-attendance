@@ -1,115 +1,179 @@
 @extends('layouts.main')
 
-@section('title', 'Gerando Frequência - ' . $materia->nome)
+@section('title', 'Gerando Frequência - Smart Attendance')
 
-@section('body-class', 'bg-gray-100 text-gray-800')
-
-@push('styles')
-<style>
-    .header-bg { background: linear-gradient(135deg, #4c1d95, #c026d3); }
-    .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    @keyframes pulse-ring {
-        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    .timer-pulse { animation: pulse-ring 2s infinite; }
-</style>
-@endpush
-
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <header class="header-bg text-white p-4 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-col gap-2">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold">{{ $materia->nome }} - Frequência</h1>
-                <div class="flex items-center gap-3">
-                    {{-- Timer --}}
-                    <div id="timer-container" class="flex items-center gap-2 bg-white/20 backdrop-blur-sm py-2 px-4 rounded-full">
-                        <div class="w-3 h-3 bg-green-400 rounded-full timer-pulse" id="timer-dot"></div>
-                        <span id="timer-text" class="text-sm font-bold tracking-wider">--:--:--</span>
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
+
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+            <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-green-500/50">
+                        QR
                     </div>
-                    <span class="text-xs font-light hidden md:inline">Código: {{ $codigo_aula }}</span>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">{{ $materia->nome }}</h1>
+                        <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Chamada em Tempo Real</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    {{-- Timer --}}
+                    <div id="timer-container" class="hidden md:flex items-center gap-3 bg-white/5 border border-white/10 py-2 px-4 rounded-xl backdrop-blur-md">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" id="timer-dot"></div>
+                        <span id="timer-text" class="text-xs font-black text-white tracking-widest tabular-nums">--:--:--</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('professor.presenca.index') }}" 
+                           class="hidden sm:block px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-white/10">
+                            Disciplinas
+                        </a>
+                        <a href="{{ route('dashboard.professor') }}" 
+                           class="px-4 py-2 bg-white text-dark_purple rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95">
+                            Home
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('professor.presenca.index') }}" 
-                   class="bg-white text-dark_purple hover:bg-gray-200 py-1 px-3 rounded-full text-sm font-semibold transition duration-200">
-                    ← Disciplinas
-                </a>
-                <a href="{{ route('dashboard.professor') }}" 
-                   class="bg-white/20 text-white hover:bg-white/30 py-1 px-3 rounded-full text-sm font-semibold transition duration-200 border border-white/40">
-                    🏠 Dashboard
-                </a>
-            </div>
-        </div>
-    </header>
+        </nav>
 
-    <main class="max-w-7xl mx-auto p-6 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {{-- Coluna Esquerda: QR Code --}}
-        <div class="bg-white p-8 rounded-lg card-shadow flex flex-col items-center justify-center text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Escanear para Confirmar Presença</h2>
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
             
-            <div id="qrcode" class="border-4 border-purple-700 p-2 rounded-lg bg-white mb-4"></div>
+            {{-- Coluna Esquerda: QR Code --}}
+            <div class="lg:col-span-5 flex flex-col gap-8 animate-reveal [animation-delay:200ms]">
+                <div class="glass p-10 rounded-[2.5rem] border border-white/10 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-600/10 blur-3xl"></div>
+                    
+                    <h2 class="text-2xl font-black text-white tracking-tight mb-8 italic">QR Code de Frequência</h2>
+                    
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                        <div id="qrcode" class="relative p-6 rounded-3xl bg-white shadow-2xl"></div>
+                    </div>
 
-            {{-- Timer grande abaixo do QR --}}
-            <div id="timer-big" class="mb-4 text-center">
-                <p class="text-xs uppercase tracking-wider text-gray-400 font-bold">Tempo Restante</p>
-                <p id="timer-big-text" class="text-4xl font-extrabold text-gray-800 tabular-nums">--:--:--</p>
-                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div id="timer-bar" class="bg-green-500 h-2 rounded-full transition-all duration-1000" style="width: 100%;"></div>
+                    {{-- Timer grande abaixo do QR --}}
+                    <div id="timer-big" class="mt-10 w-full">
+                        <div class="flex justify-between items-end mb-3">
+                            <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Tempo Restante</span>
+                            <span id="timer-big-text" class="text-3xl font-black text-white tabular-nums tracking-tighter">--:--:--</span>
+                        </div>
+                        <div class="w-full bg-white/5 border border-white/10 rounded-full h-3 overflow-hidden p-0.5">
+                            <div id="timer-bar" class="bg-gradient-to-r from-green-500 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-lg shadow-green-500/20" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex flex-col items-center gap-4">
+                        <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
+                            <code class="text-purple-300 font-black tracking-widest text-sm uppercase">CÓDIGO: {{ $codigo_aula }}</code>
+                        </div>
+                        <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest leading-relaxed mb-4">
+                            Aponte a câmera para o código ou use o link abaixo:
+                        </p>
+                        <a href="{{ route('presenca.confirmar', $codigo_aula) }}" target="_blank"
+                           class="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 hover:text-white rounded-xl transition-all duration-300 text-[10px] font-black uppercase tracking-[0.15em] group">
+                            <span>Registrar Presença (Link)</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-3xl border border-white/10 animate-reveal [animation-delay:400ms]">
+                    <h3 class="font-black text-white mb-6 text-sm uppercase tracking-widest italic flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                        Detalhes da Aula
+                    </h3>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Semestre</span>
+                            <span class="text-white font-bold">{{ $semestre }}º Semestre</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Período</span>
+                            <span class="text-white font-bold">{{ $horario == 'M' ? 'Matutino' : ($horario == 'V' ? 'Vespertino' : 'Noturno') }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Data</span>
+                            <span class="text-white font-bold">{{ \Carbon\Carbon::now()->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Status</span>
+                            <span class="text-green-400 font-bold flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                Transmissão Ativa
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <p class="text-gray-500 mb-2 text-sm">Aponte a câmera do celular para o código acima.</p>
-            <p class="text-xs text-gray-400">Ou acesse: <a href="{{ route('presenca.confirmar', $codigo_aula) }}" class="underline text-blue-500">{{ route('presenca.confirmar', $codigo_aula) }}</a></p>
+            {{-- Coluna Direita: Lista de Presença --}}
+            <div class="lg:col-span-7 flex flex-col gap-6 animate-reveal [animation-delay:400ms]">
+                <div class="glass p-8 rounded-[2.5rem] border border-white/10 flex-grow flex flex-col min-h-[600px] overflow-hidden">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-3xl font-black text-white tracking-tighter italic">Alunos Presentes</h2>
+                            <p class="text-white/40 text-xs font-medium tracking-tight mt-1">Sincronização automática a cada 3s.</p>
+                        </div>
+                        <div class="flex items-center gap-3 bg-purple-500 p-3 rounded-2xl shadow-xl shadow-purple-900/40 transform -rotate-3">
+                            <span class="text-white text-3xl font-black leading-none" id="contador-alunos">0</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-grow overflow-y-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] border-b border-white/5">
+                                    <th class="pb-4 px-2">Aluno</th>
+                                    <th class="pb-4 px-2 text-center">Registro</th>
+                                    <th class="pb-4 px-2 text-center">Horário</th>
+                                    <th class="pb-4 px-2 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-presenca" class="divide-y divide-white/5">
+                                <tr id="empty-state">
+                                    <td colspan="4" class="py-20 text-center">
+                                        <div class="flex flex-col items-center gap-4 opacity-20">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span class="text-xs font-black uppercase tracking-[0.2em]">Aguardando leituras...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {{-- Glass Expirado Overlay --}}
+    <div id="expired-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-xl bg-black/60">
+        <div class="glass p-12 rounded-[3rem] border-2 border-white/10 max-w-md w-full text-center relative overflow-hidden animate-reveal">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 blur-3xl"></div>
             
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg text-left w-full border border-gray-100">
-                <h3 class="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wider">Dados da Aula</h3>
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                    <p><strong class="text-gray-500">Matéria:</strong> {{ $materia->nome }}</p>
-                    <p><strong class="text-gray-500">Semestre:</strong> {{ $semestre }}</p>
-                    <p><strong class="text-gray-500">Horário:</strong> {{ $horario == 'M' ? 'Matutino' : ($horario == 'V' ? 'Vespertino' : 'Noturno') }}</p>
-                    <p><strong class="text-gray-500">Data:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
-                </div>
+            <div class="w-20 h-20 bg-red-500/20 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-8 animate-pulse">
+                ⏰
             </div>
-        </div>
-
-        {{-- Coluna Direita: Lista de Presença em Tempo Real --}}
-        <div class="bg-white p-6 rounded-lg card-shadow">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Alunos Presentes</h2>
-                <span id="contador-alunos" class="bg-purple-600 text-white py-1 px-3 rounded-full text-sm font-bold">0</span>
-            </div>
-
-            <div class="overflow-y-auto max-h-[600px]">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                            <th class="p-3 border-b">Nome</th>
-                            <th class="p-3 border-b">RA</th>
-                            <th class="p-3 border-b">Horário</th>
-                            <th class="p-3 border-b">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-presenca" class="text-gray-700">
-                        <tr id="empty-state">
-                            <td colspan="4" class="p-4 text-center text-gray-400">Aguardando leituras...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    {{-- QR Expirado Overlay --}}
-    <div id="expired-overlay" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
-            <div class="text-6xl mb-4">⏰</div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">QR Code Expirado!</h2>
-            <p class="text-gray-500 mb-6">O tempo de validade deste código encerrou. Gere um novo código para a próxima chamada.</p>
+            
+            <h2 class="text-4xl font-black text-white tracking-tighter mb-4 italic">Chamada Encerrada</h2>
+            <p class="text-white/40 leading-relaxed mb-10 font-medium">
+                O tempo de validade deste QR Code expirou. Para uma nova chamada, inicie outra sessão.
+            </p>
+            
             <a href="{{ route('professor.presenca.index') }}" 
-               class="block w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-800 transition">
+               class="block w-full bg-white text-dark_purple hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-xl text-lg shadow-2xl">
                 Voltar às Disciplinas
             </a>
         </div>
@@ -123,23 +187,21 @@
         const qrContent = "{{ route('presenca.confirmar', $codigo_aula) }}";
         new QRCode(document.getElementById("qrcode"), {
             text: qrContent,
-            width: 256,
-            height: 256,
+            width: 210,
+            height: 210,
             colorDark : "#000000",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
         });
 
         // ========== TIMER ==========
-        const expiraEm = {{ $expiraEmTimestamp }}; // Timestamp UNIX em segundos
+        const expiraEm = {{ $expiraEmTimestamp }};
         const timerText = document.getElementById('timer-text');
         const timerBigText = document.getElementById('timer-big-text');
         const timerBar = document.getElementById('timer-bar');
         const timerDot = document.getElementById('timer-dot');
         const expiredOverlay = document.getElementById('expired-overlay');
-
-        // Calcula duração total para a barra de progresso (2 horas = 7200s)
-        const duracaoTotal = 2 * 60 * 60; // 2 horas em segundos
+        const duracaoTotal = 2 * 60 * 60;
 
         function atualizarTimer() {
             const agora = Math.floor(Date.now() / 1000);
@@ -149,8 +211,8 @@
                 timerText.textContent = 'EXPIRADO';
                 timerBigText.textContent = '00:00:00';
                 timerBar.style.width = '0%';
-                timerBar.classList.replace('bg-green-500', 'bg-red-500');
-                timerDot.classList.replace('bg-green-400', 'bg-red-400');
+                timerBar.className = "h-full rounded-full transition-all duration-1000 bg-red-500";
+                timerDot.className = "w-2 h-2 bg-red-400 rounded-full";
                 expiredOverlay.classList.remove('hidden');
                 return;
             }
@@ -163,25 +225,19 @@
             timerText.textContent = formatted;
             timerBigText.textContent = formatted;
 
-            // Barra de progresso
             const progresso = Math.max(0, (restante / duracaoTotal) * 100);
             timerBar.style.width = progresso + '%';
 
-            // Muda cor quando falta pouco tempo (< 10 min)
             if (restante < 600) {
-                timerBar.classList.replace('bg-green-500', 'bg-yellow-500');
-                timerDot.classList.replace('bg-green-400', 'bg-yellow-400');
-                timerBigText.classList.add('text-yellow-600');
+                timerBar.className = "h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-yellow-500 to-orange-400 shadow-lg shadow-yellow-500/20";
+                timerDot.className = "w-2 h-2 bg-yellow-400 rounded-full animate-ping";
             }
             if (restante < 120) {
-                timerBar.classList.replace('bg-yellow-500', 'bg-red-500');
-                timerDot.classList.replace('bg-yellow-400', 'bg-red-400');
-                timerBigText.classList.remove('text-yellow-600');
-                timerBigText.classList.add('text-red-600');
+                timerBar.className = "h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-red-600 to-pink-500 shadow-lg shadow-red-500/20";
+                timerDot.className = "w-2 h-2 bg-red-500 rounded-full animate-ping";
             }
         }
 
-        // Atualiza timer a cada segundo
         setInterval(atualizarTimer, 1000);
         atualizarTimer();
 
@@ -197,21 +253,36 @@
                 .then(data => {
                     if (data.length > 0) {
                         if (emptyState) emptyState.style.display = 'none';
-                        
                         tabelaBody.innerHTML = '';
                         
-                        data.forEach(presenca => {
+                        // Sort by latest
+                        data.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+                        data.forEach((presenca, index) => {
                             const row = document.createElement('tr');
-                            row.className = "border-b hover:bg-gray-50 transition";
+                            row.className = `group hover:bg-white/5 transition-all duration-300 animate-reveal`;
+                            row.style.animationDelay = `${index * 50}ms`;
                             
                             const dataHora = new Date(presenca.created_at);
                             const horaFormatada = dataHora.toLocaleTimeString('pt-BR');
 
                             row.innerHTML = `
-                                <td class="p-3 font-medium text-gray-800">${presenca.aluno ? presenca.aluno.nome : 'Desconhecido'}</td>
-                                <td class="p-3 text-sm text-gray-500">${presenca.aluno_ra}</td>
-                                <td class="p-3 text-sm text-gray-500">${horaFormatada}</td>
-                                <td class="p-3"><span class="bg-green-100 text-green-700 py-1 px-2 rounded-full text-xs font-bold">Confirmado</span></td>
+                                <td class="py-4 px-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-[10px] font-black text-white group-hover:bg-purple-500/20 transition-colors capitalize">
+                                            ${presenca.aluno ? presenca.aluno.nome.charAt(0) : '?'}
+                                        </div>
+                                        <span class="text-sm font-bold text-white tracking-tight">${presenca.aluno ? presenca.aluno.nome : 'Desconhecido'}</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-2 text-center text-xs font-medium text-white/40 font-mono tracking-wider">${presenca.aluno_ra}</td>
+                                <td class="py-4 px-2 text-center text-xs font-black text-white/60 tabular-nums tracking-widest">${horaFormatada}</td>
+                                <td class="py-4 px-2 text-right">
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-400 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        <span class="w-1 h-1 bg-green-500 rounded-full"></span>
+                                        Confirmado
+                                    </span>
+                                </td>
                             `;
                             tabelaBody.appendChild(row);
                         });

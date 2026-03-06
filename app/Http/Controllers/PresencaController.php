@@ -120,10 +120,7 @@ class PresencaController extends Controller
         }
 
         if (Presenca::where('aluno_ra', $aluno->ra)->where('codigo_aula', $codigo_aula)->exists()) {
-            return view('aluno.presenca.sucesso', [
-                'mensagem' => 'Presença já confirmada anteriormente!',
-                'presenca' => null,
-            ]);
+            return view('aluno.presenca.ja_registrado');
         }
 
         $data_aula = Carbon::createFromTimestamp($timestamp)->format('Y-m-d');

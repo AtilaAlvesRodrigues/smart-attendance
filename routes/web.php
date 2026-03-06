@@ -85,6 +85,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
         Route::prefix('gerenciar')->group(function () {
             Route::get('/', [GerenciarMateriaController::class, 'index'])->name('professor.gerenciar.index');
+            Route::get('/relatorios', [GerenciarMateriaController::class, 'relatorios'])->name('professor.relatorios');
             Route::get('/{materia_id}', [GerenciarMateriaController::class, 'show'])->name('professor.gerenciar.materia');
             Route::post('/{materia_id}/notas', [GerenciarMateriaController::class, 'salvarNotas'])->name('professor.gerenciar.salvar_notas');
         });

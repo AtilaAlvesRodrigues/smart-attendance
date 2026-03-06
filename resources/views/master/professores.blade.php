@@ -2,81 +2,94 @@
 
 @section('title', 'Gerenciar Professores - Master')
 
-@section('body-class', 'bg-gray-50 text-gray-800')
-
-@push('styles')
-<style>
-    .header-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-    .t-row:nth-child(even) { background-color: #f3f4f6; }
-</style>
-@endpush
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <nav class="header-gradient text-white shadow-lg">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <a href="{{ route('dashboard.master') }}" class="text-2xl hover:scale-110 transition-transform">🛡️</a>
-                <div>
-                    <h1 class="text-xl font-bold tracking-wide">Gerenciar Professores</h1>
-                    <a href="{{ route('dashboard.master') }}" class="text-xs text-white/70 hover:text-white underline">Voltar ao Painel Master</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-    <div class="container mx-auto px-6 py-10">
-
-        <!-- Professores Section -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    👨‍🏫 Professores Cadastrados
-                </h2>
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <input type="text" id="search-professores" placeholder="Pesquisar Professor..." 
-                        class="px-3 py-1 rounded text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-blue-500/50 hover:scale-110 transition-transform">
+                        P
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">GERENCIAR PROFESSORES</h1>
+                        <a href="{{ route('dashboard.master') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <input type="text" id="search-professores" placeholder="Pesquisar por nome ou CPF..." 
+                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all w-64 backdrop-blur-md">
                 </div>
             </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                            <th class="py-3 px-6 text-left">Nome</th>
-                            <th class="py-3 px-6 text-left">Email</th>
-                            <th class="py-3 px-6 text-left">CPF</th>
-                            <th class="py-3 px-6 text-center">Matérias</th>
-                            <th class="py-3 px-6 text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="professores-body" class="text-gray-600 text-sm font-light">
-                        @foreach($professores as $prof)
-                        <tr onclick='openModal("professor", @json($prof))' class="cursor-pointer border-b border-gray-200 hover:bg-gray-100 transition t-row">
-                            <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-800">{{ $prof->nome }}</td>
-                            <td class="py-3 px-6 text-left">{{ $prof->email }}</td>
-                            <td class="py-3 px-6 text-left font-mono">{{ $prof->cpf }}</td>
-                            <td class="py-3 px-6 text-center">
-                                <span class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-xs font-bold">{{ $prof->materias_count }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span class="bg-green-200 text-green-700 py-1 px-3 rounded-full text-xs font-bold">Ativo</span>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <div class="mb-12 animate-reveal [animation-delay:200ms]">
+                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Corpo Docente</h2>
+                <p class="text-white/40 font-medium">Controle de acessos, turmas e registros de professores.</p>
+            </div>
+
+            <!-- Professores Section -->
+            <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                                <th class="py-4 px-6">Professor</th>
+                                <th class="py-4 px-6">Email</th>
+                                <th class="py-4 px-6">CPF</th>
+                                <th class="py-4 px-6 text-center">Disciplinas</th>
+                                <th class="py-4 px-6 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="professores-body" class="divide-y divide-white/5">
+                            @foreach($professores as $prof)
+                            <tr onclick='openModal("professor", @json($prof))' class="hover:bg-white/5 transition-colors group cursor-pointer">
+                                <td class="py-4 px-6">
+                                    <span class="block font-bold text-white tracking-tight group-hover:text-blue-300 transition-colors">{{ $prof->nome }}</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="text-white/60 text-sm">{{ $prof->email }}</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="text-[11px] font-black text-white/40 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-lg">{{ $prof->cpf }}</span>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold border border-blue-500/20">
+                                        {{ $prof->materias_count }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <button class="text-white/20 group-hover:text-white transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
                 @if($professores->isEmpty())
-                <div id="professores-empty" class="p-6 text-center text-gray-400">Nenhum professor encontrado.</div>
+                    <div id="professores-empty" class="py-20 text-center text-white/20 italic font-medium">Nenhum professor encontrado.</div>
                 @else
-                <div id="professores-empty" class="hidden p-6 text-center text-gray-400">Nenhum professor encontrado.</div>
+                    <div id="professores-empty" class="hidden py-20 text-center text-white/20 italic font-medium">Nenhum professor encontrado.</div>
                 @endif
                 
-                <div class="p-4">
+                <div class="px-8 py-6 border-t border-white/5 bg-white/5">
                     {{ $professores->links() }}
                 </div>
             </div>
-        </div>
-
+        </main>
     </div>
 
     <!-- Info Modal -->
@@ -139,15 +152,25 @@
             };
 
             setupSearch('search-professores', '{{ route("master.search.professores") }}', 'professores-body', 'professores-empty', (prof, jsonItem, esc) => `
-                <tr onclick='openModal("professor", ${jsonItem})' class="cursor-pointer border-b border-gray-200 hover:bg-gray-100 transition t-row">
-                    <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-800">${esc(prof.nome)}</td>
-                    <td class="py-3 px-6 text-left">${esc(prof.email)}</td>
-                    <td class="py-3 px-6 text-left font-mono">${esc(prof.cpf)}</td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-xs font-bold">${prof.materias.length}</span>
+                <tr onclick='openModal("professor", ${jsonItem})' class="hover:bg-white/5 transition-colors group cursor-pointer">
+                    <td class="py-4 px-6">
+                        <span class="block font-bold text-white tracking-tight group-hover:text-blue-300 transition-colors">${esc(prof.nome)}</span>
                     </td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="bg-green-200 text-green-700 py-1 px-3 rounded-full text-xs font-bold">Ativo</span>
+                    <td class="py-4 px-6">
+                        <span class="text-white/60 text-sm">${esc(prof.email)}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="text-[11px] font-black text-white/40 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-lg">${esc(prof.cpf)}</span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold border border-blue-500/20">
+                            ${prof.materias ? prof.materias.length : 0}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <button class="text-white/20 group-hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
                     </td>
                 </tr>
             `);

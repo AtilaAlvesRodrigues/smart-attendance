@@ -2,77 +2,94 @@
 
 @section('title', 'Gerenciar Alunos - Master')
 
-@section('body-class', 'bg-gray-50 text-gray-800')
-
-@push('styles')
-<style>
-    .header-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-    .t-row:nth-child(even) { background-color: #f3f4f6; }
-</style>
-@endpush
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <nav class="header-gradient text-white shadow-lg">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                 <a href="{{ route('dashboard.master') }}" class="text-2xl hover:scale-110 transition-transform">🛡️</a>
-                <div>
-                    <h1 class="text-xl font-bold tracking-wide">Gerenciar Alunos</h1>
-                    <a href="{{ route('dashboard.master') }}" class="text-xs text-white/70 hover:text-white underline">Voltar ao Painel Master</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-    <div class="container mx-auto px-6 py-10">
-
-        <!-- Alunos Section -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-purple-800 to-purple-600 px-6 py-4 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    🧑‍🎓 Alunos Cadastrados
-                </h2>
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <input type="text" id="search-alunos" placeholder="Pesquisar Aluno..." 
-                        class="px-3 py-1 rounded text-black text-sm focus:outline-none focus:ring-2 focus:ring-purple-300">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-purple-500/50 hover:scale-110 transition-transform">
+                        A
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">GERENCIAR ALUNOS</h1>
+                        <a href="{{ route('dashboard.master') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <input type="text" id="search-alunos" placeholder="Pesquisar por nome ou RA..." 
+                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all w-64 backdrop-blur-md">
                 </div>
             </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                            <th class="py-3 px-6 text-left">Nome</th>
-                            <th class="py-3 px-6 text-left">Email</th>
-                            <th class="py-3 px-6 text-left">RA</th>
-                            <th class="py-3 px-6 text-center">Matérias</th>
-                        </tr>
-                    </thead>
-                    <tbody id="alunos-body" class="text-gray-600 text-sm font-light">
-                        @foreach($alunos as $aluno)
-                        <tr onclick='openModal("aluno", @json($aluno))' class="cursor-pointer border-b border-gray-200 hover:bg-gray-100 transition t-row">
-                            <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-800">{{ $aluno->nome }}</td>
-                            <td class="py-3 px-6 text-left">{{ $aluno->email }}</td>
-                            <td class="py-3 px-6 text-left font-mono text-purple-600">{{ $aluno->ra }}</td>
-                            <td class="py-3 px-6 text-center">
-                                <span class="bg-purple-100 text-purple-700 py-1 px-3 rounded-full text-xs font-bold">{{ $aluno->materias_count }}</span>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <div class="mb-12 animate-reveal [animation-delay:200ms]">
+                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Base de Discentes</h2>
+                <p class="text-white/40 font-medium">Gerenciamento centralizado de matrículas e dados acadêmicos.</p>
+            </div>
+
+            <!-- Alunos Section -->
+            <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                                <th class="py-4 px-6">Nome</th>
+                                <th class="py-4 px-6">Email</th>
+                                <th class="py-4 px-6">RA</th>
+                                <th class="py-4 px-6 text-center">Disciplinas</th>
+                                <th class="py-4 px-6 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alunos-body" class="divide-y divide-white/5">
+                            @foreach($alunos as $aluno)
+                            <tr onclick='openModal("aluno", @json($aluno))' class="hover:bg-white/5 transition-colors group cursor-pointer">
+                                <td class="py-4 px-6">
+                                    <span class="block font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">{{ $aluno->nome }}</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="text-white/60 text-sm">{{ $aluno->email }}</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="text-[11px] font-black text-white/40 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-lg">{{ $aluno->ra }}</span>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-bold border border-purple-500/20">
+                                        {{ $aluno->materias_count }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <button class="text-white/20 group-hover:text-white transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
                 @if($alunos->isEmpty())
-                    <div id="alunos-empty" class="p-6 text-center text-gray-400">Nenhum aluno encontrado.</div>
+                    <div id="alunos-empty" class="py-20 text-center text-white/20 italic font-medium">Nenhum aluno encontrado.</div>
                 @else
-                    <div id="alunos-empty" class="hidden p-6 text-center text-gray-400">Nenhum aluno encontrado.</div>
+                    <div id="alunos-empty" class="hidden py-20 text-center text-white/20 italic font-medium">Nenhum aluno encontrado.</div>
                 @endif
                 
-                <div class="p-4">
+                <div class="px-8 py-6 border-t border-white/5 bg-white/5">
                     {{ $alunos->links() }}
                 </div>
             </div>
-        </div>
-
+        </main>
     </div>
 
     <!-- Info Modal -->
@@ -134,12 +151,25 @@
             };
 
             setupSearch('search-alunos', '{{ route("master.search.alunos") }}', 'alunos-body', 'alunos-empty', (aluno, jsonItem, esc) => `
-                <tr onclick='openModal("aluno", ${jsonItem})' class="cursor-pointer border-b border-gray-200 hover:bg-gray-100 transition t-row">
-                    <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-800">${esc(aluno.nome)}</td>
-                    <td class="py-3 px-6 text-left">${esc(aluno.email)}</td>
-                    <td class="py-3 px-6 text-left font-mono text-purple-600">${esc(aluno.ra)}</td>
-                     <td class="py-3 px-6 text-center">
-                        <span class="bg-purple-100 text-purple-700 py-1 px-3 rounded-full text-xs font-bold">${aluno.materias.length}</span>
+                <tr onclick='openModal("aluno", ${jsonItem})' class="hover:bg-white/5 transition-colors group cursor-pointer">
+                    <td class="py-4 px-6">
+                        <span class="block font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">${esc(aluno.nome)}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="text-white/60 text-sm">${esc(aluno.email)}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="text-[11px] font-black text-white/40 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-lg">${esc(aluno.ra)}</span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-bold border border-purple-500/20">
+                            ${aluno.materias ? aluno.materias.length : 0}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <button class="text-white/20 group-hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
                     </td>
                 </tr>
             `);

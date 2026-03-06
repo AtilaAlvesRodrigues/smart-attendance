@@ -49,6 +49,31 @@ class GerenciarMateriaController extends BaseController
         ));
     }
 
+    public function relatorios(Request $request)
+    {
+        $professor = Auth::guard('professores')->user();
+        $materias = $professor->materias;
+
+        $query = Presenca::where('professor_cpf', $professor->cpf)
+            ->with(['aluno', 'materia']);
+
+        if ($request->filled('materia_id')) {
+            $query->where('materia_id', $request->materia_id);
+        }
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('created_at', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('created_at', '<=', $request->data_fim);
+        }
+
+        $presencas = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('professor.relatorios', compact('professor', 'materias', 'presencas'));
+    }
+
     public function salvarNotas(Request $request, $materia_id)
     {
         $professor = Auth::guard('professores')->user();

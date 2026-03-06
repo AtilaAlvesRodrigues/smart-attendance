@@ -7,65 +7,97 @@
 @section('footer-class', 'py-6 text-center text-sm text-white/60')
 
 @section('content')
-    <div class="flex flex-col items-center p-4 w-full">
+    <div class="flex-grow flex flex-col items-center p-6 relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-        @if(session('pending_attendance_code'))
-            <div class="w-full max-w-md mb-6 bg-green-500/90 backdrop-blur-md border border-green-300 p-6 rounded-xl shadow-2xl text-center animate-pulse">
-                <span class="text-4xl mb-3 block">📋</span>
-                <h2 class="text-2xl font-bold text-white mb-2">Presença Pendente!</h2>
-                <p class="text-white/90 mb-4">Clique abaixo para confirmar sua presença na aula.</p>
-                <a href="{{ route('presenca.confirmar', session('pending_attendance_code')) }}"
-                    class="block w-full bg-white text-green-700 font-bold text-lg py-3 px-6 rounded-full 
-                           shadow-lg hover:bg-green-50 transition duration-300 transform hover:scale-[1.02]">
-                    ✅ Confirmar Presença Agora
+        <div class="w-full max-w-4xl relative z-10 animate-reveal">
+            
+            @if(session('pending_attendance_code'))
+                <div class="glass p-8 rounded-3xl mb-12 border-2 border-green-500/30 overflow-hidden relative group">
+                    <div class="absolute inset-0 bg-green-500/10 opacity-50"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="flex items-center gap-6">
+                            <div class="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center text-3xl animate-bounce">
+                                ✅
+                            </div>
+                            <div class="text-center md:text-left">
+                                <h2 class="text-2xl font-black text-white tracking-tight">Presença Pendente!</h2>
+                                <p class="text-green-200/80 font-medium">Você tem uma aula aguardando confirmação.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('presenca.confirmar', session('pending_attendance_code')) }}"
+                            class="bg-green-500 hover:bg-green-400 text-white font-black px-8 py-4 rounded-2xl shadow-lg shadow-green-500/20 transition-all hover:scale-105 active:scale-95 whitespace-nowrap">
+                            Confirmar Agora
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            <div class="text-center mb-16">
+                <div class="inline-block px-4 py-1.5 mb-4 rounded-full bg-white/10 border border-white/10 text-xs font-bold tracking-widest text-purple-300 uppercase">
+                    Guia de Utilização
+                </div>
+                <h1 class="text-5xl font-black tracking-tighter text-white mb-4 italic">Como funciona?</h1>
+                <div class="h-1 w-24 bg-gradient-to-r from-purple-500 to-indigo-500 mx-auto rounded-full opacity-50"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                
+                <!-- Passo 1 -->
+                <div class="glass p-8 rounded-3xl border border-white/10 hover:border-purple-400/30 transition-all group">
+                    <div class="w-14 h-14 bg-purple-600/20 rounded-2xl flex items-center justify-center text-2xl font-black text-purple-400 mb-6 group-hover:scale-110 transition-transform">
+                        01
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 tracking-tight">Acesso Rápido</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        O Aluno acessa o Smart Attendance utilizando seu <span class="text-purple-300 font-bold">RA, e-mail institucional ou CPF</span> de forma segura.
+                    </p>
+                </div>
+
+                <!-- Passo 2 -->
+                <div class="glass p-8 rounded-3xl border border-white/10 hover:border-indigo-400/30 transition-all group">
+                    <div class="w-14 h-14 bg-indigo-600/20 rounded-2xl flex items-center justify-center text-2xl font-black text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
+                        02
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 tracking-tight">QR Code Dinâmico</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        Localize o <span class="text-indigo-300 font-bold">QR Code</span> projetado pelo professor ou exibido no dispositivo do docente durante a aula.
+                    </p>
+                </div>
+
+                <!-- Passo 3 -->
+                <div class="glass p-8 rounded-3xl border border-white/10 hover:border-fuchsia-400/30 transition-all group">
+                    <div class="w-14 h-14 bg-fuchsia-600/20 rounded-2xl flex items-center justify-center text-2xl font-black text-fuchsia-400 mb-6 group-hover:scale-110 transition-transform">
+                        03
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 tracking-tight">Confirmação</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        Escaneie o código com a câmera do seu dispositivo e receba a <span class="text-fuchsia-300 font-bold">confirmação instantânea</span> de presença.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <a href="{{ Auth::check() ? route('dashboard') : route('login_form') }}"
+                    class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xl rounded-2xl shadow-xl shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all text-center">
+                    Prosseguir
                 </a>
-            </div>
-        @endif
 
-        <h1 class="text-3xl md:text-4xl font-bold text-light mt-8 mb-6">Como funciona?</h1>
-
-        <a href="{{ Auth::check() ? route('dashboard') : route('login_form') }}"
-            class="mb-10 w-full max-w-xs py-3 px-8 bg-white text-primary font-bold text-lg rounded-full 
-                 shadow-lg shadow-white/20 hover:shadow-white/40 hover:bg-gray-100
-                 transition duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-white/50 text-center">
-            Próximo
-        </a>
-
-        <div class="flex flex-col space-y-6 w-full max-w-md">
-
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-                <span class="text-5xl mb-4" role="img" aria-label="graduation cap">🎓</span>
-                <p class="text-light text-base md:text-lg font-medium">O docente acessa o Smart Attendance com seu RA,
-                    e-mail institucional ou CPF.</p>
-            </div>
-
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-                <span class="text-5xl mb-4" role="img" aria-label="QR code">
-                    <img src="{{ asset('img/qr-code.png') }}" alt="QR Code Placeholder" class="w-20 h-20 mx-auto">
-                </span>
-                <p class="text-light text-base md:text-lg font-medium">O docente escaneia o QR Code que será gerado pelo
-                    professor.</p>
-            </div>
-
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-                <span class="text-5xl mb-4" role="img" aria-label="check mark">✅</span>
-                <p class="text-light text-base md:text-lg font-medium">Com o app, o estudante escaneia o QR Code do
-                    professor para registrar presença.</p>
+                @auth
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                        class="w-full md:w-auto px-12 py-5 border-2 border-white/10 text-white/60 font-bold text-xl rounded-2xl hover:bg-white/5 hover:text-white transition-all text-center">
+                        Encerrar Sessão
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                @endauth
             </div>
 
         </div>
-
-        @auth
-            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                class="mt-12 w-full max-w-xs py-4 px-8 border-2 border-white text-light font-bold text-xl rounded-full 
-                   hover:bg-white hover:text-primary transition duration-300 transform hover:scale-[1.02] 
-                   focus:outline-none focus:ring-4 focus:ring-white/50 text-center">
-                Sair
-            </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
-        @endauth
-
     </div>
 @endsection

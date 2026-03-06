@@ -1,29 +1,40 @@
 @extends('layouts.main')
 
-@section('title', 'Erro na confirmação - Smart Attendance')
+@section('title', 'Erro na Presença - Smart Attendance')
 
-@section('body-class', 'bg-gray-100')
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <div class="flex-grow flex items-center justify-center p-4">
+    <div class="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-        <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+        <div class="glass p-12 rounded-[3rem] border border-white/10 max-w-md w-full text-center relative z-10 animate-reveal">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 blur-3xl"></div>
             
-            <div class="mb-6 flex justify-center">
-                <div class="bg-red-100 p-4 rounded-full">
-                    <svg class="w-16 h-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <div class="mb-10 relative inline-block group">
+                <div class="absolute -inset-4 bg-red-500/20 rounded-full blur-2xl group-hover:bg-red-500/30 transition-all duration-500"></div>
+                <div class="relative w-24 h-24 bg-red-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-red-500/40 -rotate-12 transition-transform group-hover:rotate-0">
+                    <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </div>
             </div>
 
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">Ops! Algo deu errado</h1>
-            <p class="text-red-500 font-medium mb-6">{{ $mensagem ?? 'Ocorreu um erro ao confirmar sua presença.' }}</p>
+            <h1 class="text-4xl font-black text-white tracking-tighter mb-4 italic">Ops! Algo deu errado</h1>
+            <p class="text-red-400 font-bold leading-relaxed mb-10 px-4">{{ $mensagem ?? 'Ocorreu um erro ao confirmar sua presença. Tente novamente ou procure o professor.' }}</p>
 
             <div class="flex flex-col gap-4">
-                 <a href="{{ route('dashboard.aluno') }}" class="block w-full bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition duration-200">
-                    Voltar à Página Principal
+                <a href="{{ route('dashboard.aluno') }}" 
+                   class="block w-full bg-white/10 hover:bg-white text-white hover:text-dark_purple border border-white/10 hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-xl text-lg shadow-2xl">
+                    Voltar ao Início
                 </a>
+                
+                <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2">
+                    Código do erro: SEC-PRES-01
+                </p>
             </div>
         </div>
 

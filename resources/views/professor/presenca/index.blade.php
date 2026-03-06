@@ -2,94 +2,121 @@
 
 @section('title', 'Selecionar Matéria - Smart Attendance')
 
-@section('body-class', 'bg-gray-100 text-gray-800')
-
-@push('styles')
-<style>
-    .header-bg { background: linear-gradient(135deg, #4c1d95, #c026d3); }
-    .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-</style>
-@endpush
-
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <header class="header-bg text-white p-4 shadow-lg">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Gerar Frequência</h1>
-            <a href="{{ route('dashboard.professor') }}" class="bg-white text-dark_purple hover:bg-gray-200 py-1 px-3 rounded-full text-sm font-semibold transition">Voltar ao Dashboard</a>
-        </div>
-    </header>
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] right-[-100px]"></div>
+        <div class="blob-2"></div>
 
-    <main class="max-w-4xl mx-auto p-6 mt-8">
-        <h2 class="text-3xl font-semibold text-gray-800 mb-6">Selecione a Disciplina</h2>
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-purple-500/50">
+                        P
+                    </div>
+                    <h1 class="text-xl font-black tracking-tighter text-white italic hidden md:block">PRESENÇA DIGITAL</h1>
+                </div>
 
-        @if($materias->isEmpty())
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-                <p>Você não possui matérias cadastradas.</p>
+                <a href="{{ route('dashboard.professor') }}" 
+                    class="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95">
+                    Voltar ao Dashboard
+                </a>
             </div>
-        @else
-            @php $hasActiveCode = $materias->contains(fn($m) => $m->active_code); @endphp
+        </nav>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach($materias as $materia)
-                    <div class="bg-white p-6 rounded-lg card-shadow hover:shadow-lg transition duration-200 border border-gray-100">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-800">{{ $materia->nome }}</h3>
-                                <p class="text-sm text-gray-500 mt-1 font-medium bg-gray-100 inline-block px-2 py-1 rounded">
-                                    {{ $materia->horario_matutino ? '☀️ Matutino' : ($materia->horario_noturno ? '🌙 Noturno' : '⛅ Vespertino') }}
-                                </p>
-                            </div>
+        <main class="max-w-4xl mx-auto w-full p-6 mt-12 relative z-10">
+            
+            <div class="mb-12 animate-reveal [animation-delay:200ms]">
+                <h2 class="text-4xl font-black text-white tracking-tighter mb-2 italic">Selecione a Disciplina</h2>
+                <p class="text-white/40 font-medium tracking-tight">Escolha qual matéria você irá registrar presença hoje.</p>
+            </div>
+
+            @if($materias->isEmpty())
+                <div class="glass p-10 rounded-3xl border border-yellow-500/30 text-center animate-reveal [animation-delay:400ms]">
+                    <div class="text-5xl mb-6">🏜️</div>
+                    <h3 class="text-2xl font-black text-white mb-2">Sem Matérias</h3>
+                    <p class="text-white/40">Você ainda não possui turmas vinculadas ao seu perfil.</p>
+                </div>
+            @else
+                @php $hasActiveCode = $materias->contains(fn($m) => $m->active_code); @endphp
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-reveal [animation-delay:400ms]">
+                    @foreach($materias as $materia)
+                        <div class="tilt-card glass p-8 rounded-3x border {{ $materia->active_code ? 'border-green-500/30' : 'border-white/10' }} group overflow-hidden relative transition-all">
+                            
                             @if($materia->active_code)
-                                <span class="bg-green-100 text-green-700 text-xs font-bold py-1 px-2 rounded-full">ATIVO</span>
+                                <div class="absolute -top-12 -right-12 w-32 h-32 bg-green-500/20 blur-3xl"></div>
                             @endif
-                        </div>
 
-                        @if($materia->active_code)
-                            {{-- Já tem QR ativo: botão verde para VER --}}
-                            <a href="{{ route('professor.presenca.gerar', $materia->id) }}" 
-                               target="_blank"
-                               class="block w-full bg-green-600 text-white text-center py-3 px-4 rounded-lg font-bold text-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                                ✅ Mostrar QR Code
-                            </a>
-                        @else
-                            {{-- Sem QR ativo: botão para gerar (com verificação de conflito) --}}
-                            @if($hasActiveCode)
-                                {{-- Outra matéria já tem QR ativo: mostra popup --}}
-                                <button onclick="mostrarPopup('{{ $materia->nome }}')"
-                                   class="block w-full bg-gray-400 text-white text-center py-3 px-4 rounded-lg font-bold text-lg hover:bg-gray-500 transition duration-300 shadow-md cursor-pointer">
-                                    📷 Gerar QR Code
-                                </button>
-                            @else
-                                {{-- Nenhum QR ativo: pode gerar livremente --}}
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-purple-300 transition-colors">{{ $materia->nome }}</h3>
+                                    <div class="mt-3 flex items-center gap-2">
+                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-white/50 tracking-widest uppercase">
+                                            {{ $materia->horario_matutino ? '☀️ Matutino' : ($materia->horario_noturno ? '🌙 Noturno' : '⛅ Vespertino') }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                @if($materia->active_code)
+                                    <div class="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                        <span class="text-[9px] font-black text-green-400 tracking-widest uppercase">Ativo</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            @if($materia->active_code)
                                 <a href="{{ route('professor.presenca.gerar', $materia->id) }}" 
                                    target="_blank"
-                                   class="block w-full bg-purple-600 text-white text-center py-3 px-4 rounded-lg font-bold text-lg hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                                    📷 Gerar QR Code
+                                   class="block w-full bg-green-600 hover:bg-green-500 text-white text-center py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-green-900/40 hover:scale-[1.02] active:scale-95">
+                                    Acessar QR Code
                                 </a>
+                            @else
+                                @if($hasActiveCode)
+                                    <button onclick="mostrarPopup('{{ $materia->nome }}')"
+                                       class="block w-full bg-white/5 border border-white/10 text-white/20 text-center py-4 rounded-xl font-black text-lg cursor-not-allowed">
+                                        Indisponível (Conflito)
+                                    </button>
+                                @else
+                                    <a href="{{ route('professor.presenca.gerar', $materia->id) }}" 
+                                       target="_blank"
+                                       class="block w-full bg-purple-600 hover:bg-purple-500 text-white text-center py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-purple-900/40 hover:scale-[1.02] active:scale-95">
+                                        Gerar QR Code
+                                    </a>
+                                @endif
                             @endif
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </main>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </main>
+    </div>
 
-    {{-- Modal/Popup de aviso --}}
-    <div id="popup-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl transform transition-all">
-            <div class="text-5xl mb-4">⚠️</div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">QR Code Já Ativo!</h2>
-            <p class="text-gray-500 mb-2">Você já possui um QR Code de frequência ativo para outra disciplina.</p>
-            <p class="text-gray-400 text-sm mb-6">Aguarde o término ou encerramento da chamada atual antes de gerar outro.</p>
-            <p id="popup-materia" class="text-sm font-bold text-purple-600 mb-6"></p>
+    {{-- Glass Popup --}}
+    <div id="popup-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 backdrop-blur-md bg-black/40">
+        <div class="glass p-10 rounded-[2.5rem] border-2 border-white/10 max-w-md w-full text-center relative overflow-hidden animate-reveal">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-yellow-500/10 blur-3xl"></div>
             
-            <div class="flex gap-3">
-                <button onclick="fecharPopup()" 
-                    class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition">
-                    Entendi
-                </button>
+            <div class="w-20 h-20 bg-yellow-500/20 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-8 animate-bounce">
+                ⚠️
             </div>
+            
+            <h2 class="text-3xl font-black text-white tracking-tighter mb-4 italic">Conflito Ativo</h2>
+            <p class="text-white/40 leading-relaxed mb-6 font-medium">
+                Você já possui um QR Code de frequência ativo para outra disciplina no sistema.
+            </p>
+            
+            <div id="popup-materia" class="mb-10 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-yellow-300 font-bold text-sm inline-block"></div>
+            
+            <button onclick="fecharPopup()" 
+                class="w-full bg-white/10 hover:bg-white text-white hover:text-dark_purple font-black py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-95">
+                Entendido
+            </button>
         </div>
     </div>
 @endsection
@@ -97,7 +124,7 @@
 @push('scripts')
     <script>
         function mostrarPopup(nomeMateria) {
-            document.getElementById('popup-materia').textContent = 'Disciplina solicitada: ' + nomeMateria;
+            document.getElementById('popup-materia').textContent = nomeMateria;
             document.getElementById('popup-overlay').classList.remove('hidden');
         }
 
@@ -105,14 +132,30 @@
             document.getElementById('popup-overlay').classList.add('hidden');
         }
 
-        // Fecha popup ao clicar fora
         document.getElementById('popup-overlay').addEventListener('click', function(e) {
             if (e.target === this) fecharPopup();
         });
 
-        // Fecha popup com ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') fecharPopup();
+        });
+
+        // Tilt effect
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const rotateX = (y - rect.height/2) / 15;
+                    const rotateY = (rect.width/2 - x) / 15;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
         });
     </script>
 @endpush

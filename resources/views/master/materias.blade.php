@@ -2,101 +2,102 @@
 
 @section('title', 'Gerenciar Matérias - Master')
 
-@section('body-class', 'bg-gray-50 text-gray-800')
-
-@push('styles')
-<style>
-    .header-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-    .t-row:nth-child(even) { background-color: #f3f4f6; }
-</style>
-@endpush
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <nav class="header-gradient text-white shadow-lg">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                 <a href="{{ route('dashboard.master') }}" class="text-2xl hover:scale-110 transition-transform">🛡️</a>
-                <div>
-                    <h1 class="text-xl font-bold tracking-wide">Gerenciar Matérias</h1>
-                    <a href="{{ route('dashboard.master') }}" class="text-xs text-white/70 hover:text-white underline">Voltar ao Painel Master</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-    <div class="container mx-auto px-6 py-10">
-
-        <!-- Matérias Section -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-teal-700 to-teal-500 px-6 py-4 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    📚 Matérias Cadastradas
-                </h2>
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <input type="text" id="search-materias" placeholder="Pesquisar Matéria..." 
-                        class="px-3 py-1 rounded text-black text-sm focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-teal-500/50 hover:scale-110 transition-transform">
+                        M
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">GERENCIAR DISCIPLINAS</h1>
+                        <a href="{{ route('dashboard.master') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <input type="text" id="search-materias" placeholder="Pesquisar por nome ou sala..." 
+                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all w-64 backdrop-blur-md">
                 </div>
             </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                            <th class="py-3 px-6 text-left">Matéria</th>
-                            <th class="py-3 px-6 text-center">Matutino</th>
-                            <th class="py-3 px-6 text-center">Vespertino</th>
-                            <th class="py-3 px-6 text-center">Noturno</th>
+            <div class="mb-12 animate-reveal [animation-delay:200ms]">
+                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Grade Curricular</h2>
+                <p class="text-white/40 font-medium">Configuração de horários, salas e vínculos acadêmicos.</p>
+            </div>
 
-                            <th class="py-3 px-6 text-center">Professores</th>
-                            <th class="py-3 px-6 text-center">Alunos</th>
-                        </tr>
-                    </thead>
-                    <tbody id="materias-body" class="text-gray-600 text-sm font-light">
-                        @foreach($materias as $materia)
-                        <tr onclick='openModal("materia", @json($materia))' class="cursor-pointer border-b border-gray-200 hover:bg-gray-100 transition t-row">
-                            <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-800">
-                                {{ $materia->nome }}
-                                <div class="text-xs text-gray-400 font-mono">{{ $materia->sala }}</div>
-                                <div class="text-[10px] text-gray-400 font-mono">{{ $materia->carga_horaria }}h • {{ $materia->total_aulas }} aulas</div>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span class="{{ $materia->horario_matutino ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} py-1 px-2 rounded-full text-xs font-bold">
-                                    {{ $materia->horario_matutino ? 'Ativo' : 'Inativo' }}
-                                </span>
-                            </td>
-                             <td class="py-3 px-6 text-center">
-                                <span class="{{ $materia->horario_vespertino ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} py-1 px-2 rounded-full text-xs font-bold">
-                                    {{ $materia->horario_vespertino ? 'Ativo' : 'Inativo' }}
-                                </span>
-                            </td>
-                             <td class="py-3 px-6 text-center">
-                                <span class="{{ $materia->horario_noturno ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} py-1 px-2 rounded-full text-xs font-bold">
-                                    {{ $materia->horario_noturno ? 'Ativo' : 'Inativo' }}
-                                </span>
-                            </td>
+            <!-- Matérias Section -->
+            <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                                <th class="py-4 px-6">Disciplina</th>
+                                <th class="py-4 px-6 text-center">Matutino</th>
+                                <th class="py-4 px-6 text-center">Vespertino</th>
+                                <th class="py-4 px-6 text-center">Noturno</th>
+                                <th class="py-4 px-6 text-center">Docentes</th>
+                                <th class="py-4 px-6 text-center">Alunos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materias-body" class="divide-y divide-white/5">
+                            @foreach($materias as $materia)
+                            <tr onclick='openModal("materia", @json($materia))' class="hover:bg-white/5 transition-colors group cursor-pointer">
+                                <td class="py-4 px-6">
+                                    <span class="block font-bold text-white tracking-tight group-hover:text-teal-300 transition-colors">{{ $materia->nome }}</span>
+                                    <div class="flex gap-2 mt-1">
+                                        <span class="text-[9px] text-white/30 font-black uppercase tracking-widest">{{ $materia->sala }}</span>
+                                        <span class="text-[9px] text-white/20 font-black uppercase tracking-widest">• {{ $materia->carga_horaria }}h</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="w-2 h-2 rounded-full inline-block {{ $materia->horario_matutino ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-white/10' }}"></span>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="w-2 h-2 rounded-full inline-block {{ $materia->horario_vespertino ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-white/10' }}"></span>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="w-2 h-2 rounded-full inline-block {{ $materia->horario_noturno ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-white/10' }}"></span>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold border border-blue-500/20">
+                                        {{ $materia->professores_count }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-bold border border-purple-500/20">
+                                        {{ $materia->alunos_count }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                            <td class="py-3 px-6 text-center">
-                                <span class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-xs font-bold">{{ $materia->professores_count }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span class="bg-purple-100 text-purple-700 py-1 px-3 rounded-full text-xs font-bold">{{ $materia->alunos_count }}</span>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
                 @if($materias->isEmpty())
-                    <div id="materias-empty" class="p-6 text-center text-gray-400">Nenhuma matéria encontrada.</div>
+                    <div id="materias-empty" class="py-20 text-center text-white/20 italic font-medium">Nenhuma disciplina encontrada.</div>
                 @else
-                    <div id="materias-empty" class="hidden p-6 text-center text-gray-400">Nenhuma matéria encontrada.</div>
+                    <div id="materias-empty" class="hidden py-20 text-center text-white/20 italic font-medium">Nenhuma disciplina encontrada.</div>
                 @endif
                 
-                <div class="p-4">
+                <div class="px-8 py-6 border-t border-white/5 bg-white/5">
                     {{ $materias->links() }}
                 </div>
             </div>
-        </div>
-
+        </main>
     </div>
 
     <!-- Info Modal -->
@@ -158,33 +159,32 @@
             };
 
             setupSearch('search-materias', '{{ route("master.search.materias") }}', 'materias-body', 'materias-empty', (materia, jsonItem, esc) => `
-                <tr onclick='openModal("materia", ${jsonItem})' class="cursor-pointer border-b border-gray-200 hover:bg-gray-100 transition t-row">
-                    <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-800">
-                        ${esc(materia.nome)}
-                        <div class="text-xs text-gray-400 font-mono">${esc(materia.sala)}</div>
-                        <div class="text-[10px] text-gray-400 font-mono">${esc(materia.carga_horaria)}h • ${esc(materia.total_aulas)} aulas</div>
+                <tr onclick='openModal("materia", ${jsonItem})' class="hover:bg-white/5 transition-colors group cursor-pointer">
+                    <td class="py-4 px-6">
+                        <span class="block font-bold text-white tracking-tight group-hover:text-teal-300 transition-colors">${esc(materia.nome)}</span>
+                        <div class="flex gap-2 mt-1">
+                            <span class="text-[9px] text-white/30 font-black uppercase tracking-widest">${esc(materia.sala || '')}</span>
+                            <span class="text-[9px] text-white/20 font-black uppercase tracking-widest">• ${esc(materia.carga_horaria)}h</span>
+                        </div>
                     </td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="${materia.horario_matutino ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} py-1 px-2 rounded-full text-xs font-bold">
-                            ${esc(materia.horario_matutino || 'Inativo')}
+                    <td class="py-4 px-6 text-center">
+                        <span class="w-2 h-2 rounded-full inline-block ${materia.horario_matutino ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-white/10'}"></span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="w-2 h-2 rounded-full inline-block ${materia.horario_vespertino ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-white/10'}"></span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="w-2 h-2 rounded-full inline-block ${materia.horario_noturno ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-white/10'}"></span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold border border-blue-500/20">
+                            ${materia.professores_count ?? 0}
                         </span>
                     </td>
-                     <td class="py-3 px-6 text-center">
-                        <span class="${materia.horario_vespertino ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} py-1 px-2 rounded-full text-xs font-bold">
-                            ${esc(materia.horario_vespertino || 'Inativo')}
+                    <td class="py-4 px-6 text-center">
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-bold border border-purple-500/20">
+                            ${materia.alunos_count ?? 0}
                         </span>
-                    </td>
-                     <td class="py-3 px-6 text-center">
-                        <span class="${materia.horario_noturno ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} py-1 px-2 rounded-full text-xs font-bold">
-                            ${esc(materia.horario_noturno || 'Inativo')}
-                        </span>
-                    </td>
-
-                    <td class="py-3 px-6 text-center">
-                        <span class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-xs font-bold">${materia.professores_count ?? 0}</span>
-                    </td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="bg-purple-100 text-purple-700 py-1 px-3 rounded-full text-xs font-bold">${materia.alunos_count ?? 0}</span>
                     </td>
                 </tr>
             `);

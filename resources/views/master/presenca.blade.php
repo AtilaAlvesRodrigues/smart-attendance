@@ -1,225 +1,307 @@
 @extends('layouts.main')
 
-@section('title', 'Gerenciar Presenças - Master')
+@section('title', 'Central de Frequência - Master')
 
-@section('body-class', 'bg-gray-50 text-gray-800')
-
-@push('styles')
-<style>
-    @media print {
-        @page { 
-            size: A4 landscape; 
-            margin: 10mm; 
-        }
-        body { 
-            margin: 0; 
-            padding: 0;
-            -webkit-print-color-adjust: exact !important; 
-            print-color-adjust: exact !important;
-        }
-        body * { visibility: hidden; }
-        #printable-content, #printable-content * { visibility: visible; }
-        
-        #printable-content { 
-            position: absolute; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            margin: 0;
-            padding: 0;
-        }
-        
-        .no-print { display: none !important; }
-        
-        /* Tabela Ocupando tudo */
-        table { 
-            width: 100% !important; 
-            table-layout: fixed !important; /* Força obediência às larguras */
-            border-collapse: collapse !important;
-            font-size: 11px !important; /* Fonte levemente menor para caber bem */
-        }
-        
-        th, td {
-            border-bottom: 1px solid #ddd !important;
-            padding: 8px 4px !important;
-            word-wrap: break-word !important; /* Quebra texto longo */
-        }
-
-        /* Estilização específica para impressão */
-        .card-shadow { box-shadow: none !important; border: none !important; }
-        .text-center { text-align: center !important; }
-        
-        /* Rodapé fixo em todas as páginas */
-        .print-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 10px;
-            color: #6b7280;
-            background-color: white;
-            padding: 10px 0;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        /* Espaço para não cobrir o conteúdo */
-        #printable-content { 
-            margin-bottom: 50px; 
-        }
-    }
-</style>
-@endpush
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    {{-- ... (Navbar e Filtros mantidos) ... --}}
-    <div class="no-print">
-        {{-- Navbar e Forms --}}
-        <nav class="bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg mb-8">
-            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                 <div class="flex items-center space-x-3">
-                     <a href="{{ route('dashboard.master') }}" class="text-2xl hover:scale-110 transition-transform">🛡️</a>
+    <style>
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print, nav, .blob, .blob-2, footer, #cursor-glow, #theme-toggle { display: none !important; }
+            .glass { background: white !important; border: 1px solid #eee !important; box-shadow: none !important; backdrop-filter: none !important; }
+            main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+            #printable-content { border: none !important; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { color: black !important; border-bottom: 1px solid #eee !important; }
+            .text-white, .text-white\/30, .text-white\/40 { color: black !important; }
+        }
+        .suggestion-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            margin-top: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+        body.theme-light .suggestion-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .suggestion-item {
+            padding: 1rem 1.25rem;
+            color: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        body.theme-light .suggestion-item {
+            color: #1e293b;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+        body.theme-light .suggestion-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+            color: #a855f7;
+        }
+        .suggestion-item .sub {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        body.theme-light .suggestion-item .sub {
+            color: #64748b;
+        }
+    </style>
+
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
+
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal no-print">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-orange-500/50 hover:scale-110 transition-transform">
+                        P
+                    </a>
                     <div>
-                        <h1 class="text-xl font-bold tracking-wide">Painel de Chamadas</h1>
-                        <a href="{{ route('dashboard.master') }}" class="text-xs text-white/70 hover:text-white underline">Voltar ao Painel Master</a>
+                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">PAINEL DE CHAMADAS</h1>
+                        <a href="{{ route('dashboard.master') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
                     </div>
+                </div>
+
+                <div class="hidden md:flex items-center gap-2">
+                    <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                        📄 Gerar PDF
+                    </button>
                 </div>
             </div>
         </nav>
+
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
     
-        <div class="container mx-auto px-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                <form action="{{ route('master.presenca') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    {{-- Inputs do form mantidos --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Professor</label>
-                        <input type="text" name="professor" value="{{ request('professor') }}" placeholder="Nome..." class="w-full rounded-lg border-gray-300 focus:ring-orange-500 focus:border-orange-500 shadow-sm p-2 border">
+            <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
+                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Relatório de Presenças</h2>
+                <p class="text-white/40 font-medium">Acompanhamento centralizado de registros em tempo real.</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="glass p-6 rounded-3xl border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print relative z-30">
+                <form action="{{ route('master.presenca') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Professor</label>
+                        <input type="text" name="professor" id="input-professor" value="{{ request('professor') }}" autocomplete="off" placeholder="Nome..." 
+                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                        <div id="suggestions-professor" class="suggestion-box"></div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Matéria</label>
-                        <input type="text" name="materia" value="{{ request('materia') }}" placeholder="Nome..." class="w-full rounded-lg border-gray-300 focus:ring-orange-500 focus:border-orange-500 shadow-sm p-2 border">
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Matéria</label>
+                        <input type="text" name="materia" id="input-materia" value="{{ request('materia') }}" autocomplete="off" placeholder="Nome..." 
+                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                        <div id="suggestions-materia" class="suggestion-box"></div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Aluno</label>
-                        <input type="text" name="aluno" value="{{ request('aluno') }}" placeholder="Nome..." class="w-full rounded-lg border-gray-300 focus:ring-orange-500 focus:border-orange-500 shadow-sm p-2 border">
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Aluno</label>
+                        <input type="text" name="aluno" id="input-aluno" value="{{ request('aluno') }}" autocomplete="off" placeholder="Nome..." 
+                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                        <div id="suggestions-aluno" class="suggestion-box"></div>
                     </div>
-                    <div class="flex gap-2">
-                        <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg flex-1 transition shadow">Filtrar</button>
-                        <a href="{{ route('master.presenca') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-3 rounded-lg transition" title="Limpar">✖</a>
-                        <button type="button" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex-1 transition shadow flex items-center justify-center gap-2">
-                            PDF
+                    <div class="flex gap-2 no-print">
+                        <button type="submit" class="flex-grow bg-white text-dark_purple font-black py-3 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl">
+                            Filtrar
                         </button>
+                        <a href="{{ route('master.presenca') }}" class="px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl flex items-center justify-center text-white transition-all">
+                            ✖
+                        </a>
                     </div>
                 </form>
             </div>
-        </div>
+
+            <!-- Tabela Container -->
+            <div id="printable-content" class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms] relative z-10">
+                <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center no-print bg-white/5">
+                    <h3 class="text-xl font-black text-white italic tracking-tighter">Registros de Frequência</h3>
+                    <span class="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black text-white/60 uppercase tracking-widest">
+                        Total: {{ $presencas->total() }} de registros
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                                <th class="py-4 px-6">Data / Hora</th>
+                                <th class="py-4 px-6">Aluno (RA)</th>
+                                <th class="py-4 px-6">Disciplina</th>
+                                <th class="py-4 px-6">Professor (CPF)</th>
+                                <th class="py-4 px-6 text-center">Faltas</th>
+                                <th class="py-4 px-6 text-center">Média</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            @forelse($presencas as $p)
+                                @php
+                                    $materiaPivot = $p->aluno ? $p->aluno->materias->where('id', $p->materia_id)->first()->pivot ?? null : null;
+                                    $media = null;
+                                    if($materiaPivot) {
+                                        $notas = collect([$materiaPivot->prova1, $materiaPivot->prova2, $materiaPivot->trabalho1, $materiaPivot->trabalho2])
+                                            ->filter(fn($n) => !is_null($n));
+                                        if($notas->isNotEmpty()) {
+                                            $media = round($notas->avg(), 1);
+                                        }
+                                    }
+
+                                    $totalAulas = $p->materia->total_aulas ?? 0;
+                                    $presencasAluno = \App\Models\Presenca::where('materia_id', $p->materia_id)
+                                        ->where('aluno_ra', $p->aluno_ra)
+                                        ->count();
+                                    $faltas = max(0, $totalAulas - $presencasAluno);
+                                    
+                                    $corMedia = 'text-white/40';
+                                    if($media !== null) {
+                                        $corMedia = $media >= 6 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
+                                    }
+                                @endphp
+
+                                <tr class="hover:bg-white/5 transition-colors group">
+                                    <td class="py-4 px-6 whitespace-nowrap">
+                                        <span class="block font-bold text-white tracking-tight">{{ \Carbon\Carbon::parse($p->data_aula)->format('d/m/Y') }}</span>
+                                        <span class="block text-[10px] text-white/30 font-mono">{{ $p->created_at->format('H:i') }}</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span class="block font-bold text-white tracking-tight">{{ $p->aluno->nome ?? 'N/A' }}</span>
+                                        <span class="block text-[10px] text-white/30 font-mono">{{ $p->aluno_ra }}</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span class="block font-bold text-white tracking-tight">{{ $p->materia->nome ?? 'N/A' }}</span>
+                                        <span class="block text-[10px] text-white/30 uppercase tracking-widest font-black">{{ $p->materia->sala ?? '' }}</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span class="block text-white/80 font-medium">{{ $p->professor->nome ?? 'N/A' }}</span>
+                                        <span class="block text-[10px] text-white/30 font-mono">{{ $p->professor_cpf }}</span>
+                                    </td>
+                                    
+                                    <td class="py-4 px-6 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <span class="{{ $faltas > 0 ? 'text-red-400 font-black' : 'text-green-400' }} text-lg tracking-tighter">
+                                                {{ $faltas }}
+                                            </span>
+                                            <span class="text-[9px] text-white/20 uppercase font-bold">de {{ $totalAulas }}</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="py-4 px-6 text-center">
+                                        <span class="{{ $corMedia }} text-lg block tracking-tighter">
+                                            {{ $media !== null ? number_format($media, 1) : '--' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-20 text-center text-white/20 italic font-medium">Nenhum registro encontrado.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-8 py-6 border-t border-white/5 bg-white/5 no-print">
+                    {{ $presencas->withQueryString()->links() }}
+                </div>
+            </div>
+        </main>
     </div>
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const setupAutocomplete = (inputId, suggestionId, url, renderItem) => {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(suggestionId);
+            let timeout = null;
 
-    <div id="printable-content" class="w-full px-4 pb-12">
-        {{-- Título PDF --}}
-        <div class="hidden print:block text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 uppercase tracking-wider">Gerenciar Presenças - Master</h1>
-            <p class="text-sm text-gray-500 mt-1">Relatório Oficial de Acompanhamento</p>
-        </div>
+            const triggerSearch = async () => {
+                const query = input.value;
+                // Removido o limite de query.length < 2 para mostrar tudo ao clicar
+                
+                try {
+                    const response = await fetch(`${url}?q=${query}`);
+                    const data = await response.json();
+                    
+                    box.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.innerHTML = renderItem(item);
+                            div.onclick = () => {
+                                input.value = item.nome;
+                                box.style.display = 'none';
+                                // Opcional: submeter o form ao selecionar
+                                // input.closest('form').submit();
+                            };
+                            box.appendChild(div);
+                        });
+                        box.style.display = 'block';
+                    } else {
+                        box.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error('Search error:', e);
+                }
+            };
 
-        <div class="bg-white rounded-2xl print:shadow-none shadow-xl overflow-hidden border border-gray-200 card-shadow">
-           {{-- Tabela mantida (conteúdo igual ao anterior) --}}
-           {{-- ... --}}
-           <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center no-print">
-                <h2 class="text-lg font-bold text-gray-800">Relatório de Presenças</h2>
-                <span class="text-sm text-gray-500">Total: {{ $presencas->total() }} registros</span>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 uppercase text-xs font-bold tracking-wider border-b-2 border-gray-300">
-                            <th class="py-3 px-2" style="width: 15%;">Data / Hora</th>
-                            <th class="py-3 px-2" style="width: 25%;">Aluno (RA)</th>
-                            <th class="py-3 px-2" style="width: 20%;">Matéria</th>
-                            <th class="py-3 px-2" style="width: 20%;">Professor (CPF)</th>
-                            <th class="py-3 px-2 text-center" style="width: 10%;">Faltas</th>
-                            <th class="py-3 px-2 text-center" style="width: 10%;">Média</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-gray-600 text-sm font-light">
-                        @forelse($presencas as $p)
-                        {{-- Logica PHP mantida --}}
-                        @php
-                            $materiaPivot = $p->aluno->materias->where('id', $p->materia_id)->first()->pivot ?? null;
-                            $media = null;
-                            if($materiaPivot) {
-                                $notas = collect([$materiaPivot->prova1, $materiaPivot->prova2, $materiaPivot->trabalho1, $materiaPivot->trabalho2])
-                                    ->filter(fn($n) => !is_null($n));
-                                if($notas->isNotEmpty()) {
-                                    $media = round($notas->avg(), 1);
-                                }
-                            }
+            input.addEventListener('input', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(triggerSearch, 300);
+            });
 
-                            $totalAulas = $p->materia->total_aulas ?? 0;
-                            $presencasAluno = \App\Models\Presenca::where('materia_id', $p->materia_id)
-                                ->where('aluno_ra', $p->aluno_ra)
-                                ->count();
-                            $faltas = max(0, $totalAulas - $presencasAluno);
-                            
-                            $corMedia = 'text-gray-400';
-                            if($media !== null) {
-                                $corMedia = $media >= 6 ? 'text-green-600 font-bold' : 'text-red-600 font-bold';
-                            }
-                        @endphp
+            // Mostrar ao clicar ou focar
+            input.addEventListener('focus', triggerSearch);
+            input.addEventListener('click', triggerSearch);
 
-                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition print:border-gray-300">
-                            <td class="py-3 px-2 whitespace-nowrap">
-                                <span class="block font-bold text-gray-800">{{ \Carbon\Carbon::parse($p->data_aula)->format('d/m/Y') }}</span>
-                                <span class="block text-xs text-gray-500">{{ $p->created_at->format('H:i') }}</span>
-                            </td>
-                            <td class="py-3 px-2">
-                                <span class="block font-medium text-gray-800">{{ $p->aluno->nome ?? 'N/A' }}</span>
-                                <span class="block text-xs text-gray-500 font-mono">{{ $p->aluno_ra }}</span>
-                            </td>
-                            <td class="py-3 px-2">
-                                <span class="block font-medium text-gray-800">{{ $p->materia->nome ?? 'N/A' }}</span>
-                            </td>
-                            <td class="py-3 px-2">
-                                <span class="block text-gray-800">{{ $p->professor->nome ?? 'N/A' }}</span>
-                                <span class="block text-xs text-gray-500 font-mono">{{ $p->professor_cpf }}</span>
-                            </td>
-                            
-                            <td class="py-3 px-2 text-center align-middle">
-                                <div class="flex flex-col items-center justify-center">
-                                    <span class="{{ $faltas > 0 ? 'text-red-600 font-bold' : 'text-green-600' }} text-lg">
-                                        {{ $faltas }}
-                                    </span>
-                                    <span class="text-[10px] text-gray-400">de {{ $totalAulas }}</span>
-                                </div>
-                            </td>
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !box.contains(e.target)) {
+                    box.style.display = 'none';
+                }
+            });
+        };
 
-                            <td class="py-3 px-2 text-center align-middle">
-                                <span class="{{ $corMedia }} text-lg block">
-                                    {{ $media !== null ? number_format($media, 1) : '--' }}
-                                </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="py-8 text-center text-gray-400 italic">Nenhum registro encontrado.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 no-print">
-                {{ $presencas->withQueryString()->links() }}
-            </div>
-        </div>
-        
-        {{-- Rodapé Fixo nas Impressões --}}
-        <div class="print-footer hidden print:block">
-            <div class="flex flex-col items-center justify-center space-y-1">
-                <span class="text-xs">Gerado em {{ now()->format('d/m/Y H:i:s') }} por {{ Auth::guard('masters')->user()->nome ?? 'Master' }}</span>
-                <span class="text-[10px] uppercase font-bold text-gray-400">© {{ date('Y') }} Smart Attendance. Todos os direitos reservados.</span>
-            </div>
-        </div>
-    </div>
+        setupAutocomplete('input-professor', 'suggestions-professor', '{{ route("master.search.professores") }}', (prof) => `
+            <span class="block font-bold">👨‍🏫 ${prof.nome}</span>
+            <span class="sub">${prof.cpf}</span>
+        `);
+
+        setupAutocomplete('input-materia', 'suggestions-materia', '{{ route("master.search.materias") }}', (mat) => `
+            <span class="block font-bold">📚 ${mat.nome}</span>
+            <span class="sub">SALA: ${mat.sala || 'N/A'}</span>
+        `);
+
+        setupAutocomplete('input-aluno', 'suggestions-aluno', '{{ route("master.search.alunos") }}', (aluno) => `
+            <span class="block font-bold">🧑‍🎓 ${aluno.nome}</span>
+            <span class="sub">RA: ${aluno.ra}</span>
+        `);
+    });
+</script>
+@endpush
 @endsection

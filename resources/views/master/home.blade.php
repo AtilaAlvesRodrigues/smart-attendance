@@ -1,147 +1,150 @@
 @extends('layouts.main')
 
-@section('title', 'Painel Administrativo Master - Smart Attendance')
+@section('title', 'Painel Master - Smart Attendance')
 
-@section('body-class', 'bg-gray-50 text-gray-800')
-
-@push('styles')
-<style>
-    .header-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-    .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2); }
-    .stat-icon { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 16px; font-size: 1.5rem; }
-</style>
-@endpush
+@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 
 @section('content')
-    <nav class="header-gradient text-white shadow-lg">
-        <div class="container mx-auto px-6 py-5 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <span class="text-3xl">🛡️</span>
-                <div>
-                    <span class="text-xl font-bold tracking-wide block">Painel Master</span>
-                    <span class="text-xs text-white/70">Smart Attendance</span>
+    <div class="flex-grow flex flex-col relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
+
+        <!-- Glass Navbar -->
+        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-blue-500/50">
+                        M
+                    </div>
+                    <h1 class="text-xl font-black tracking-tighter text-white italic hidden md:block">ADMIN MASTER</h1>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <div class="hidden sm:flex flex-col items-end">
+                        <span class="text-[10px] font-bold tracking-widest text-blue-300 uppercase">Acesso Root</span>
+                        <span class="text-white font-bold text-sm">{{ $master->nome ?? 'Administrador' }}</span>
+                    </div>
+
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" 
+                            class="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95">
+                            Sair
+                        </button>
+                    </form>
                 </div>
             </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10">
             
-            <div class="flex items-center gap-4">
-                <span class="text-sm opacity-90 hidden sm:block">Olá, {{ $master->nome ?? 'Administrador' }}</span>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" 
-                        class="bg-white/10 border border-white/30 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-                        Sair
-                    </button>
-                </form>
+            <div class="mb-12 animate-reveal [animation-delay:200ms]">
+                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Visão Geral do Sistema</h2>
+                <p class="text-white/40 font-medium">Controle total de usuários, turmas e registros de presença.</p>
             </div>
-        </div>
-    </nav>
 
-    <div class="container mx-auto px-6 py-10">
-
-        <div class="mb-10">
-            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Visão Geral do Sistema</h1>
-            <p class="text-gray-500">Selecione uma seção para gerenciar.</p>
-        </div>
-
-        {{-- Cards de Resumo (números) --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-white rounded-2xl shadow-md p-6 flex items-center gap-5 border border-gray-100">
-                <div class="stat-icon bg-blue-100 text-blue-600">👨‍🏫</div>
-                <div>
-                    <p class="text-3xl font-extrabold text-gray-800">{{ $professoresCount }}</p>
-                    <p class="text-sm text-gray-500">Professores cadastrados</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md p-6 flex items-center gap-5 border border-gray-100">
-                <div class="stat-icon bg-purple-100 text-purple-600">🧑‍🎓</div>
-                <div>
-                    <p class="text-3xl font-extrabold text-gray-800">{{ $alunosCount }}</p>
-                    <p class="text-sm text-gray-500">Alunos cadastrados</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md p-6 flex items-center gap-5 border border-gray-100">
-                <div class="stat-icon bg-teal-100 text-teal-600">📚</div>
-                <div>
-                    <p class="text-3xl font-extrabold text-gray-800">{{ $materiasCount }}</p>
-                    <p class="text-sm text-gray-500">Matérias cadastradas</p>
-                </div>
-            </div>
-        </div>
-
-        {{-- Cards de Navegação --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-            {{-- Card Professores --}}
-            <a href="{{ route('master.professores') }}" class="card-hover group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 block">
-                <div class="bg-gradient-to-r from-blue-800 to-blue-500 p-6">
-                    <div class="flex items-center justify-between">
-                        <span class="text-4xl">👨‍🏫</span>
-                        <span class="bg-white/20 text-white text-sm px-3 py-1 rounded-full font-bold">{{ $professoresCount }}</span>
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-reveal [animation-delay:300ms]">
+                <div class="glass p-6 rounded-3xl border border-white/10 flex items-center gap-5 group hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">👨‍🏫</div>
+                    <div>
+                        <p class="text-3xl font-black text-white leading-none mb-1">{{ $professoresCount }}</p>
+                        <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Professores</p>
                     </div>
-                    <h2 class="text-2xl font-bold text-white mt-4">Professores</h2>
-                    <p class="text-white/70 text-sm mt-1">Gerenciar professores cadastrados</p>
                 </div>
-                <div class="p-5 flex items-center justify-between">
-                    <span class="text-sm text-gray-500">Visualizar, pesquisar e gerenciar</span>
-                    <span class="text-blue-600 font-bold group-hover:translate-x-1 transition-transform duration-200">→</span>
+                <div class="glass p-6 rounded-3xl border border-white/10 flex items-center gap-5 group hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🧑‍🎓</div>
+                    <div>
+                        <p class="text-3xl font-black text-white leading-none mb-1">{{ $alunosCount }}</p>
+                        <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Alunos</p>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-3xl border border-white/10 flex items-center gap-5 group hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-teal-500/20 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">📚</div>
+                    <div>
+                        <p class="text-3xl font-black text-white leading-none mb-1">{{ $materiasCount }}</p>
+                        <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Matérias</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 animate-reveal [animation-delay:400ms]">
+
+                <!-- Professores -->
+                <a href="{{ route('master.professores') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-blue-400/30 transition-all group relative overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-blue-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Professores</h3>
+                    <p class="text-white/40 text-sm leading-relaxed mb-6">Visualizar, pesquisar e gerenciar docentes do sistema.</p>
+                    <span class="text-blue-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
+                </a>
+
+                <!-- Alunos -->
+                <a href="{{ route('master.alunos') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-purple-400/30 transition-all group relative overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Alunos</h3>
+                    <p class="text-white/40 text-sm leading-relaxed mb-6">Gerencie matriculas e acesso dos estudantes.</p>
+                    <span class="text-purple-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
+                </a>
+
+                <!-- Matérias -->
+                <a href="{{ route('master.materias') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-teal-400/30 transition-all group relative overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-teal-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Matérias</h3>
+                    <p class="text-white/40 text-sm leading-relaxed mb-6">Configure as disciplinas e vínculos curriculares.</p>
+                    <span class="text-teal-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
+                </a>
+
+            </div>
+
+            <!-- Large Action: Chamada -->
+            <a href="{{ route('master.presenca') }}" class="glass p-8 rounded-3xl border border-white/10 hover:bg-white/5 transition-all animate-reveal [animation-delay:600ms] block group">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="max-w-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-[10px] font-black tracking-widest uppercase rounded">Novo Módulo</span>
+                        </div>
+                        <h3 class="text-3xl font-black text-white tracking-tighter mb-4">Central de Chamada QR Code</h3>
+                        <p class="text-white/40 leading-relaxed mb-6">
+                            Gere códigos de aula de forma centralizada e monitore as presenças em tempo real. 
+                            Acesse o log completo de atividades e frequências.
+                        </p>
+                        <span class="inline-block bg-white text-dark_purple font-black px-8 py-3 rounded-xl transition-all group-hover:scale-105 active:scale-95">
+                            Acessar Central Control
+                        </span>
+                    </div>
+                    
+                    <div class="w-24 h-24 bg-orange-600/20 rounded-3xl flex items-center justify-center text-4xl group-hover:rotate-12 transition-transform shadow-2xl shadow-orange-600/20">
+                        📱
+                    </div>
                 </div>
             </a>
 
-            {{-- Card Alunos --}}
-            <a href="{{ route('master.alunos') }}" class="card-hover group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 block">
-                <div class="bg-gradient-to-r from-purple-800 to-purple-500 p-6">
-                    <div class="flex items-center justify-between">
-                        <span class="text-4xl">🧑‍🎓</span>
-                        <span class="bg-white/20 text-white text-sm px-3 py-1 rounded-full font-bold">{{ $alunosCount }}</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white mt-4">Alunos</h2>
-                    <p class="text-white/70 text-sm mt-1">Gerenciar alunos matriculados</p>
-                </div>
-                <div class="p-5 flex items-center justify-between">
-                    <span class="text-sm text-gray-500">Visualizar, pesquisar e gerenciar</span>
-                    <span class="text-purple-600 font-bold group-hover:translate-x-1 transition-transform duration-200">→</span>
-                </div>
-            </a>
-
-            {{-- Card Matérias --}}
-            <a href="{{ route('master.materias') }}" class="card-hover group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 block">
-                <div class="bg-gradient-to-r from-teal-700 to-teal-500 p-6">
-                    <div class="flex items-center justify-between">
-                        <span class="text-4xl">📚</span>
-                        <span class="bg-white/20 text-white text-sm px-3 py-1 rounded-full font-bold">{{ $materiasCount }}</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white mt-4">Matérias</h2>
-                    <p class="text-white/70 text-sm mt-1">Gerenciar disciplinas do sistema</p>
-                </div>
-                <div class="p-5 flex items-center justify-between">
-                    <span class="text-sm text-gray-500">Visualizar, pesquisar e gerenciar</span>
-                    <span class="text-teal-600 font-bold group-hover:translate-x-1 transition-transform duration-200">→</span>
-                </div>
-            </a>
-
-        </div>
-
-        {{-- Card Chamada QR Code --}}
-        <a href="{{ route('master.presenca') }}" class="card-hover group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 block mt-8">
-            <div class="bg-gradient-to-r from-orange-500 to-red-600 p-6 flex items-center justify-between">
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="text-3xl">📱</span>
-                        <span class="bg-white/20 text-white text-xs px-2 py-1 rounded-full font-bold">Novo</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white">Chamada - QR Code</h2>
-                    <p class="text-white/80 text-sm mt-1">Gerar códigos de aula e monitorar presenças em tempo real</p>
-                </div>
-                <div class="bg-white/20 p-4 rounded-2xl">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                </div>
-            </div>
-            <div class="p-5 flex items-center justify-between">
-                <span class="text-sm text-gray-500">Acessar painel de chamadas</span>
-                <span class="text-orange-600 font-bold group-hover:translate-x-1 transition-transform duration-200">→</span>
-            </div>
-        </a>
-
+        </main>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.tilt-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    });
+</script>
+@endpush

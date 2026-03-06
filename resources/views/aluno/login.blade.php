@@ -4,44 +4,47 @@
 
 @section('body-class', 'gradient-bg relative')
 
-@section('footer-class', 'fixed bottom-4 w-full text-center text-sm text-white/60')
-
 @section('content')
-    <div class="flex-grow flex items-center justify-center p-4">
+    <div class="flex-grow flex items-center justify-center p-4 relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="blob top-[-100px] left-[-100px]"></div>
+        <div class="blob-2"></div>
 
-        <div
-            class="w-full max-w-sm bg-card_purple p-8 rounded-xl shadow-2xl transition duration-500 hover:shadow-card_purple/70 transform text-light">
+        <div class="w-full max-w-sm glass p-8 rounded-3xl shadow-2xl transition-all duration-700 animate-reveal border border-white/20 relative z-10 backdrop-blur-xl">
 
-            <div class="text-center mb-6">
-                <h1 class="text-4xl font-extrabold tracking-wider text-light mb-1">CEUB</h1>
-                <hr class="w-full border-t border-light/50 my-4" />
-                <h2 class="text-2xl font-bold text-button_accent mt-4">Smart Attendance</h2>
-                <p class="text-light font-semibold mb-4">Login - Aluno</p>
-                <hr class="w-full border-t border-light/50 my-4" />
+            <div class="text-center mb-8">
+                <div class="inline-block px-3 py-1 mb-3 rounded-full bg-white/10 border border-white/10 text-[10px] font-bold tracking-widest text-purple-300 uppercase">
+                    Portal do Aluno
+                </div>
+                <h1 class="text-4xl font-black tracking-tighter text-white mb-1 italic">CEUB</h1>
+                <h2 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-indigo-200">
+                    Smart Attendance
+                </h2>
+                <div class="h-0.5 w-12 bg-gradient-to-r from-purple-500 to-indigo-500 mx-auto my-4 rounded-full opacity-50"></div>
             </div>
 
-            <form method="POST" action="{{ route('login.aluno') }}" class="flex flex-col space-y-4">
+            <form method="POST" action="{{ route('login.aluno') }}" class="flex flex-col space-y-5">
                 @csrf
 
-                {{-- Exibe erros de validação (se houver) --}}
                 @error('ra_email_cpf')
-                    <div class="bg-red-600 text-light p-3 rounded-lg font-bold text-sm text-center">
+                    <div class="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-xl font-medium text-xs text-center animate-shake">
                         {{ $message }}
                     </div>
                 @enderror
 
-                {{-- 1. CAMPO MATRÍCULA --}}
-                <input type="text" name="ra_email_cpf" placeholder="Matrícula, RA, CPF ou E-Mail"
-                    class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-button_accent transition duration-200 text-gray-800 placeholder-gray-900"
-                    required value="{{ old('ra_email_cpf') }}" />
+                <div class="group">
+                    <input type="text" name="ra_email_cpf" placeholder="Matrícula, RA, CPF ou E-Mail"
+                        class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-300 text-white placeholder-white/30 text-sm group-hover:bg-white/10"
+                        required value="{{ old('ra_email_cpf') }}" />
+                </div>
 
-                {{-- 2. CAMPO SENHA --}}
-                <div class="relative w-full">
+                <div class="relative w-full group">
                     <input type="password" name="password" id="password" placeholder="Senha"
-                        class="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-button_accent transition duration-200 text-gray-800 pr-10 placeholder-gray-900"
+                        class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-300 text-white pr-12 placeholder-white/30 text-sm group-hover:bg-white/10"
                         required />
                     <button type="button" onclick="togglePassword()"
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-button_accent focus:outline-none">
+                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-white/30 hover:text-white transition-colors">
                         <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -49,29 +52,25 @@
                     </button>
                 </div>
 
-                {{-- Campo Lembrar de Mim (Checkbox) --}}
-                <label
-                    class="flex items-center space-x-2 text-light text-sm cursor-pointer hover:text-button_accent transition duration-200">
-                    <input type="checkbox" name="remember"
-                        class="form-checkbox text-button_accent rounded focus:ring-button_accent" />
-                    <span>Lembrar de mim por 30 dias</span>
+                <label class="flex items-center space-x-3 text-white/60 text-xs cursor-pointer hover:text-white transition duration-200 group">
+                    <input type="checkbox" name="remember" class="form-checkbox bg-white/5 border-white/20 text-purple-500 rounded-md focus:ring-purple-500/50 w-4 h-4" />
+                    <span class="font-medium">Permanecer conectado</span>
                 </label>
 
-                {{-- 3. BOTÃO DE SUBMISSÃO --}}
                 <button type="submit"
-                    class="mt-6 w-full p-3 bg-yellow-500 text-white font-bold rounded-full flex items-center justify-center space-x-2 
-                            shadow-lg hover:shadow-xl hover:bg-yellow-600 transition duration-300 transform hover:scale-[1.01] 
-                            focus:outline-none focus:ring-4 focus:ring-yellow-500/50">
-                    <span role="img" aria-label="login">
-                        🔐
-                    </span>
-                    <span>Acessar</span>
+                    class="mt-4 w-full p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-2xl flex items-center justify-center space-x-2 
+                            shadow-lg hover:shadow-purple-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 
+                            focus:outline-none ring-offset-2 ring-offset-[#1e1b4b] focus:ring-2 focus:ring-purple-500">
+                    <span class="text-lg">Acessar Sistema</span>
                 </button>
             </form>
 
-            <div class="mt-6 text-center">
-                <a href="{{ route('login_form') }}" class="text-light text-sm hover:text-button_accent transition">
-                    ← Voltar à seleção de perfil
+            <div class="mt-8 text-center">
+                <a href="{{ route('login_form') }}" class="text-white/40 text-xs hover:text-white transition-all inline-flex items-center space-x-2 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Trocar Perfil</span>
                 </a>
             </div>
 

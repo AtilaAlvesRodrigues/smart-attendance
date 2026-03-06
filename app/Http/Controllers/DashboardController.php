@@ -10,12 +10,31 @@ use App\Models\Materia;
 use App\Models\Presenca;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Cache;
+
 class DashboardController extends BaseController
 {
     public function professorIndex()
     {
         $professor = Auth::guard('professores')->user();
-        return view('professor.home', compact('professor'));
+        
+        $activeMateria = null;
+        $activeCode = null;
+
+        if ($professor) {
+            foreach ($professor->materias as $materia) {
+                $cacheKey = 'aula_materia_' . $materia->id . '_' . now()->format('Y-m-d');
+                $cacheData = Cache::get($cacheKey);
+
+                if (is_array($cacheData)) {
+                    $activeMateria = $materia;
+                    $activeCode = $cacheData['codigo'];
+                    break;
+                }
+            }
+        }
+
+        return view('professor.home', compact('professor', 'activeMateria', 'activeCode'));
     }
 
     public function alunoIndex()
