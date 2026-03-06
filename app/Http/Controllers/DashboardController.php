@@ -39,7 +39,26 @@ class DashboardController extends BaseController
 
     public function alunoIndex()
     {
-        $aluno = Auth::guard('alunos')->user();
+        $aluno = Auth::guard('alunos')->user()->load('materias');
+        
+        foreach ($aluno->materias as $materia) {
+            // Conta quantas aulas (códigos únicos) existiram para essa matéria até agora
+            $total_sessoes = Presenca::where('materia_id', $materia->id)
+                ->distinct('codigo_aula')
+                ->count('codigo_aula');
+            
+            // Conta as presenças do aluno
+            $presencas_aluno = Presenca::where('materia_id', $materia->id)
+                ->where('aluno_ra', $aluno->ra)
+                ->count();
+            
+            // Faltas = Total de sessões que ocorreram - presenças confirmadas
+            $materia->faltas = max(0, $total_sessoes - $presencas_aluno);
+            
+            // Limite de faltas (25% da carga horária total de aulas)
+            $materia->limite_faltas = floor(($materia->total_aulas ?? 0) * 0.25);
+        }
+
         return view('aluno.home', compact('aluno'));
     }
 
