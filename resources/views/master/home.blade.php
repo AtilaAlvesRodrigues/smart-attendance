@@ -48,21 +48,35 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-reveal [animation-delay:300ms]">
                 <div class="glass p-6 rounded-3xl border border-white/10 flex items-center gap-5 group hover:bg-white/5 transition-colors">
-                    <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">👨‍🏫</div>
+                    <div class="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                    </div>
                     <div>
                         <p class="text-3xl font-black text-white leading-none mb-1">{{ $professoresCount }}</p>
                         <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Professores</p>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-3xl border border-white/10 flex items-center gap-5 group hover:bg-white/5 transition-colors">
-                    <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🧑‍🎓</div>
+                    <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        </svg>
+                    </div>
                     <div>
                         <p class="text-3xl font-black text-white leading-none mb-1">{{ $alunosCount }}</p>
                         <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Alunos</p>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-3xl border border-white/10 flex items-center gap-5 group hover:bg-white/5 transition-colors">
-                    <div class="w-14 h-14 bg-teal-500/20 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">📚</div>
+                    <div class="w-14 h-14 bg-teal-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                    </div>
                     <div>
                         <p class="text-3xl font-black text-white leading-none mb-1">{{ $materiasCount }}</p>
                         <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Matérias</p>
@@ -74,16 +88,32 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 animate-reveal [animation-delay:400ms]">
 
                 <!-- Professores -->
-                <a href="{{ route('master.professores') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-blue-400/30 transition-all group relative overflow-hidden">
-                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-blue-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <a href="{{ route('master.professores') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-indigo-400/30 transition-all group relative overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    
+                    <div class="relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                    </div>
+
                     <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Professores</h3>
                     <p class="text-white/40 text-sm leading-relaxed mb-6">Visualizar, pesquisar e gerenciar docentes do sistema.</p>
-                    <span class="text-blue-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
+                    <span class="text-indigo-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
                 </a>
 
                 <!-- Alunos -->
                 <a href="{{ route('master.alunos') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-purple-400/30 transition-all group relative overflow-hidden">
                     <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    
+                    <div class="relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        </svg>
+                    </div>
+
                     <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Alunos</h3>
                     <p class="text-white/40 text-sm leading-relaxed mb-6">Gerencie matriculas e acesso dos estudantes.</p>
                     <span class="text-purple-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
@@ -92,6 +122,13 @@
                 <!-- Matérias -->
                 <a href="{{ route('master.materias') }}" class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-teal-400/30 transition-all group relative overflow-hidden">
                     <div class="absolute -top-12 -right-12 w-32 h-32 bg-teal-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    
+                    <div class="relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                    </div>
+
                     <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Matérias</h3>
                     <p class="text-white/40 text-sm leading-relaxed mb-6">Configure as disciplinas e vínculos curriculares.</p>
                     <span class="text-teal-400 font-bold group-hover:gap-2 flex items-center gap-1 transition-all">Explorar →</span>
@@ -116,8 +153,10 @@
                         </span>
                     </div>
                     
-                    <div class="w-24 h-24 bg-orange-600/20 rounded-3xl flex items-center justify-center text-4xl group-hover:rotate-12 transition-transform shadow-2xl shadow-orange-600/20">
-                        📱
+                    <div class="w-24 h-24 bg-orange-600/20 rounded-3xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-2xl shadow-orange-600/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
                     </div>
                 </div>
             </a>

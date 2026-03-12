@@ -93,17 +93,17 @@
     </div>
 
     <!-- Info Modal -->
-    <div id="info-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 transform transition-all scale-95" id="modal-content-container">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-6">
-                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800">Detalhes</h3>
-                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none transition">
+    <div id="info-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center backdrop-blur-md transition-opacity duration-300 p-4">
+        <div class="glass rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 border border-white/10" id="modal-content-container">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
+                    <h3 id="modal-title" class="text-xs font-black text-white/40 uppercase tracking-[0.3em]">Detalhes</h3>
+                    <button onclick="closeModal()" class="text-white/20 hover:text-white transition-colors">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
                 
-                <div id="modal-body" class="space-y-4">
+                <div id="modal-body" class="space-y-6">
                 <!-- Dynamic Content -->
                 </div>
             </div>
