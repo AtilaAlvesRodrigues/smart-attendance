@@ -1,8 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Gerenciar Matérias - Master')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('no-nav')
 
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
@@ -15,18 +16,18 @@
         <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-teal-500/50 hover:scale-110 transition-transform">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-white font-black text-sm hover:border-white/30 transition">
                         M
                     </a>
                     <div>
                         <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">GERENCIAR DISCIPLINAS</h1>
-                        <a href="{{ route('dashboard.master') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
+                        <a href="{{ route('dashboard.master') }}" class="text-xs font-bold text-white/70 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
                     </div>
                 </div>
 
                 <div class="hidden md:block">
                     <input type="text" id="search-materias" placeholder="Pesquisar por nome ou sala..." 
-                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all w-64 backdrop-blur-md">
+                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs font-medium focus:outline-none focus:ring-1 focus:ring-white/30 transition-all w-64">
                 </div>
             </div>
         </nav>
@@ -35,7 +36,7 @@
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
                 <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Grade Curricular</h2>
-                <p class="text-white/40 font-medium">Configuração de horários, salas e vínculos acadêmicos.</p>
+                <p class="text-white/70 font-medium">Configuração de horários, salas e vínculos acadêmicos.</p>
             </div>
 
             <!-- Matérias Section -->
@@ -43,7 +44,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                            <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
                                 <th class="py-4 px-6">Disciplina</th>
                                 <th class="py-4 px-6 text-center">Matutino</th>
                                 <th class="py-4 px-6 text-center">Vespertino</th>
@@ -58,8 +59,8 @@
                                 <td class="py-4 px-6">
                                     <span class="block font-bold text-white tracking-tight group-hover:text-teal-300 transition-colors">{{ $materia->nome }}</span>
                                     <div class="flex gap-2 mt-1">
-                                        <span class="text-[9px] text-white/30 font-black uppercase tracking-widest">{{ $materia->sala }}</span>
-                                        <span class="text-[9px] text-white/20 font-black uppercase tracking-widest">• {{ $materia->carga_horaria }}h</span>
+                                        <span class="text-[9px] text-white/80 font-black uppercase tracking-widest">{{ $materia->sala }}</span>
+                                        <span class="text-[9px] text-white/70 font-black uppercase tracking-widest">• {{ $materia->carga_horaria }}h</span>
                                     </div>
                                 </td>
                                 <td class="py-4 px-6 text-center">
@@ -88,9 +89,9 @@
                 </div>
 
                 @if($materias->isEmpty())
-                    <div id="materias-empty" class="py-20 text-center text-white/20 italic font-medium">Nenhuma disciplina encontrada.</div>
+                    <div id="materias-empty" class="py-20 text-center text-white/70 italic font-medium">Nenhuma disciplina encontrada.</div>
                 @else
-                    <div id="materias-empty" class="hidden py-20 text-center text-white/20 italic font-medium">Nenhuma disciplina encontrada.</div>
+                    <div id="materias-empty" class="hidden py-20 text-center text-white/70 italic font-medium">Nenhuma disciplina encontrada.</div>
                 @endif
                 
                 <div class="px-8 py-6 border-t border-white/5 bg-white/5">
@@ -105,8 +106,8 @@
         <div class="glass rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 border border-white/10" id="modal-content-container">
             <div class="p-8">
                 <div class="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
-                    <h3 id="modal-title" class="text-xs font-black text-white/40 uppercase tracking-[0.3em]">Detalhes</h3>
-                    <button onclick="closeModal()" class="text-white/20 hover:text-white transition-colors">
+                    <h3 id="modal-title" class="text-xs font-black text-white/70 uppercase tracking-[0.3em]">Detalhes</h3>
+                    <button onclick="closeModal()" class="text-white/70 hover:text-white transition-colors">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
@@ -163,8 +164,8 @@
                     <td class="py-4 px-6">
                         <span class="block font-bold text-white tracking-tight group-hover:text-teal-300 transition-colors">${esc(materia.nome)}</span>
                         <div class="flex gap-2 mt-1">
-                            <span class="text-[9px] text-white/30 font-black uppercase tracking-widest">${esc(materia.sala || '')}</span>
-                            <span class="text-[9px] text-white/20 font-black uppercase tracking-widest">• ${esc(materia.carga_horaria)}h</span>
+                            <span class="text-[9px] text-white/80 font-black uppercase tracking-widest">${esc(materia.sala || '')}</span>
+                            <span class="text-[9px] text-white/70 font-black uppercase tracking-widest">• ${esc(materia.carga_horaria)}h</span>
                         </div>
                     </td>
                     <td class="py-4 px-6 text-center">

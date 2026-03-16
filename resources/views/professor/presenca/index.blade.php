@@ -1,8 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Selecionar Matéria - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('no-nav')
 
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
@@ -32,14 +33,14 @@
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
                 <h2 class="text-4xl font-black text-white tracking-tighter mb-2 italic">Selecione a Disciplina</h2>
-                <p class="text-white/40 font-medium tracking-tight">Escolha qual matéria você irá registrar presença hoje.</p>
+                <p class="text-white/70 font-medium tracking-tight">Escolha qual matéria você irá registrar presença hoje.</p>
             </div>
 
             @if($materias->isEmpty())
                 <div class="glass p-10 rounded-3xl border border-yellow-500/30 text-center animate-reveal [animation-delay:400ms]">
                     <div class="text-5xl mb-6">🏜️</div>
                     <h3 class="text-2xl font-black text-white mb-2">Sem Matérias</h3>
-                    <p class="text-white/40">Você ainda não possui turmas vinculadas ao seu perfil.</p>
+                    <p class="text-white/70">Você ainda não possui turmas vinculadas ao seu perfil.</p>
                 </div>
             @else
                 @php $hasActiveCode = $materias->contains(fn($m) => $m->active_code); @endphp
@@ -56,7 +57,7 @@
                                 <div>
                                     <h3 class="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-purple-300 transition-colors">{{ $materia->nome }}</h3>
                                     <div class="mt-3 flex items-center gap-2">
-                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-white/50 tracking-widest uppercase">
+                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs font-black text-white/80 tracking-widest uppercase">
                                             {{ $materia->horario_matutino ? '☀️ Matutino' : ($materia->horario_noturno ? '🌙 Noturno' : '⛅ Vespertino') }}
                                         </span>
                                     </div>
@@ -79,7 +80,7 @@
                             @else
                                 @if($hasActiveCode)
                                     <button onclick="mostrarPopup('{{ $materia->nome }}')"
-                                       class="block w-full bg-white/5 border border-white/10 text-white/20 text-center py-4 rounded-xl font-black text-lg cursor-not-allowed">
+                                       class="block w-full bg-white/5 border border-white/10 text-white/70 text-center py-4 rounded-xl font-black text-lg cursor-not-allowed">
                                         Indisponível (Conflito)
                                     </button>
                                 @else
@@ -107,7 +108,7 @@
             </div>
             
             <h2 class="text-3xl font-black text-white tracking-tighter mb-4 italic">Conflito Ativo</h2>
-            <p class="text-white/40 leading-relaxed mb-6 font-medium">
+            <p class="text-white/70 leading-relaxed mb-6 font-medium">
                 Você já possui um QR Code de frequência ativo para outra disciplina no sistema.
             </p>
             

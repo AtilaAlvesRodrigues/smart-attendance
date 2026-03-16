@@ -1,109 +1,236 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
-@section('title', 'Seleção de Perfil - Smart Attendance')
-
-@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('title', 'Smart Attendance — Presença Inteligente')
 
 @section('content')
-    <div class="flex-grow flex items-center justify-center p-4 relative overflow-hidden">
-        
-        <!-- Animated Background Elements -->
-        <div class="blob top-[-100px] left-[-100px]"></div>
-        <div class="blob-2"></div>
-        <div class="absolute top-[20%] right-[10%] w-32 h-32 bg-purple-400/20 blur-3xl rounded-full animate-pulse"></div>
 
-        <div class="w-full max-w-2xl glass p-10 rounded-3xl shadow-2xl transition-all duration-700 
-                    border border-white/20 relative z-10 backdrop-blur-xl animate-reveal">
-
-            <div class="text-center mb-12 animate-fade-in [animation-delay:200ms]">
-                <div class="inline-block px-4 py-1.5 mb-4 rounded-full bg-white/10 border border-white/10 text-xs font-bold tracking-widest text-purple-300 uppercase">
-                    Sistema de Presença Inteligente
-                </div>
-                <h1 class="text-5xl font-black tracking-tighter text-white mb-2 italic">CEUB</h1>
-                <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-indigo-200">
-                    Smart Attendance
-                </h2>
-                <div class="h-1 w-24 bg-gradient-to-r from-purple-500 to-indigo-500 mx-auto my-6 rounded-full opacity-50"></div>
-                <p class="text-white/80 font-medium text-lg">Selecione seu perfil para continuar</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
-
-                {{-- Card de ALUNO --}}
-                <a href="{{ route('login.aluno.form') }}"
-                    class="tilt-card group relative flex flex-col items-center justify-center p-8 bg-white/5 rounded-2xl 
-                           border border-white/10 hover:border-purple-400/50 transition-all duration-500 
-                           hover:bg-white/10 cursor-pointer overflow-hidden text-center">
-                    
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                    <div class="relative z-10 mb-6 transition-transform duration-500 group-hover:scale-110">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                        </svg>
-                    </div>
-                    <h3 class="relative z-10 text-2xl font-black text-white tracking-tight">ALUNO</h3>
-                    <p class="relative z-10 text-sm text-purple-200/60 font-medium mt-1">Acesso Estudantil</p>
-                </a>
-
-                {{-- Card de PROFESSOR --}}
-                <a href="{{ route('login.professor.form') }}"
-                    class="tilt-card group relative flex flex-col items-center justify-center p-8 bg-white/5 rounded-2xl 
-                           border border-white/10 hover:border-indigo-400/50 transition-all duration-500 
-                           hover:bg-white/10 cursor-pointer overflow-hidden text-center">
-                    
-                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                    <div class="relative z-10 mb-6 transition-transform duration-500 group-hover:scale-110">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                        </svg>
-                    </div>
-                    <h3 class="relative z-10 text-2xl font-black text-white tracking-tight">PROFESSOR</h3>
-                    <p class="relative z-10 text-sm text-indigo-200/60 font-medium mt-1">Painel Docente</p>
-                </a>
-            </div>
-
-            <p class="text-center text-xs text-white/40 mt-10 font-medium tracking-wide">
-                © {{ date('Y') }} Smart Attendance. Todos os direitos reservados.
+{{-- ===== HERO SECTION ===== --}}
+<section id="hero" class="pal-hero">
+    <div class="pal-container">
+        <div class="pal-hero-content">
+            <p class="pal-overline">Sistema de Presença Inteligente</p>
+            <h1 class="pal-hero-title">
+                Controle de<br>
+                Presença<br>
+                <em>para Todos.</em>
+            </h1>
+            <p class="pal-hero-sub">
+                Automatize o registro de frequência com QR Code dinâmico. Simples para o aluno. Poderoso para o docente.
             </p>
-
+            <div class="pal-hero-actions">
+                <a href="{{ route('login.aluno.form') }}" class="pal-btn-primary">Entrar como Aluno</a>
+                <a href="{{ route('login.professor.form') }}" class="pal-btn-outline">Entrar como Professor</a>
+            </div>
+        </div>
+        <div class="pal-hero-visual">
+            <div class="pal-qr-mock">
+                <div class="pal-qr-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" width="120" height="120">
+                        <!-- QR Code mock pattern -->
+                        <rect x="10" y="10" width="30" height="30" rx="2" fill="white"/>
+                        <rect x="15" y="15" width="20" height="20" rx="1" fill="#0d0d0d"/>
+                        <rect x="18" y="18" width="14" height="14" rx="1" fill="white"/>
+                        <rect x="60" y="10" width="30" height="30" rx="2" fill="white"/>
+                        <rect x="65" y="15" width="20" height="20" rx="1" fill="#0d0d0d"/>
+                        <rect x="68" y="18" width="14" height="14" rx="1" fill="white"/>
+                        <rect x="10" y="60" width="30" height="30" rx="2" fill="white"/>
+                        <rect x="15" y="65" width="20" height="20" rx="1" fill="#0d0d0d"/>
+                        <rect x="18" y="68" width="14" height="14" rx="1" fill="white"/>
+                        <!-- Data dots -->
+                        <rect x="48" y="10" width="6" height="6" fill="white"/>
+                        <rect x="56" y="10" width="6" height="6" fill="white"/>
+                        <rect x="44" y="18" width="6" height="6" fill="white"/>
+                        <rect x="52" y="18" width="6" height="6" fill="white"/>
+                        <rect x="44" y="26" width="6" height="6" fill="white"/>
+                        <rect x="56" y="26" width="6" height="6" fill="white"/>
+                        <rect x="48" y="34" width="6" height="6" fill="white"/>
+                        <rect x="10" y="44" width="6" height="6" fill="white"/>
+                        <rect x="18" y="44" width="6" height="6" fill="white"/>
+                        <rect x="26" y="44" width="6" height="6" fill="white"/>
+                        <rect x="34" y="44" width="6" height="6" fill="white"/>
+                        <rect x="42" y="44" width="6" height="6" fill="white"/>
+                        <rect x="50" y="44" width="6" height="6" fill="white"/>
+                        <rect x="58" y="44" width="6" height="6" fill="white"/>
+                        <rect x="66" y="44" width="6" height="6" fill="white"/>
+                        <rect x="74" y="44" width="6" height="6" fill="white"/>
+                        <rect x="82" y="44" width="6" height="6" fill="white"/>
+                        <rect x="44" y="52" width="6" height="6" fill="white"/>
+                        <rect x="52" y="52" width="6" height="6" fill="white"/>
+                        <rect x="60" y="52" width="6" height="6" fill="white"/>
+                        <rect x="68" y="52" width="6" height="6" fill="white"/>
+                        <rect x="76" y="52" width="6" height="6" fill="white"/>
+                        <rect x="44" y="60" width="6" height="6" fill="white"/>
+                        <rect x="60" y="60" width="6" height="6" fill="white"/>
+                        <rect x="76" y="60" width="6" height="6" fill="white"/>
+                        <rect x="52" y="68" width="6" height="6" fill="white"/>
+                        <rect x="60" y="68" width="6" height="6" fill="white"/>
+                        <rect x="68" y="68" width="6" height="6" fill="white"/>
+                        <rect x="44" y="76" width="6" height="6" fill="white"/>
+                        <rect x="52" y="76" width="6" height="6" fill="white"/>
+                        <rect x="68" y="76" width="6" height="6" fill="white"/>
+                        <rect x="76" y="76" width="6" height="6" fill="white"/>
+                        <rect x="60" y="84" width="6" height="6" fill="white"/>
+                        <rect x="76" y="84" width="6" height="6" fill="white"/>
+                    </svg>
+                    <p class="pal-qr-label">QR CODE DINÂMICO</p>
+                    <p class="pal-qr-sub">Escaneie para confirmar presença</p>
+                </div>
+            </div>
         </div>
     </div>
-@endsection
+    <div class="pal-hero-scroll-hint">
+        <span>↓</span>
+        <span>Como funciona</span>
+    </div>
+</section>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const cards = document.querySelectorAll('.tilt-card');
-        
-        cards.forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (y - centerY) / 8;
-                const rotateY = (centerX - x) / 8;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            });
-        });
-    });
-</script>
-<style>
-    .tilt-card {
-        transform-style: preserve-3d;
-        will-change: transform;
-    }
-</style>
-@endpush
+{{-- ===== MARQUEE STRIP ===== --}}
+<div class="pal-marquee-strip">
+    <div class="pal-marquee-track">
+        <span>SMART ATTENDANCE</span>
+        <span class="pal-sep">✦</span>
+        <span>QR CODE</span>
+        <span class="pal-sep">✦</span>
+        <span>FREQUÊNCIA INTELIGENTE</span>
+        <span class="pal-sep">✦</span>
+        <span>CEUB</span>
+        <span class="pal-sep">✦</span>
+        <span>SMART ATTENDANCE</span>
+        <span class="pal-sep">✦</span>
+        <span>QR CODE</span>
+        <span class="pal-sep">✦</span>
+        <span>FREQUÊNCIA INTELIGENTE</span>
+        <span class="pal-sep">✦</span>
+        <span>CEUB</span>
+        <span class="pal-sep">✦</span>
+        <span>SMART ATTENDANCE</span>
+        <span class="pal-sep">✦</span>
+        <span>QR CODE</span>
+        <span class="pal-sep">✦</span>
+        <span>FREQUÊNCIA INTELIGENTE</span>
+        <span class="pal-sep">✦</span>
+        <span>CEUB</span>
+        <span class="pal-sep">✦</span>
+    </div>
+</div>
+
+{{-- ===== STATEMENT SECTION ===== --}}
+<section id="statement" class="pal-statement-section">
+    <div class="pal-container">
+        <p class="pal-statement-text">
+            Nosso sistema registra presença em tempo real, reduz fraudes e mantém os professores focados no que importa — ensinar.
+        </p>
+    </div>
+</section>
+
+{{-- ===== HOW IT WORKS (Palantir product listing style) ===== --}}
+<section id="how-it-works" class="pal-products-section">
+    <div class="pal-container">
+        <div class="pal-products-header">
+            <p class="pal-tag">COMO FUNCIONA</p>
+        </div>
+
+        <div class="pal-product-item">
+            <div class="pal-product-number">/0.1</div>
+            <div class="pal-product-body">
+                <h2 class="pal-product-title">Acesso Rápido</h2>
+                <p class="pal-product-desc">O aluno acessa o Smart Attendance utilizando seu <strong>RA, e-mail institucional ou CPF</strong> de forma segura, sem necessidade de senha complexa.</p>
+                <a href="{{ route('login.aluno.form') }}" class="pal-product-link">Entrar agora →</a>
+            </div>
+        </div>
+
+        <div class="pal-product-item">
+            <div class="pal-product-number">/0.2</div>
+            <div class="pal-product-body">
+                <h2 class="pal-product-title">QR Code Dinâmico</h2>
+                <p class="pal-product-desc">O professor gera um <strong>QR Code exclusivo</strong> por aula, com validade configurável. O código muda a cada sessão para evitar compartilhamento.</p>
+                <a href="{{ route('login.professor.form') }}" class="pal-product-link">Painel do professor →</a>
+            </div>
+        </div>
+
+        <div class="pal-product-item">
+            <div class="pal-product-number">/0.3</div>
+            <div class="pal-product-body">
+                <h2 class="pal-product-title">Confirmação Instantânea</h2>
+                <p class="pal-product-desc">O aluno escaneia o QR Code com a câmera do celular e recebe a <strong>confirmação instantânea de presença</strong>. Sem formulários, sem burocracia.</p>
+            </div>
+        </div>
+
+        <div class="pal-product-item">
+            <div class="pal-product-number">/0.4</div>
+            <div class="pal-product-body">
+                <h2 class="pal-product-title">Relatórios em Tempo Real</h2>
+                <p class="pal-product-desc">Professores e administradores visualizam <strong>relatórios completos de frequência</strong> com filtros por aluno, matéria e período, com alertas de limite de faltas.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ===== PROFILE SELECTION (Light section) ===== --}}
+<section id="perfis" class="pal-light-section">
+    <div class="pal-container">
+        <div class="pal-section-top">
+            <p class="pal-tag pal-tag-dark">SELECIONE SEU PERFIL</p>
+            <h2 class="pal-section-title-dark">Quem é você?</h2>
+        </div>
+        <div class="pal-profiles-grid">
+            <a href="{{ route('login.aluno.form') }}" class="pal-profile-card">
+                <div class="pal-profile-number">01</div>
+                <div class="pal-profile-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
+                </div>
+                <h3 class="pal-profile-title">ALUNO</h3>
+                <p class="pal-profile-sub">Confirme sua presença via QR Code. Acompanhe suas faltas em tempo real.</p>
+                <span class="pal-profile-cta">Acessar →</span>
+            </a>
+            <a href="{{ route('login.professor.form') }}" class="pal-profile-card">
+                <div class="pal-profile-number">02</div>
+                <div class="pal-profile-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 21V9"/>
+                    </svg>
+                </div>
+                <h3 class="pal-profile-title">PROFESSOR</h3>
+                <p class="pal-profile-sub">Gere QR Codes, gerencie chamadas e visualize relatórios de frequência.</p>
+                <span class="pal-profile-cta">Acessar →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- ===== STATS SECTION ===== --}}
+<section class="pal-stats-section">
+    <div class="pal-container">
+        <div class="pal-stats-grid">
+            <div class="pal-stat">
+                <span class="pal-stat-number">< 3s</span>
+                <span class="pal-stat-label">Para confirmar presença</span>
+            </div>
+            <div class="pal-stat">
+                <span class="pal-stat-number">100%</span>
+                <span class="pal-stat-label">Sem papel, sem caneta</span>
+            </div>
+            <div class="pal-stat">
+                <span class="pal-stat-number">Real-time</span>
+                <span class="pal-stat-label">Relatórios instantâneos</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ===== FOOTER CTA ===== --}}
+<section class="pal-footer-cta">
+    <div class="pal-container">
+        <h2 class="pal-cta-title">Pronto para começar?</h2>
+        <div class="pal-cta-actions">
+            <a href="{{ route('login.aluno.form') }}" class="pal-btn-primary">Sou Aluno</a>
+            <a href="{{ route('login.professor.form') }}" class="pal-btn-outline">Sou Professor</a>
+        </div>
+    </div>
+</section>
+
+@endsection

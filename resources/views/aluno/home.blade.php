@@ -1,211 +1,148 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
-@section('title', 'Como Funciona? - Smart Attendance')
+@section('title', 'Painel do Aluno - Smart Attendance')
 
 @section('body-class', 'gradient-bg')
-
-@section('footer-class', 'py-6 text-center text-sm text-white/60')
+@section('no-nav')
 
 @section('content')
-    <div class="flex-grow flex flex-col items-center p-6 relative overflow-hidden">
-        
-        <!-- Profile Button -->
-        <button id="open-profile" class="fixed top-8 right-8 z-50 w-14 h-14 glass rounded-2xl flex items-center justify-center border border-white/20 shadow-xl hover:scale-110 active:scale-95 transition-all group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white group-hover:text-purple-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <div class="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 rounded-full border-2 border-indigo-900 animate-pulse"></div>
-        </button>
+<div style="min-height:100vh; display:flex; flex-direction:column;">
 
-        <!-- Profile Modal -->
-        <div id="profile-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="close-modal-overlay"></div>
-            
-            <div class="glass w-full max-w-2xl rounded-3xl border border-white/20 shadow-2xl relative z-10 overflow-hidden animate-reveal">
-                <!-- Modal Header -->
-                <div class="p-8 border-b border-white/10 flex justify-between items-center bg-white/5">
-                    <div>
-                        <h2 class="text-3xl font-black text-white italic tracking-tighter">Meu Perfil</h2>
-                        <p class="text-purple-300 text-xs font-bold uppercase tracking-widest mt-1">Informações Acadêmicas</p>
-                    </div>
-                    <button id="close-profile" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-red-500/20 hover:text-red-400 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-8 max-h-[70vh] overflow-y-auto">
-                    <!-- Personal Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <span class="text-white/40 text-[10px] font-bold uppercase tracking-widest block mb-1">Nome Completo</span>
-                            <span class="text-white font-bold">{{ $aluno->nome }}</span>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <span class="text-white/40 text-[10px] font-bold uppercase tracking-widest block mb-1">E-mail Institucional</span>
-                            <span class="text-white font-bold">{{ $aluno->email }}</span>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <span class="text-white/40 text-[10px] font-bold uppercase tracking-widest block mb-1">Matrícula (RA)</span>
-                            <span class="text-white font-mono font-bold">{{ $aluno->ra }}</span>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <span class="text-white/40 text-[10px] font-bold uppercase tracking-widest block mb-1">CPF</span>
-                            <span class="text-white font-mono font-bold">{{ $aluno->cpf }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Subjects & Absences -->
-                    <div>
-                        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                            <span class="w-2 h-8 bg-purple-500 rounded-full"></span>
-                            Matérias e Frequência
-                        </h3>
-                        
-                        <div class="space-y-4">
-                            @forelse($aluno->materias as $materia)
-                                <div class="glass bg-white/5 p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group">
-                                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div class="flex-grow">
-                                            <h4 class="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">{{ $materia->nome }}</h4>
-                                            <p class="text-white/40 text-xs mt-1">Carga Horária: {{ $materia->carga_horaria }}h | Total de Aulas: {{ $materia->total_aulas }}</p>
-                                        </div>
-                                        
-                                        <div class="flex items-center gap-4">
-                                            <div class="text-right">
-                                                <span class="block text-white font-black text-2xl {{ $materia->faltas >= $materia->limite_faltas ? 'text-red-400' : 'text-green-400' }}">
-                                                    {{ $materia->faltas }}
-                                                </span>
-                                                <span class="text-[10px] font-bold text-white/40 uppercase tracking-tighter">Faltas Atuais</span>
-                                            </div>
-                                            
-                                            <div class="w-px h-10 bg-white/10"></div>
-                                            
-                                            <div class="text-right">
-                                                <span class="block text-white/80 font-bold text-lg">
-                                                    {{ $materia->limite_faltas }}
-                                                </span>
-                                                <span class="text-[10px] font-bold text-white/40 uppercase tracking-tighter">Limite Permitido</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Progress Bar -->
-                                    <div class="mt-4 h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                        @php
-                                            $percent = $materia->limite_faltas > 0 ? ($materia->faltas / $materia->limite_faltas) * 100 : 0;
-                                            $percent = min(100, $percent);
-                                            $barColor = $percent > 80 ? 'bg-red-500' : ($percent > 50 ? 'bg-yellow-500' : 'bg-green-500');
-                                        @endphp
-                                        <div class="{{ $barColor }} h-full transition-all duration-1000" style="width: {{ $percent }}%"></div>
-                                    </div>
-                                    @if($materia->faltas >= $materia->limite_faltas)
-                                        <p class="text-red-400 text-[10px] font-black uppercase mt-2 animate-pulse">⚠️ ALERTA: LIMITE DE FALTAS ATINGIDO OU EXCEDIDO</p>
-                                    @endif
-                                </div>
-                            @empty
-                                <div class="text-center py-10 glass rounded-3xl border border-dashed border-white/20">
-                                    <p class="text-white/40 font-medium">Você ainda não possui matérias vinculadas.</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
+    {{-- Top Nav --}}
+    <nav style="position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:60px; background:rgba(13,13,13,0.95); border-bottom:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(12px);">
+        <a href="{{ url('/') }}" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:0.85rem; letter-spacing:0.1em; color:#efefef; text-decoration:none; text-transform:uppercase;">Smart<span style="color:#777;">Attendance</span></a>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="text-align:right;">
+                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#777; margin:0;">Aluno</p>
+                <p style="font-size:0.8rem; font-weight:600; color:#efefef; margin:0;">{{ $aluno->nome ?? 'Estudante' }}</p>
             </div>
+            <button id="open-profile" style="width:36px; height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#888; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#888'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </button>
+            <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                @csrf
+                <button type="submit" style="font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.04em; padding:0.4rem 0.9rem; background:transparent; color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:3px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='#ef4444'; this.style.color='#ef4444'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.7)'">Sair</button>
+            </form>
         </div>
+    </nav>
 
-        <!-- Background Elements -->
-        <div class="blob top-[-100px] left-[-100px]"></div>
-        <div class="blob-2"></div>
-        <div class="w-full max-w-4xl relative z-10 animate-reveal">
-            
-            @if(session('pending_attendance_code'))
-                <div class="glass p-8 rounded-3xl mb-12 border-2 border-green-500/30 overflow-hidden relative group">
-                    <div class="absolute inset-0 bg-green-500/10 opacity-50"></div>
-                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center text-3xl animate-bounce">
-                                ✅
+    {{-- Profile Modal --}}
+    <div id="profile-modal" style="display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; padding:1rem;">
+        <div id="close-modal-overlay" style="position:absolute; inset:0; background:rgba(0,0,0,0.7);"></div>
+        <div style="position:relative; z-index:10; width:100%; max-width:640px; background:#111; border:1px solid rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; max-height:85vh; overflow-y:auto;">
+            <div style="padding:1.75rem 2rem; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.3rem;">Registro Acadêmico</p>
+                    <h2 style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; color:#efefef; margin:0;">Meu Perfil</h2>
+                </div>
+                <button id="close-profile" style="width:32px; height:32px; background:transparent; border:1px solid rgba(255,255,255,0.1); border-radius:3px; color:#888; cursor:pointer; display:flex; align-items:center; justify-content:center;" onmouseover="this.style.borderColor='#ef4444'; this.style.color='#ef4444'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#888'">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="padding:2rem;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+                    @foreach([['Nome Completo', $aluno->nome], ['E-mail', $aluno->email], ['Matrícula (RA)', $aluno->ra], ['CPF', $aluno->cpf]] as $field)
+                    <div style="background:#0d0d0d; border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:1rem;">
+                        <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#777; margin:0 0 0.4rem;">{{ $field[0] }}</p>
+                        <p style="font-size:0.88rem; font-weight:600; color:#efefef; margin:0; word-break:break-all;">{{ $field[1] }}</p>
+                    </div>
+                    @endforeach
+                </div>
+
+                <hr style="border:none; border-top:1px solid rgba(255,255,255,0.06); margin-bottom:1.5rem;">
+                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 1rem;">Matérias e Frequência</p>
+
+                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                    @forelse($aluno->materias as $materia)
+                    @php
+                        $percent = $materia->limite_faltas > 0 ? ($materia->faltas / $materia->limite_faltas) * 100 : 0;
+                        $percent = min(100, $percent);
+                        $barColor = $percent > 80 ? '#ef4444' : ($percent > 50 ? '#eab308' : '#22c55e');
+                    @endphp
+                    <div style="background:#0d0d0d; border:1px solid rgba(255,255,255,0.06); border-radius:3px; padding:1.25rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+                            <div>
+                                <p style="font-size:0.9rem; font-weight:700; color:#efefef; margin:0 0 0.2rem;">{{ $materia->nome }}</p>
+                                <p style="font-size:0.72rem; color:#999; margin:0;">{{ $materia->carga_horaria }}h · {{ $materia->total_aulas }} aulas</p>
                             </div>
-                            <div class="text-center md:text-left">
-                                <h2 class="text-2xl font-black text-white tracking-tight">Presença Pendente!</h2>
-                                <p class="text-green-200/80 font-medium">Você tem uma aula aguardando confirmação.</p>
+                            <div style="text-align:right;">
+                                <span style="font-size:1.4rem; font-weight:900; color:{{ $materia->faltas >= $materia->limite_faltas ? '#ef4444' : '#efefef' }};">{{ $materia->faltas }}</span>
+                                <span style="font-size:0.72rem; color:#999;"> / {{ $materia->limite_faltas }} faltas</span>
                             </div>
                         </div>
-                        <a href="{{ route('presenca.confirmar', session('pending_attendance_code')) }}"
-                            class="bg-green-500 hover:bg-green-400 text-white font-black px-8 py-4 rounded-2xl shadow-lg shadow-green-500/20 transition-all hover:scale-105 active:scale-95 whitespace-nowrap">
-                            Confirmar Agora
-                        </a>
+                        <div style="height:3px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;">
+                            <div style="height:100%; width:{{ $percent }}%; background:{{ $barColor }}; transition:width 1s ease;"></div>
+                        </div>
+                        @if($materia->faltas >= $materia->limite_faltas)
+                        <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#ef4444; margin:0.5rem 0 0;">⚠ Limite de faltas atingido</p>
+                        @endif
                     </div>
+                    @empty
+                    <div style="text-align:center; padding:2rem; border:1px dashed rgba(255,255,255,0.08); border-radius:3px;">
+                        <p style="color:#777; font-size:0.85rem; margin:0;">Nenhuma matéria vinculada.</p>
+                    </div>
+                    @endforelse
                 </div>
-            @endif
-
-            <div class="text-center mb-16">
-                <div class="inline-block px-4 py-1.5 mb-4 rounded-full bg-white/10 border border-white/10 text-xs font-bold tracking-widest text-purple-300 uppercase">
-                    Guia de Utilização
-                </div>
-                <h1 class="text-5xl font-black tracking-tighter text-white mb-4 italic">Como funciona?</h1>
-                <div class="h-1 w-24 bg-gradient-to-r from-purple-500 to-indigo-500 mx-auto rounded-full opacity-50"></div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                
-                <!-- Passo 1 -->
-                <div class="glass p-8 rounded-3xl border border-white/10 hover:border-purple-400/30 transition-all group">
-                    <div class="w-14 h-14 bg-purple-600/20 rounded-2xl flex items-center justify-center text-2xl font-black text-purple-400 mb-6 group-hover:scale-110 transition-transform">
-                        01
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3 tracking-tight">Acesso Rápido</h3>
-                    <p class="text-white/60 text-sm leading-relaxed">
-                        O Aluno acessa o Smart Attendance utilizando seu <span class="text-purple-300 font-bold">RA, e-mail institucional ou CPF</span> de forma segura.
-                    </p>
-                </div>
-
-                <!-- Passo 2 -->
-                <div class="glass p-8 rounded-3xl border border-white/10 hover:border-indigo-400/30 transition-all group">
-                    <div class="w-14 h-14 bg-indigo-600/20 rounded-2xl flex items-center justify-center text-2xl font-black text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
-                        02
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3 tracking-tight">QR Code Dinâmico</h3>
-                    <p class="text-white/60 text-sm leading-relaxed">
-                        Localize o <span class="text-indigo-300 font-bold">QR Code</span> projetado pelo professor ou exibido no dispositivo do docente durante a aula.
-                    </p>
-                </div>
-
-                <!-- Passo 3 -->
-                <div class="glass p-8 rounded-3xl border border-white/10 hover:border-fuchsia-400/30 transition-all group">
-                    <div class="w-14 h-14 bg-fuchsia-600/20 rounded-2xl flex items-center justify-center text-2xl font-black text-fuchsia-400 mb-6 group-hover:scale-110 transition-transform">
-                        03
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3 tracking-tight">Confirmação</h3>
-                    <p class="text-white/60 text-sm leading-relaxed">
-                        Escaneie o código com a câmera do seu dispositivo e receba a <span class="text-fuchsia-300 font-bold">confirmação instantânea</span> de presença.
-                    </p>
-                </div>
-
-            </div>
-
-            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
-                <a href="{{ Auth::check() ? route('dashboard') : route('login_form') }}"
-                    class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xl rounded-2xl shadow-xl shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all text-center">
-                    Prosseguir
-                </a>
-
-                @auth
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                        class="w-full md:w-auto px-12 py-5 border-2 border-white/10 text-white/60 font-bold text-xl rounded-2xl hover:bg-white/5 hover:text-white transition-all text-center">
-                        Encerrar Sessão
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                @endauth
-            </div>
-
         </div>
     </div>
+
+    {{-- Main Content --}}
+    <main style="padding-top:60px; flex:1; display:flex; flex-direction:column; align-items:center; padding-left:2rem; padding-right:2rem; padding-bottom:4rem;">
+
+        {{-- Pending attendance banner --}}
+        @if(session('pending_attendance_code'))
+        <div style="width:100%; max-width:900px; margin-top:2.5rem; background:#111; border:1px solid rgba(255,255,255,0.12); border-radius:4px; padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; flex-wrap:wrap;">
+            <div>
+                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; margin:0 0 0.3rem;">Presença Pendente</p>
+                <p style="font-size:1rem; font-weight:700; color:#efefef; margin:0;">Você tem uma aula aguardando confirmação.</p>
+            </div>
+            <a href="{{ route('presenca.confirmar', session('pending_attendance_code')) }}"
+                style="background:#efefef; color:#0d0d0d; padding:0.65rem 1.5rem; font-size:0.82rem; font-weight:700; letter-spacing:0.04em; border-radius:3px; text-decoration:none; white-space:nowrap;"
+                onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='#efefef'">
+                Confirmar Agora →
+            </a>
+        </div>
+        @endif
+
+        {{-- Hero text --}}
+        <div style="width:100%; max-width:900px; margin-top:4rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:3rem;">
+            <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.75rem;">Guia de Utilização</p>
+            <h1 style="font-size:clamp(2rem,5vw,3.5rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0;">Como funciona?</h1>
+        </div>
+
+        {{-- Steps grid --}}
+        <div style="width:100%; max-width:900px; display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:3rem;">
+            @foreach([
+                ['01', 'Acesso Rápido', 'Acesse o Smart Attendance com seu RA, e-mail institucional ou CPF de forma segura.'],
+                ['02', 'QR Code Dinâmico', 'Localize o QR Code projetado pelo professor durante a aula.'],
+                ['03', 'Confirmação', 'Escaneie o código com a câmera e receba a confirmação instantânea de presença.'],
+            ] as [$num, $title, $desc])
+            <div style="background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:4px; padding:1.75rem; transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; color:#777; margin:0 0 1rem;">{{ $num }}</p>
+                <h3 style="font-size:1rem; font-weight:800; color:#efefef; margin:0 0 0.5rem; letter-spacing:-0.02em;">{{ $title }}</h3>
+                <p style="font-size:0.82rem; color:#bbb; line-height:1.6; margin:0;">{{ $desc }}</p>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Actions --}}
+        <div style="width:100%; max-width:900px; display:flex; gap:1rem; flex-wrap:wrap;">
+            <a href="{{ Auth::check() ? route('dashboard') : route('login_form') }}"
+                style="background:#efefef; color:#0d0d0d; padding:0.85rem 2rem; font-size:0.85rem; font-weight:700; letter-spacing:0.04em; border-radius:3px; text-decoration:none; border:1px solid #efefef;"
+                onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='#efefef'">
+                Prosseguir
+            </a>
+            @auth
+            <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                @csrf
+                <button type="submit" style="background:transparent; color:rgba(255,255,255,0.7); padding:0.85rem 2rem; font-size:0.85rem; font-weight:700; letter-spacing:0.04em; border:1px solid rgba(255,255,255,0.1); border-radius:3px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.7)'">Encerrar Sessão</button>
+            </form>
+            @endauth
+        </div>
+
+    </main>
+</div>
 @endsection
 
 @push('scripts')
@@ -214,26 +151,13 @@
     const openBtn = document.getElementById('open-profile');
     const closeBtn = document.getElementById('close-profile');
     const overlay = document.getElementById('close-modal-overlay');
-
     function toggleModal(show) {
-        if (show) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        } else {
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
+        modal.style.display = show ? 'flex' : 'none';
+        document.body.style.overflow = show ? 'hidden' : '';
     }
-
     openBtn.addEventListener('click', () => toggleModal(true));
     closeBtn.addEventListener('click', () => toggleModal(false));
     overlay.addEventListener('click', () => toggleModal(false));
-
-    // Close on ESC
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            toggleModal(false);
-        }
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleModal(false); });
 </script>
 @endpush

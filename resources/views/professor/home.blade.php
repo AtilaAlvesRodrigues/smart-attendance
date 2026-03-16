@@ -1,191 +1,126 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Painel do Professor - Smart Attendance')
 
-@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('body-class', 'gradient-bg')
+@section('no-nav')
 
 @section('content')
-    <div class="flex-grow flex flex-col relative overflow-hidden">
-        
-        <!-- Background Elements -->
-        <div class="blob top-[-100px] left-[-100px]"></div>
-        <div class="blob-2"></div>
+<div style="min-height:100vh; display:flex; flex-direction:column;">
 
-        <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-indigo-500/50">
-                        C
-                    </div>
-                    <h1 class="text-xl font-black tracking-tighter text-white italic hidden md:block">SMART ATTENDANCE</h1>
-                </div>
-
-                <div class="flex items-center gap-6">
-                    <div class="hidden sm:flex flex-col items-end">
-                        <span class="text-[10px] font-bold tracking-widest text-indigo-300 uppercase">Professor Conectado</span>
-                        <span class="text-white font-bold text-sm">{{ $professor->nome ?? 'Docente' }}</span>
-                    </div>
-
-                    <a href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                        class="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95">
-                        Sair
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
+    {{-- Nav --}}
+    <nav style="position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:60px; background:rgba(13,13,13,0.95); border-bottom:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(12px);">
+        <a href="{{ url('/') }}" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:0.85rem; letter-spacing:0.1em; color:#efefef; text-decoration:none; text-transform:uppercase;">Smart<span style="color:#777;">Attendance</span></a>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="text-align:right;">
+                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#777; margin:0;">Professor Conectado</p>
+                <p style="font-size:0.8rem; font-weight:600; color:#efefef; margin:0;">{{ $professor->nome ?? 'Docente' }}</p>
             </div>
-        </nav>
+            <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                @csrf
+                <button type="submit" style="font-size:0.72rem; font-weight:600; letter-spacing:0.04em; padding:0.4rem 0.9rem; background:transparent; color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:3px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='#ef4444'; this.style.color='#ef4444'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.7)'">Sair</button>
+            </form>
+        </div>
+    </nav>
 
-        <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10">
-            
-            <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Painel de Controle</h2>
-                <p class="text-white/40 font-medium">Gerencie suas aulas e registros de presença em tempo real.</p>
-            </div>
+    {{-- Main --}}
+    <main style="padding-top:60px; max-width:1100px; width:100%; margin:0 auto; padding-left:2rem; padding-right:2rem; padding-bottom:4rem;">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 animate-reveal [animation-delay:400ms]">
+        {{-- Header --}}
+        <div style="padding:3rem 0 2rem; border-bottom:1px solid rgba(255,255,255,0.07); margin-bottom:2.5rem;">
+            <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.6rem;">Painel Docente</p>
+            <h1 style="font-size:clamp(2rem,4vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0;">Painel de Controle</h1>
+            <p style="font-size:0.88rem; color:#bbb; margin:0.5rem 0 0;">Gerencie suas aulas e registros de presença em tempo real.</p>
+        </div>
 
-                <!-- Card: Gerar QR -->
-                <div class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-indigo-400/30 transition-all group overflow-hidden relative">
-                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    
-                    <div class="w-14 h-14 bg-indigo-600/20 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
-                        ⚡
-                    </div>
-                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Gerar QR Code</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-6">Inicie uma nova sessão de presença para sua turma atual.</p>
-                    
-                    <a href="{{ route('professor.presenca.index') }}"
-                        class="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-xl transition-all hover:gap-5">
-                        <span>Iniciar Agora</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </a>
+        {{-- Cards --}}
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2.5rem;">
+
+            {{-- Card: QR --}}
+            <div style="background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:4px; padding:1.75rem; transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                <div style="width:40px; height:40px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
+                    <svg width="18" height="18" fill="none" stroke="#888" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
                 </div>
-
-                <!-- Card: Histórico -->
-                <div class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-purple-400/30 transition-all group overflow-hidden relative">
-                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                    <div class="w-14 h-14 bg-purple-600/20 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
-                        📊
-                    </div>
-                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Relatórios</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-6">Consulte o histórico de frequências e exporte dados.</p>
-                    
-                    <a href="{{ route('professor.relatorios') }}"
-                        class="inline-flex items-center gap-3 border border-white/10 hover:bg-white/5 text-white/80 font-bold px-6 py-3 rounded-xl transition-all">
-                        <span>Ver Histórico</span>
-                    </a>
-                </div>
-
-                <!-- Card: Matérias -->
-                <div class="tilt-card glass p-8 rounded-3xl border border-white/10 hover:border-fuchsia-400/30 transition-all group overflow-hidden relative">
-                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-fuchsia-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                    <div class="w-14 h-14 bg-fuchsia-600/20 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
-                        📚
-                    </div>
-                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Minhas Turmas</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-6">Configure suas disciplinas e gerencie dados dos alunos.</p>
-                    
-                    <a href="{{ route('professor.gerenciar.index') }}"
-                        class="inline-flex items-center gap-3 border border-white/10 hover:bg-white/5 text-white/80 font-bold px-6 py-3 rounded-xl transition-all">
-                        <span>Configurar</span>
-                    </a>
-                </div>
-
+                <h3 style="font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; color:#efefef; margin:0 0 0.4rem;">Gerar QR Code</h3>
+                <p style="font-size:0.8rem; color:#bbb; line-height:1.6; margin:0 0 1.25rem;">Inicie uma nova sessão de presença para sua turma.</p>
+                <a href="{{ route('professor.presenca.index') }}"
+                    style="display:inline-flex; align-items:center; gap:0.4rem; background:#efefef; color:#0d0d0d; padding:0.55rem 1.1rem; font-size:0.78rem; font-weight:700; letter-spacing:0.04em; border-radius:3px; text-decoration:none;"
+                    onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='#efefef'">Iniciar Agora →</a>
             </div>
 
-            <!-- Active Geração Area -->
-            <section class="glass p-10 rounded-3xl border border-white/10 animate-reveal [animation-delay:600ms]">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div class="max-w-md">
-                        @if(isset($activeCode))
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
-                                <span class="text-xs font-black tracking-widest text-green-500 uppercase">Chamada em Andamento</span>
-                            </div>
-                            <h3 class="text-3xl font-black text-white tracking-tight mb-4">QR Code Ativo</h3>
-                            <p class="text-white/40 leading-relaxed">
-                                Você possui uma sessão de presença ativa para <strong>{{ $activeMateria->nome }}</strong>. 
-                                O código expira em breve. Clique no QR Code para gerenciar a lista.
-                            </p>
-                        @else
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
-                                <span class="text-xs font-black tracking-widest text-yellow-500 uppercase">Sistema em Espera</span>
-                            </div>
-                            <h3 class="text-3xl font-black text-white tracking-tight mb-4">Geração de Código Ativa</h3>
-                            <p class="text-white/40 leading-relaxed">
-                                Ao iniciar uma sessão, o QR Code dinâmico será geratado e exibido nesta área. 
-                                Os alunos poderão escanear em tempo real para registrar a presença.
-                            </p>
-                        @endif
-                    </div>
-                    
-                    @if(isset($activeCode))
-                        <a href="{{ route('professor.presenca.gerar', $activeMateria->id) }}" 
-                           class="w-full md:w-64 aspect-square bg-white p-4 rounded-[2rem] flex items-center justify-center relative overflow-hidden group shadow-2xl shadow-indigo-500/40 hover:scale-105 transition-all duration-500">
-                            <div class="absolute inset-0 bg-indigo-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                            <div id="qrcode" class="relative z-10 p-2"></div>
-                        </a>
-                    @else
-                        <div class="w-full md:w-64 aspect-square bg-white/5 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-indigo-500/5 group-hover:bg-indigo-500/10 transition-colors"></div>
-                            <div class="text-center relative z-10 px-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white/10 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                                </svg>
-                                <p class="text-white/10 text-[10px] font-black tracking-widest uppercase">Aguardando Início</p>
-                            </div>
-                        </div>
-                    @endif
+            {{-- Card: Relatórios --}}
+            <div style="background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:4px; padding:1.75rem; transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                <div style="width:40px; height:40px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
+                    <svg width="18" height="18" fill="none" stroke="#888" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 </div>
-            </section>
+                <h3 style="font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; color:#efefef; margin:0 0 0.4rem;">Relatórios</h3>
+                <p style="font-size:0.8rem; color:#bbb; line-height:1.6; margin:0 0 1.25rem;">Consulte o histórico de frequências e exporte dados.</p>
+                <a href="{{ route('professor.relatorios') }}"
+                    style="display:inline-flex; align-items:center; gap:0.4rem; background:transparent; color:rgba(255,255,255,0.5); padding:0.55rem 1.1rem; font-size:0.78rem; font-weight:700; letter-spacing:0.04em; border:1px solid rgba(255,255,255,0.1); border-radius:3px; text-decoration:none; transition:all 0.2s;"
+                    onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.5)'">Ver Histórico</a>
+            </div>
 
-        </main>
-    </div>
+            {{-- Card: Turmas --}}
+            <div style="background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:4px; padding:1.75rem; transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                <div style="width:40px; height:40px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
+                    <svg width="18" height="18" fill="none" stroke="#888" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                </div>
+                <h3 style="font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; color:#efefef; margin:0 0 0.4rem;">Minhas Turmas</h3>
+                <p style="font-size:0.8rem; color:#bbb; line-height:1.6; margin:0 0 1.25rem;">Configure suas disciplinas e gerencie dados dos alunos.</p>
+                <a href="{{ route('professor.gerenciar.index') }}"
+                    style="display:inline-flex; align-items:center; gap:0.4rem; background:transparent; color:rgba(255,255,255,0.5); padding:0.55rem 1.1rem; font-size:0.78rem; font-weight:700; letter-spacing:0.04em; border:1px solid rgba(255,255,255,0.1); border-radius:3px; text-decoration:none; transition:all 0.2s;"
+                    onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.5)'">Configurar</a>
+            </div>
+        </div>
+
+        {{-- Active session section --}}
+        <div style="background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:4px; padding:2rem; display:flex; align-items:center; justify-content:space-between; gap:2rem; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px;">
+                @if(isset($activeCode))
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
+                    <span style="width:6px; height:6px; background:#22c55e; border-radius:50%; display:inline-block;"></span>
+                    <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; margin:0;">Chamada em Andamento</p>
+                </div>
+                <h2 style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; color:#efefef; margin:0 0 0.5rem;">QR Code Ativo</h2>
+                <p style="font-size:0.85rem; color:#bbb; margin:0;">Sessão ativa para <strong style="color:#efefef;">{{ $activeMateria->nome }}</strong>. O código expira em breve.</p>
+                @else
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
+                    <span style="width:6px; height:6px; background:#888; border-radius:50%; display:inline-block;"></span>
+                    <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0;">Sistema em Espera</p>
+                </div>
+                <h2 style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; color:#efefef; margin:0 0 0.5rem;">Geração de Código</h2>
+                <p style="font-size:0.85rem; color:#bbb; margin:0;">Inicie uma sessão para gerar o QR Code dinâmico para os alunos escanearem.</p>
+                @endif
+            </div>
+
+            @if(isset($activeCode))
+            <a href="{{ route('professor.presenca.gerar', $activeMateria->id) }}"
+                style="width:180px; height:180px; background:white; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; text-decoration:none;">
+                <div id="qrcode"></div>
+            </a>
+            @else
+            <div style="width:180px; height:180px; border:1px dashed rgba(255,255,255,0.08); border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#222; margin:0; text-align:center;">Aguardando<br>Início</p>
+            </div>
+            @endif
+        </div>
+
+    </main>
+</div>
 @endsection
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+    @if(isset($activeCode))
     document.addEventListener('DOMContentLoaded', () => {
-        const cards = document.querySelectorAll('.tilt-card');
-        
-        cards.forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            });
+        new QRCode(document.getElementById("qrcode"), {
+            text: "{{ route('presenca.confirmar', $activeCode) }}",
+            width: 160, height: 160,
+            colorDark: "#000000", colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
         });
-
-        @if(isset($activeCode))
-            // Gerar QR Code
-            const qrContent = "{{ route('presenca.confirmar', $activeCode) }}";
-            new QRCode(document.getElementById("qrcode"), {
-                text: qrContent,
-                width: 200,
-                height: 200,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-        @endif
     });
+    @endif
 </script>
 @endpush

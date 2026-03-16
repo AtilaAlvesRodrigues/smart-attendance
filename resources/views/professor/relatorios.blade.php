@@ -1,8 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Relatórios de Presença - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('no-nav')
 
 @push('head-scripts')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -207,7 +208,7 @@
                     </a>
                     <div>
                         <h1 class="text-xl font-black tracking-tighter text-white italic leading-none uppercase">Relatórios</h1>
-                        <a href="{{ route('dashboard.professor') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
+                        <a href="{{ route('dashboard.professor') }}" class="text-xs font-bold text-white/70 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
                     </div>
                 </div>
 
@@ -222,14 +223,14 @@
             
             <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
                 <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Histórico de Presenças</h2>
-                <p class="text-white/40 font-medium">Filtre por matéria e período para gerar seu relatório.</p>
+                <p class="text-white/70 font-medium">Filtre por matéria e período para gerar seu relatório.</p>
             </div>
 
             <!-- Filtros -->
             <div class="glass p-6 rounded-3xl border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print">
                 <form action="{{ route('professor.relatorios') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div>
-                        <label class="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block">Matéria</label>
+                        <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Matéria</label>
                         <select name="materia_id" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
                             <option value="">Todas as Matérias</option>
                             @foreach($materias as $materia)
@@ -240,12 +241,12 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block">Data Início</label>
+                        <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Data Início</label>
                         <input type="text" name="data_inicio" value="{{ request('data_inicio') }}" placeholder="DD/MM/AAAA"
                             class="datepicker w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer">
                     </div>
                     <div>
-                        <label class="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block">Data Fim</label>
+                        <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Data Fim</label>
                         <input type="text" name="data_fim" value="{{ request('data_fim') }}" placeholder="DD/MM/AAAA"
                             class="datepicker w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer">
                     </div>
@@ -253,7 +254,7 @@
                         <button type="submit" class="flex-grow bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-xl transition-all border border-white/10">
                             Filtrar
                         </button>
-                        <a href="{{ route('professor.relatorios') }}" class="bg-white/5 hover:bg-white/10 text-white/40 hover:text-white p-2.5 rounded-xl border border-white/10 transition-all" title="Resetar Filtros">
+                        <a href="{{ route('professor.relatorios') }}" class="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white p-2.5 rounded-xl border border-white/10 transition-all" title="Resetar Filtros">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </a>
                     </div>
@@ -264,7 +265,7 @@
             <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                     <h3 class="text-xl font-black text-white italic tracking-tighter">Registros Encontrados</h3>
-                    <div class="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                    <div class="text-xs font-black text-white/70 uppercase tracking-widest">
                         Total: {{ $presencas->total() }} registros
                     </div>
                 </div>
@@ -272,7 +273,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                            <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
                                 <th class="py-4 px-6">Data / Hora</th>
                                 <th class="py-4 px-6">Aluno</th>
                                 <th class="py-4 px-6">Matéria</th>
@@ -284,14 +285,14 @@
                                 <tr class="hover:bg-white/5 transition-colors group">
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $presenca->created_at->format('d/m/Y') }}</span>
-                                        <span class="block text-[10px] text-white/30 font-mono">{{ $presenca->created_at->format('H:i:s') }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $presenca->created_at->format('H:i:s') }}</span>
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $presenca->aluno->nome }}</span>
-                                        <span class="block text-[10px] text-white/30 font-mono">{{ $presenca->aluno_ra }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $presenca->aluno_ra }}</span>
                                     </td>
                                     <td class="py-4 px-6">
-                                        <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-black border border-indigo-500/20 uppercase tracking-widest">
+                                        <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-lg text-xs font-black border border-indigo-500/20 uppercase tracking-widest">
                                             {{ $presenca->materia->nome }}
                                         </span>
                                     </td>
@@ -303,7 +304,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-12 text-center text-white/20 font-bold italic">
+                                    <td colspan="4" class="py-12 text-center text-white/70 font-bold italic">
                                         Nenhum registro de presença encontrado para os filtros selecionados.
                                     </td>
                                 </tr>
@@ -327,8 +328,8 @@
                         <p class="font-bold text-gray-800">{{ $professor->nome }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] text-gray-400 font-mono">Documento gerado em {{ now()->format('d/m/Y H:i:s') }}</p>
-                        <p class="text-[10px] text-gray-400 font-mono italic">Smart Attendance System</p>
+                        <p class="text-xs text-gray-400 font-mono">Documento gerado em {{ now()->format('d/m/Y H:i:s') }}</p>
+                        <p class="text-xs text-gray-400 font-mono italic">Smart Attendance System</p>
                     </div>
                 </div>
             </div>

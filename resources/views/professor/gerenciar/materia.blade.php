@@ -1,8 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', $materia->nome . ' - Gerenciar - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('no-nav')
 
 @push('styles')
 <style>
@@ -68,7 +69,7 @@
                     </a>
                     <div>
                         <h1 class="text-xl font-black tracking-tighter text-white italic leading-none truncate max-w-[200px] md:max-w-none">{{ $materia->nome }}</h1>
-                        <a href="{{ route('professor.gerenciar.index') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar às Matérias</a>
+                        <a href="{{ route('professor.gerenciar.index') }}" class="text-xs font-bold text-white/70 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar às Matérias</a>
                     </div>
                 </div>
 
@@ -85,22 +86,22 @@
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
                 <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Gerenciamento de Turma</h2>
-                <p class="text-white/40 font-medium italic">Sala: {{ $materia->sala }} · {{ $alunos->count() }} alunos matriculados</p>
+                <p class="text-white/70 font-medium italic">Sala: {{ $materia->sala }} · {{ $alunos->count() }} alunos matriculados</p>
             </div>
 
             {{-- Cards de resumo --}}
             <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12 animate-reveal [animation-delay:300ms]">
                 <div class="glass p-6 rounded-3xl border border-white/10 text-center">
                     <p class="text-3xl font-black text-purple-400 tracking-tighter">{{ $alunos->count() }}</p>
-                    <p class="text-[9px] text-white/20 uppercase font-black tracking-widest mt-2">Alunos</p>
+                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Alunos</p>
                 </div>
                 <div class="glass p-6 rounded-3xl border border-white/10 text-center">
                     <p class="text-3xl font-black text-blue-400 tracking-tighter">{{ $totalAulas }}</p>
-                    <p class="text-[9px] text-white/20 uppercase font-black tracking-widest mt-2">Aulas Semestre</p>
+                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Aulas Semestre</p>
                 </div>
                 <div class="glass p-6 rounded-3xl border border-white/10 text-center">
                     <p class="text-3xl font-black text-indigo-400 tracking-tighter">{{ $aulasRealizadas }}</p>
-                    <p class="text-[9px] text-white/20 uppercase font-black tracking-widest mt-2">Realizadas</p>
+                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Realizadas</p>
                 </div>
                 <div class="glass p-6 rounded-3xl border border-white/10 text-center">
                     @php
@@ -110,14 +111,14 @@
                         })->filter(fn($m) => $m !== null);
                     @endphp
                     <p class="text-3xl font-black text-green-400 tracking-tighter">{{ $mediaGeral->isNotEmpty() ? number_format($mediaGeral->avg(), 1) : '--' }}</p>
-                    <p class="text-[9px] text-white/20 uppercase font-black tracking-widest mt-2">Média Geral</p>
+                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Média Geral</p>
                 </div>
                 <div class="glass p-6 rounded-3xl border border-white/10 text-center">
                     @php
                         $aprovados = $mediaGeral->filter(fn($m) => $m >= 5)->count();
                     @endphp
                     <p class="text-3xl font-black text-emerald-400 tracking-tighter">{{ $mediaGeral->isNotEmpty() ? round(($aprovados / $mediaGeral->count()) * 100) . '%' : '--' }}</p>
-                    <p class="text-[9px] text-white/20 uppercase font-black tracking-widest mt-2">Taxa Aprovação</p>
+                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Taxa Aprovação</p>
                 </div>
             </div>
 
@@ -126,10 +127,10 @@
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                     <h3 class="text-xl font-black text-white italic tracking-tighter">📋 Alunos Matriculados</h3>
                     <div class="flex gap-2">
-                        <span class="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black text-white/60 uppercase tracking-widest">
+                        <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-black text-white/60 uppercase tracking-widest">
                             Previstas: {{ $totalAulas }}
                         </span>
-                        <span class="px-3 py-1 bg-indigo-500/20 rounded-lg text-[10px] font-black text-indigo-400 uppercase tracking-widest border border-indigo-500/20">
+                        <span class="px-3 py-1 bg-indigo-500/20 rounded-lg text-xs font-black text-indigo-400 uppercase tracking-widest border border-indigo-500/20">
                             Realizadas: {{ $aulasRealizadas }}
                         </span>
                     </div>
@@ -138,7 +139,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                            <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
                                 <th class="py-4 px-6">Aluno</th>
                                 <th class="py-4 px-6 text-center">Presenças</th>
                                 <th class="py-4 px-6 text-center">Faltas</th>
@@ -166,7 +167,7 @@
                                 <tr class="hover:bg-white/5 transition-colors group">
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $aluno->nome }}</span>
-                                        <span class="block text-[10px] text-white/30 font-mono">{{ $aluno->ra }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $aluno->ra }}</span>
                                     </td>
                                     
                                     <td class="py-4 px-6 text-center">
@@ -174,7 +175,7 @@
                                             <span class="font-black {{ $percentPresenca >= 75 ? 'text-green-400' : 'text-red-400' }} text-base tracking-tighter">
                                                 {{ $presencas }}
                                             </span>
-                                            <span class="text-[9px] text-white/20 uppercase font-bold">{{ $percentPresenca }}%</span>
+                                            <span class="text-[9px] text-white/70 uppercase font-bold">{{ $percentPresenca }}%</span>
                                         </div>
                                     </td>
                                     
@@ -210,7 +211,7 @@
                                                 {{ number_format($media, 1) }}
                                             </span>
                                         @else
-                                            <span class="text-white/20 text-xs">--</span>
+                                            <span class="text-white/70 text-xs">--</span>
                                         @endif
                                     </td>
 
@@ -222,7 +223,7 @@
                                         @elseif($media !== null && !$aprovado)
                                             <span class="px-3 py-1 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Reprovado</span>
                                         @else
-                                            <span class="px-3 py-1 bg-white/5 text-white/40 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/5">Pendente</span>
+                                            <span class="px-3 py-1 bg-white/5 text-white/70 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/5">Pendente</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -236,15 +237,15 @@
             <div class="mt-8 flex flex-wrap gap-8 animate-reveal [animation-delay:500ms]">
                 <div class="flex items-center gap-3">
                     <span class="w-3 h-3 bg-green-400 rounded-full shadow-lg shadow-green-400/50"></span>
-                    <span class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Aprovado (Média ≥ 5.0)</span>
+                    <span class="text-xs font-bold text-white/70 uppercase tracking-widest">Aprovado (Média ≥ 5.0)</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="w-3 h-3 bg-red-400 rounded-full shadow-lg shadow-red-400/50"></span>
-                    <span class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Reprovado por Nota ou Falta</span>
+                    <span class="text-xs font-bold text-white/70 uppercase tracking-widest">Reprovado por Nota ou Falta</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="w-3 h-3 bg-white/20 rounded-full border border-white/10"></span>
-                    <span class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Pendente / Em andamento</span>
+                    <span class="text-xs font-bold text-white/70 uppercase tracking-widest">Pendente / Em andamento</span>
                 </div>
             </div>
         </main>
@@ -341,8 +342,8 @@
                     situacaoCell.innerHTML = `<span class="px-3 py-1 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Reprovado</span>`;
                 }
             } else {
-                mediaCell.innerHTML = `<span class="text-white/20 text-xs">--</span>`;
-                situacaoCell.innerHTML = `<span class="px-3 py-1 bg-white/5 text-white/40 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/5">Pendente</span>`;
+                mediaCell.innerHTML = `<span class="text-white/70 text-xs">--</span>`;
+                situacaoCell.innerHTML = `<span class="px-3 py-1 bg-white/5 text-white/70 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/5">Pendente</span>`;
             }
         }
     });

@@ -1,46 +1,38 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Presença já Registrada - Smart Attendance')
 
-@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('body-class', 'gradient-bg')
 
 @section('content')
-    <div class="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
-        
-        <!-- Background Elements -->
-        <div class="blob top-[-100px] left-[-100px]"></div>
-        <div class="blob-2"></div>
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem;">
+    <div style="width:100%; max-width:460px; text-align:center;">
 
-        <div class="glass p-12 rounded-[3rem] border border-white/10 max-w-md w-full text-center relative z-10 animate-reveal">
-            <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-3xl"></div>
-            
-            <div class="mb-10 relative inline-block group">
-                <div class="absolute -inset-4 bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/30 transition-all duration-500"></div>
-                <div class="relative w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/40 rotate-12 transition-transform group-hover:rotate-0">
-                    <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-
-            <h1 class="text-4xl font-black text-white tracking-tighter mb-4 italic">Tudo Certo!</h1>
-            <p class="text-white/40 font-medium leading-relaxed mb-10">Você já registrou sua presença nesta sessão anteriormente. Não é necessário realizar o procedimento novamente.</p>
-
-            <div class="glass p-6 rounded-2xl border border-white/5 mb-10 text-center relative overflow-hidden group">
-                <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest block mb-1">Status do Registro</span>
-                <p class="font-black text-white text-xl tracking-tight">Presença Confirmada ✅</p>
-            </div>
-
-            <a href="{{ route('dashboard.aluno') }}" 
-               class="block w-full bg-white text-dark_purple hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-xl text-lg shadow-2xl">
-                Voltar ao Início
-            </a>
-            
-            <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-6">
-                Sincronizado com o sistema docente
-            </p>
+        {{-- Icon --}}
+        <div style="display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border:1px solid rgba(255,255,255,0.12); border-radius:4px; margin-bottom:2rem;">
+            <svg width="28" height="28" fill="none" stroke="#efefef" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
 
+        <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin-bottom:0.75rem;">Presença Duplicada</p>
+        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Tudo Certo.</h1>
+        <p style="font-size:0.9rem; color:#bbb; margin-bottom:2.5rem;">Você já registrou sua presença nesta sessão anteriormente. Não é necessário realizar o procedimento novamente.</p>
+
+        <div style="background:rgba(18,18,18,0.98); border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:1.25rem; margin-bottom:2.5rem;">
+            <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.4rem;">Status do Registro</p>
+            <p style="font-size:1rem; font-weight:700; color:#efefef; margin:0;">Presença Confirmada</p>
+        </div>
+
+        <a href="{{ route('dashboard.aluno') }}"
+            style="display:inline-block; width:100%; background:#efefef; color:#0d0d0d; border:1px solid #efefef; padding:0.85rem; font-size:0.85rem; font-weight:700; letter-spacing:0.04em; border-radius:3px; text-decoration:none; box-sizing:border-box;"
+            onmouseover="this.style.background='#d4d4d4'"
+            onmouseout="this.style.background='#efefef'">
+            Voltar ao Início
+        </a>
+
+        <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#222; margin-top:1.5rem;">
+            Sincronizado com o sistema docente
+        </p>
+
     </div>
+</div>
 @endsection

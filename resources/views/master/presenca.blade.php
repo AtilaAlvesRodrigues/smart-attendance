@@ -1,8 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Central de Frequência - Master')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('no-nav')
 
 @section('content')
     <style>
@@ -87,7 +88,7 @@
                     </a>
                     <div>
                         <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">PAINEL DE CHAMADAS</h1>
-                        <a href="{{ route('dashboard.master') }}" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
+                        <a href="{{ route('dashboard.master') }}" class="text-xs font-bold text-white/70 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
                     </div>
                 </div>
 
@@ -103,26 +104,26 @@
     
             <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
                 <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Relatório de Presenças</h2>
-                <p class="text-white/40 font-medium">Acompanhamento centralizado de registros em tempo real.</p>
+                <p class="text-white/70 font-medium">Acompanhamento centralizado de registros em tempo real.</p>
             </div>
 
             <!-- Filtros -->
             <div class="glass p-6 rounded-3xl border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print relative z-30">
                 <form action="{{ route('master.presenca') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                     <div class="relative">
-                        <label class="block text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Professor</label>
+                        <label class="block text-xs font-black text-white/80 uppercase tracking-[0.2em] mb-2">Professor</label>
                         <input type="text" name="professor" id="input-professor" value="{{ request('professor') }}" autocomplete="off" placeholder="Nome..." 
                             class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
                         <div id="suggestions-professor" class="suggestion-box"></div>
                     </div>
                     <div class="relative">
-                        <label class="block text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Matéria</label>
+                        <label class="block text-xs font-black text-white/80 uppercase tracking-[0.2em] mb-2">Matéria</label>
                         <input type="text" name="materia" id="input-materia" value="{{ request('materia') }}" autocomplete="off" placeholder="Nome..." 
                             class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
                         <div id="suggestions-materia" class="suggestion-box"></div>
                     </div>
                     <div class="relative">
-                        <label class="block text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Aluno</label>
+                        <label class="block text-xs font-black text-white/80 uppercase tracking-[0.2em] mb-2">Aluno</label>
                         <input type="text" name="aluno" id="input-aluno" value="{{ request('aluno') }}" autocomplete="off" placeholder="Nome..." 
                             class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
                         <div id="suggestions-aluno" class="suggestion-box"></div>
@@ -142,7 +143,7 @@
             <div id="printable-content" class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms] relative z-10">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center no-print bg-white/5">
                     <h3 class="text-xl font-black text-white italic tracking-tighter">Registros de Frequência</h3>
-                    <span class="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black text-white/60 uppercase tracking-widest">
+                    <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-black text-white/60 uppercase tracking-widest">
                         Total: {{ $presencas->total() }} de registros
                     </span>
                 </div>
@@ -150,7 +151,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] border-b border-white/10">
+                            <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
                                 <th class="py-4 px-6">Data / Hora</th>
                                 <th class="py-4 px-6">Aluno (RA)</th>
                                 <th class="py-4 px-6">Disciplina</th>
@@ -178,7 +179,7 @@
                                         ->count();
                                     $faltas = max(0, $totalAulas - $presencasAluno);
                                     
-                                    $corMedia = 'text-white/40';
+                                    $corMedia = 'text-white/70';
                                     if($media !== null) {
                                         $corMedia = $media >= 6 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
                                     }
@@ -187,19 +188,19 @@
                                 <tr class="hover:bg-white/5 transition-colors group">
                                     <td class="py-4 px-6 whitespace-nowrap">
                                         <span class="block font-bold text-white tracking-tight">{{ \Carbon\Carbon::parse($p->data_aula)->format('d/m/Y') }}</span>
-                                        <span class="block text-[10px] text-white/30 font-mono">{{ $p->created_at->format('H:i') }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $p->created_at->format('H:i') }}</span>
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $p->aluno->nome ?? 'N/A' }}</span>
-                                        <span class="block text-[10px] text-white/30 font-mono">{{ $p->aluno_ra }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $p->aluno_ra }}</span>
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $p->materia->nome ?? 'N/A' }}</span>
-                                        <span class="block text-[10px] text-white/30 uppercase tracking-widest font-black">{{ $p->materia->sala ?? '' }}</span>
+                                        <span class="block text-xs text-white/80 uppercase tracking-widest font-black">{{ $p->materia->sala ?? '' }}</span>
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block text-white/80 font-medium">{{ $p->professor->nome ?? 'N/A' }}</span>
-                                        <span class="block text-[10px] text-white/30 font-mono">{{ $p->professor_cpf }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $p->professor_cpf }}</span>
                                     </td>
                                     
                                     <td class="py-4 px-6 text-center">
@@ -207,7 +208,7 @@
                                             <span class="{{ $faltas > 0 ? 'text-red-400 font-black' : 'text-green-400' }} text-lg tracking-tighter">
                                                 {{ $faltas }}
                                             </span>
-                                            <span class="text-[9px] text-white/20 uppercase font-bold">de {{ $totalAulas }}</span>
+                                            <span class="text-[9px] text-white/70 uppercase font-bold">de {{ $totalAulas }}</span>
                                         </div>
                                     </td>
 
@@ -219,7 +220,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-20 text-center text-white/20 italic font-medium">Nenhum registro encontrado.</td>
+                                    <td colspan="6" class="py-20 text-center text-white/70 italic font-medium">Nenhum registro encontrado.</td>
                                 </tr>
                             @endforelse
                         </tbody>

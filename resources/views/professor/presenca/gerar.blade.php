@@ -1,8 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.theme')
 
 @section('title', 'Gerando Frequência - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
+@section('no-nav')
 
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
@@ -20,7 +21,7 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">{{ $materia->nome }}</h1>
-                        <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Chamada em Tempo Real</p>
+                        <p class="text-xs font-bold text-white/70 uppercase tracking-widest mt-1">Chamada em Tempo Real</p>
                     </div>
                 </div>
 
@@ -33,11 +34,11 @@
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('professor.presenca.index') }}" 
-                           class="hidden sm:block px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-white/10">
+                           class="hidden sm:block px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all hover:bg-white/10">
                             Disciplinas
                         </a>
                         <a href="{{ route('dashboard.professor') }}" 
-                           class="px-4 py-2 bg-white text-dark_purple rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95">
+                           class="px-4 py-2 bg-white text-dark_purple rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95">
                             Home
                         </a>
                     </div>
@@ -62,7 +63,7 @@
                     {{-- Timer grande abaixo do QR --}}
                     <div id="timer-big" class="mt-10 w-full">
                         <div class="flex justify-between items-end mb-3">
-                            <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Tempo Restante</span>
+                            <span class="text-xs font-black text-white/80 uppercase tracking-[0.2em]">Tempo Restante</span>
                             <span id="timer-big-text" class="text-3xl font-black text-white tabular-nums tracking-tighter">--:--:--</span>
                         </div>
                         <div class="w-full bg-white/5 border border-white/10 rounded-full h-3 overflow-hidden p-0.5">
@@ -74,11 +75,11 @@
                         <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
                             <code class="text-purple-300 font-black tracking-widest text-sm uppercase">CÓDIGO: {{ $codigo_aula }}</code>
                         </div>
-                        <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest leading-relaxed mb-4">
+                        <p class="text-white/70 text-xs font-bold uppercase tracking-widest leading-relaxed mb-4">
                             Aponte a câmera para o código ou use o link abaixo:
                         </p>
                         <a href="{{ route('presenca.confirmar', $codigo_aula) }}" target="_blank"
-                           class="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 hover:text-white rounded-xl transition-all duration-300 text-[10px] font-black uppercase tracking-[0.15em] group">
+                           class="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 hover:text-white rounded-xl transition-all duration-300 text-xs font-black uppercase tracking-[0.15em] group">
                             <span>Registrar Presença (Link)</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -94,19 +95,19 @@
                     </h3>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Semestre</span>
+                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Semestre</span>
                             <span class="text-white font-bold">{{ $semestre }}º Semestre</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Período</span>
+                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Período</span>
                             <span class="text-white font-bold">{{ $horario == 'M' ? 'Matutino' : ($horario == 'V' ? 'Vespertino' : 'Noturno') }}</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Data</span>
+                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Data</span>
                             <span class="text-white font-bold">{{ \Carbon\Carbon::now()->format('d/m/Y') }}</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Status</span>
+                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Status</span>
                             <span class="text-green-400 font-bold flex items-center gap-1.5">
                                 <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                                 Transmissão Ativa
@@ -122,7 +123,7 @@
                     <div class="flex justify-between items-center mb-8">
                         <div>
                             <h2 class="text-3xl font-black text-white tracking-tighter italic">Alunos Presentes</h2>
-                            <p class="text-white/40 text-xs font-medium tracking-tight mt-1">Sincronização automática a cada 3s.</p>
+                            <p class="text-white/70 text-xs font-medium tracking-tight mt-1">Sincronização automática a cada 3s.</p>
                         </div>
                         <div class="flex items-center gap-3 bg-purple-500 p-3 rounded-2xl shadow-xl shadow-purple-900/40 transform -rotate-3">
                             <span class="text-white text-3xl font-black leading-none" id="contador-alunos">0</span>
@@ -132,7 +133,7 @@
                     <div class="flex-grow overflow-y-auto custom-scrollbar">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] border-b border-white/5">
+                                <tr class="text-xs font-black text-white/70 uppercase tracking-[0.2em] border-b border-white/5">
                                     <th class="pb-4 px-2">Aluno</th>
                                     <th class="pb-4 px-2 text-center">Registro</th>
                                     <th class="pb-4 px-2 text-center">Horário</th>
@@ -168,7 +169,7 @@
             </div>
             
             <h2 class="text-4xl font-black text-white tracking-tighter mb-4 italic">Chamada Encerrada</h2>
-            <p class="text-white/40 leading-relaxed mb-10 font-medium">
+            <p class="text-white/70 leading-relaxed mb-10 font-medium">
                 O tempo de validade deste QR Code expirou. Para uma nova chamada, inicie outra sessão.
             </p>
             
@@ -269,13 +270,13 @@
                             row.innerHTML = `
                                 <td class="py-4 px-2">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-[10px] font-black text-white group-hover:bg-purple-500/20 transition-colors capitalize">
+                                        <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-xs font-black text-white group-hover:bg-purple-500/20 transition-colors capitalize">
                                             ${presenca.aluno ? presenca.aluno.nome.charAt(0) : '?'}
                                         </div>
                                         <span class="text-sm font-bold text-white tracking-tight">${presenca.aluno ? presenca.aluno.nome : 'Desconhecido'}</span>
                                     </div>
                                 </td>
-                                <td class="py-4 px-2 text-center text-xs font-medium text-white/40 font-mono tracking-wider">${presenca.aluno_ra}</td>
+                                <td class="py-4 px-2 text-center text-xs font-medium text-white/70 font-mono tracking-wider">${presenca.aluno_ra}</td>
                                 <td class="py-4 px-2 text-center text-xs font-black text-white/60 tabular-nums tracking-widest">${horaFormatada}</td>
                                 <td class="py-4 px-2 text-right">
                                     <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-400 rounded-lg text-[9px] font-black uppercase tracking-widest">
