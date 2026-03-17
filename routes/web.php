@@ -48,7 +48,7 @@ Route::get('/', function () { return redirect()->route('login_form'); });
 Route::get('/login', [LoginRouterController::class, 'showLoginForm'])->name('login_form');
 
 Route::get('/login/aluno', [AlunoLoginController::class, 'showLoginForm'])->name('login.aluno.form');
-Route::post('/login/aluno', [AlunoLoginController::class, 'attemptAuthentication'])
+Route::post('/login/aluno', [AlunoLoginController::class, 'attemptAuthentication'])     
     ->middleware('throttle:10,3')
     ->name('login.aluno');
 
@@ -92,7 +92,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
     });
 
     Route::middleware(['auth:masters'])->prefix('dashboard/master')->group(function () {
-        
+         
         Route::get('/', [DashboardController::class, 'masterIndex'])->name('dashboard.master');
 
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');

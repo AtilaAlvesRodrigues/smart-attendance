@@ -21,14 +21,14 @@ function openModal(type, data) {
 
     const renderMaterias = (materias) => {
         if (!materias || materias.length === 0) {
-            return '<p class="text-white/20 italic text-xs">Nenhuma matéria vinculada.</p>';
+            return '<p class="pal-text-muted italic text-xs">Nenhuma matéria vinculada.</p>';
         }
         return `
             <div class="mt-4">
-                <p class="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">Matérias Matriculadas</p>
+                <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-2">Matérias Matriculadas</p>
                 <div class="flex flex-wrap gap-2">
                 ${materias.map(m => `
-                    <span class="bg-blue-500/10 text-blue-300 text-[11px] font-bold px-3 py-1 rounded-lg border border-blue-500/20">
+                    <span class="bg-blue-500/10 pal-text text-[11px] font-bold px-3 py-1 rounded-lg border border-blue-500/20">
                         ${escapeHtml(m.nome)}
                     </span>
                 `).join('')}
@@ -39,14 +39,14 @@ function openModal(type, data) {
 
     const renderProfessores = (professores) => {
         if (!professores || professores.length === 0) {
-            return '<p class="text-white/20 italic text-xs">Sem professores vinculados.</p>';
+            return '<p class="pal-text-muted italic text-xs">Sem professores vinculados.</p>';
         }
         return `
             <div class="mt-4">
-                <p class="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">Corpo Docente</p>
+                <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-2">Corpo Docente</p>
                 <div class="flex flex-wrap gap-2">
                 ${professores.map(p => `
-                    <span class="bg-indigo-500/10 text-indigo-300 text-[11px] font-bold px-3 py-1 rounded-lg border border-indigo-500/20">
+                    <span class="bg-indigo-500/10 pal-text text-[11px] font-bold px-3 py-1 rounded-lg border border-indigo-500/20">
                         ${escapeHtml(p.nome)}
                     </span>
                 `).join('')}
@@ -61,17 +61,17 @@ function openModal(type, data) {
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                        <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">Nome Completo</p>
-                        <p class="text-white font-bold tracking-tight">${escapeHtml(data.nome)}</p>
+                        <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Nome Completo</p>
+                        <p class="pal-text font-bold tracking-tight">${escapeHtml(data.nome)}</p>
                     </div>
                     <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                        <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">Identificação CPF</p>
-                        <p class="text-white font-mono text-sm tracking-widest">${escapeHtml(data.cpf)}</p>
+                        <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Identificação CPF</p>
+                        <p class="pal-text font-mono text-sm tracking-widest">${escapeHtml(data.cpf)}</p>
                     </div>
                 </div>
                 <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                    <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">Endereço de Email</p>
-                    <p class="text-white font-medium">${escapeHtml(data.email)}</p>
+                    <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Endereço de Email</p>
+                    <p class="pal-text font-medium">${escapeHtml(data.email)}</p>
                 </div>
                 ${renderMaterias(data.materias)}
             </div>
@@ -81,24 +81,24 @@ function openModal(type, data) {
         content = `
             <div class="space-y-4">
                 <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                    <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">Nome do Aluno</p>
-                    <p class="text-lg text-white font-black tracking-tighter">${escapeHtml(data.nome)}</p>
+                    <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Nome do Aluno</p>
+                    <p class="text-lg pal-text font-black tracking-tighter">${escapeHtml(data.nome)}</p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-purple-500/20 p-4 rounded-2xl border border-purple-400/30">
-                        <p class="text-[10px] text-purple-200 uppercase font-black tracking-widest mb-1">Registro (RA)</p>
-                        <p class="text-white font-black font-mono tracking-wider">${escapeHtml(data.ra)}</p>
+                        <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Registro (RA)</p>
+                        <p class="pal-text font-black font-mono tracking-wider">${escapeHtml(data.ra)}</p>
                     </div>
                     <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                        <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">CPF</p>
-                        <p class="text-white font-mono text-sm uppercase">${escapeHtml(data.cpf)}</p>
+                        <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">CPF</p>
+                        <p class="pal-text font-mono text-sm uppercase">${escapeHtml(data.cpf)}</p>
                     </div>
                 </div>
 
                 <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                    <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">E-mail Acadêmico</p>
-                    <p class="text-white/90 font-medium italic">${escapeHtml(data.email)}</p>
+                    <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">E-mail Acadêmico</p>
+                    <p class="pal-text-muted font-medium italic">${escapeHtml(data.email)}</p>
                 </div>
 
                 ${renderMaterias(data.materias)}
@@ -110,34 +110,34 @@ function openModal(type, data) {
             <div class="space-y-4">
                 <div class="bg-teal-500/20 p-5 rounded-2xl border border-teal-400/30">
                     <p class="text-[10px] text-teal-200 uppercase font-black tracking-widest mb-1">Nome da Matéria</p>
-                    <p class="text-xl text-white font-black tracking-tighter uppercase italic">${escapeHtml(data.nome)}</p>
+                    <p class="text-xl pal-text font-black tracking-tighter uppercase italic">${escapeHtml(data.nome)}</p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                        <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">Localização</p>
-                        <p class="text-white font-bold"><span class="text-white/40 mr-1">SALA</span> ${escapeHtml(data.sala)}</p>
+                        <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Localização</p>
+                        <p class="pal-text font-bold"><span class="pal-text-muted mr-1">SALA</span> ${escapeHtml(data.sala)}</p>
                     </div>
                     <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-                        <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1">Carga Horária</p>
-                        <p class="text-white font-bold">${escapeHtml(data.carga_horaria)} <span class="text-white/40 text-[10px]">HORAS</span></p>
+                        <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-1">Carga Horária</p>
+                        <p class="pal-text font-bold">${escapeHtml(data.carga_horaria)} <span class="pal-text-muted text-[10px]">HORAS</span></p>
                     </div>
                 </div>
                 
                 <div>
-                    <p class="text-[10px] text-white/50 uppercase font-black tracking-widest mb-2">Disponibilidade por Turno</p>
+                    <p class="text-[10px] pal-text-muted uppercase font-black tracking-widest mb-2">Disponibilidade por Turno</p>
                     <div class="grid grid-cols-3 gap-3">
                         <div class="p-3 rounded-xl border ${data.horario_matutino ? 'bg-green-500/20 border-green-400/40' : 'bg-white/5 border-white/10 opacity-30'}">
-                            <p class="text-[9px] ${data.horario_matutino ? 'text-green-300' : 'text-white/20'} font-black uppercase tracking-widest">Matutino</p>
-                            <p class="text-[10px] font-mono text-white mt-1">${escapeHtml(data.horario_matutino || '---')}</p>
+                            <p class="text-[9px] ${data.horario_matutino ? 'text-green-500 font-bold' : 'pal-text-muted'} uppercase tracking-widest">Matutino</p>
+                            <p class="text-[10px] font-mono pal-text mt-1">${escapeHtml(data.horario_matutino || '---')}</p>
                         </div>
                         <div class="p-3 rounded-xl border ${data.horario_vespertino ? 'bg-green-500/20 border-green-400/40' : 'bg-white/5 border-white/10 opacity-30'}">
-                            <p class="text-[9px] ${data.horario_vespertino ? 'text-green-300' : 'text-white/20'} font-black uppercase tracking-widest">Vespertino</p>
-                            <p class="text-[10px] font-mono text-white mt-1">${escapeHtml(data.horario_vespertino || '---')}</p>
+                            <p class="text-[9px] ${data.horario_vespertino ? 'text-green-500 font-bold' : 'pal-text-muted'} uppercase tracking-widest">Vespertino</p>
+                            <p class="text-[10px] font-mono pal-text mt-1">${escapeHtml(data.horario_vespertino || '---')}</p>
                         </div>
                         <div class="p-3 rounded-xl border ${data.horario_noturno ? 'bg-green-500/20 border-green-400/40' : 'bg-white/5 border-white/10 opacity-30'}">
-                            <p class="text-[9px] ${data.horario_noturno ? 'text-green-300' : 'text-white/20'} font-black uppercase tracking-widest">Noturno</p>
-                            <p class="text-[10px] font-mono text-white mt-1">${escapeHtml(data.horario_noturno || '---')}</p>
+                            <p class="text-[9px] ${data.horario_noturno ? 'text-green-500 font-bold' : 'pal-text-muted'} uppercase tracking-widest">Noturno</p>
+                            <p class="text-[10px] font-mono pal-text mt-1">${escapeHtml(data.horario_noturno || '---')}</p>
                         </div>
                     </div>
                 </div>

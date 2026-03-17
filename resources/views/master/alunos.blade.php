@@ -13,10 +13,10 @@
         <div class="blob-2"></div>
 
         <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
+        <nav class="glass mx-6 mt-6 p-4 rounded-sm border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-white font-black text-sm hover:border-white/30 transition">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-white/5 border border-white/10 rounded-sm flex items-center justify-center text-white font-black text-sm hover:border-white/30 transition">
                         A
                     </a>
                     <div>
@@ -27,7 +27,7 @@
 
                 <div class="hidden md:block">
                     <input type="text" id="search-alunos" placeholder="Pesquisar por nome ou RA..." 
-                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs font-medium focus:outline-none focus:ring-1 focus:ring-white/30 transition-all w-64">
+                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-sm text-white text-xs font-medium focus:outline-none focus:ring-1 focus:ring-white/30 transition-all w-64">
                 </div>
             </div>
         </nav>
@@ -35,12 +35,12 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Base de Discentes</h2>
+                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Base de Discentes</h2>
                 <p class="text-white/70 font-medium">Gerenciamento centralizado de matrículas e dados acadêmicos.</p>
             </div>
 
             <!-- Alunos Section -->
-            <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
+            <div class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -62,10 +62,10 @@
                                     <span class="text-white/60 text-sm">{{ $aluno->email }}</span>
                                 </td>
                                 <td class="py-4 px-6">
-                                    <span class="text-[11px] font-black text-white/70 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-lg">{{ $aluno->ra }}</span>
+                                    <span class="text-[11px] font-black text-white/70 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-sm">{{ $aluno->ra }}</span>
                                 </td>
                                 <td class="py-4 px-6 text-center">
-                                    <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-bold border border-purple-500/20">
+                                    <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-sm text-xs font-bold border border-purple-500/20">
                                         {{ $aluno->materias_count }}
                                     </span>
                                 </td>
@@ -95,7 +95,7 @@
 
     <!-- Info Modal -->
     <div id="info-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center backdrop-blur-md transition-opacity duration-300 p-4">
-        <div class="glass rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 border border-white/10" id="modal-content-container">
+        <div class="glass rounded-sm shadow-2xl w-full max-w-lg transform transition-all scale-95 border border-white/10" id="modal-content-container">
             <div class="p-8">
                 <div class="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
                     <h3 id="modal-title" class="text-xs font-black text-white/70 uppercase tracking-[0.3em]">Detalhes</h3>
@@ -160,10 +160,10 @@
                         <span class="text-white/60 text-sm">${esc(aluno.email)}</span>
                     </td>
                     <td class="py-4 px-6">
-                        <span class="text-[11px] font-black text-white/70 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-lg">${esc(aluno.ra)}</span>
+                        <span class="text-[11px] font-black text-white/70 font-mono tracking-wider bg-white/5 px-2 py-1 rounded-sm">${esc(aluno.ra)}</span>
                     </td>
                     <td class="py-4 px-6 text-center">
-                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-bold border border-purple-500/20">
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-sm text-xs font-bold border border-purple-500/20">
                             ${aluno.materias ? aluno.materias.length : 0}
                         </span>
                     </td>

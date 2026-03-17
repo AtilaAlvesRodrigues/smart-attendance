@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 use App\Models\ProfessorModel;
 use App\Models\AlunoModel;
 use App\Models\Materia;

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\ProfessorModel;
 use App\Models\UsuarioMaster;
-use App\Http\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 
 class ProfessorLoginController extends BaseController
 {
@@ -19,11 +19,11 @@ class ProfessorLoginController extends BaseController
     public function attemptAuthentication(Request $request)
     {
         $request->validate([
-            'ra_email_cpf' => 'required|string|max:255',
+            'cpf_email' => 'required|string|max:255',
             'password' => 'required|string|max:255',
         ]);
 
-        $login = $request->input('ra_email_cpf');
+        $login = $request->input('cpf_email');
         $password = $request->input('password');
         $remember = $request->has('remember');
 
@@ -59,7 +59,7 @@ class ProfessorLoginController extends BaseController
 
         return redirect()->route('login.professor.form')
             ->withErrors([
-                'ra_email_cpf' => 'Credenciais de acesso fornecidas são inválidas.',
+                'cpf_email' => 'Credenciais de acesso fornecidas são inválidas.',
             ])->withInput();
     }
 }

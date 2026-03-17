@@ -1,0 +1,244 @@
+/* ============================================================
+   PROFESSOR THEME — theme_professor.css
+   Only styles specific to the professor dashboard views.
+   Loaded alongside theme.css on professor pages only.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   PAGE HEADER TYPOGRAPHY
+   ---------------------------------------------------------- */
+.pal-eyebrow {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #999;
+    margin: 0 0 0.6rem;
+}
+.pal-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: #efefef !important;
+    margin: 0;
+}
+.pal-subtitle {
+    font-size: 0.88rem;
+    color: #bbb;
+    margin: 0.5rem 0 0;
+}
+
+/* ----------------------------------------------------------
+   DASHBOARD CARDS
+   ---------------------------------------------------------- */
+.pal-dashboard-card {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 1.75rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+.pal-dashboard-card:hover {
+    border-color: rgba(255,255,255,0.18);
+}
+
+/* .pal-card-primary and .pal-card-muted inherit .pal-dashboard-card — overrides below */
+
+/* DASHBOARD BUTTONS */
+.pal-dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pal-dashboard-btn-solid {
+    background: #efefef;
+    color: #0d0d0d;
+    padding: 0.55rem 1.1rem;
+    border: none;
+}
+.pal-dashboard-btn-solid:hover {
+    background: #d4d4d4;
+}
+.pal-dashboard-btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    padding: 0.55rem 1.1rem;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.pal-dashboard-btn-ghost:hover {
+    border-color: rgba(255,255,255,0.3);
+    color: #efefef;
+}
+
+/* DASHBOARD BANNER (bottom active session area) */
+.pal-dashboard-banner {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+/* ----------------------------------------------------------
+   LIGHT MODE OVERRIDES — professor dashboard
+   ---------------------------------------------------------- */
+html.light-mode .pal-section-header {
+    border-bottom-color: rgba(0,0,0,0.08) !important;
+}
+html.light-mode .pal-eyebrow   { color: #777 !important; }
+html.light-mode .pal-subtitle  { color: #555 !important; }
+
+/* Muted cards: dark by default, reveal to white after 3s in light mode */
+@keyframes pal-card-reveal {
+    from {
+        background: #111;
+        border-color: rgba(255,255,255,0.07);
+    }
+    to {
+        background: #ffffff;
+        border-color: rgba(0,0,0,0.08);
+    }
+}
+@keyframes pal-card-text-reveal {
+    from { color: #efefef; }
+    to   { color: #111; }
+}
+@keyframes pal-card-sub-reveal {
+    from { color: #bbb; }
+    to   { color: #555; }
+}
+@keyframes pal-card-svg-reveal {
+    from { stroke: #888; }
+    to   { stroke: #666; }
+}
+@keyframes pal-card-ghost-reveal {
+    from { color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1); }
+    to   { color: #555; border-color: rgba(0,0,0,0.15); }
+}
+
+
+/* Staggered card reveal — all start dark, turn white in sequence */
+
+
+/* Card 1: Gerar QR Code — reveals at 1s */
+html.light-mode .pal-card-delay-1 {
+    background: #111;
+    border-color: rgba(255,255,255,0.07);
+    animation: pal-card-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 h3 {
+    color: #efefef;
+    animation: pal-card-text-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 p {
+    color: #bbb;
+    animation: pal-card-sub-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 svg {
+    stroke: #888;
+    animation: pal-card-svg-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 .pal-dashboard-btn-solid {
+    background: #efefef;
+    color: #0d0d0d;
+    animation: pal-card-btn-solid-reveal 0.8s ease 1s both;
+}
+
+/* Card 2: Relatórios — reveals at 2s */
+html.light-mode .pal-card-delay-2 {
+    background: #111;
+    border-color: rgba(255,255,255,0.07);
+    animation: pal-card-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 h3 {
+    color: #efefef;
+    animation: pal-card-text-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 p {
+    color: #bbb;
+    animation: pal-card-sub-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 svg {
+    stroke: #888;
+    animation: pal-card-svg-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 .pal-dashboard-btn-ghost {
+    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.1);
+    animation: pal-card-ghost-reveal 0.8s ease 2s both;
+}
+
+/* Card 3: Minhas Turmas — reveals at 3s */
+html.light-mode .pal-card-delay-3 {
+    background: #111;
+    border-color: rgba(255,255,255,0.07);
+    animation: pal-card-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 h3 {
+    color: #efefef;
+    animation: pal-card-text-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 p {
+    color: #bbb;
+    animation: pal-card-sub-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 svg {
+    stroke: #888;
+    animation: pal-card-svg-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 .pal-dashboard-btn-ghost {
+    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.1);
+    animation: pal-card-ghost-reveal 0.8s ease 3s both;
+}
+
+/* Shared button-solid reveal keyframe (dark bg → light) */
+@keyframes pal-card-btn-solid-reveal {
+    from { background: #efefef; color: #0d0d0d; }
+    to   { background: #111; color: #fff; }
+}
+
+
+
+/* Primary banner (QR Code display) — white background */
+html.light-mode .pal-banner-primary {
+    background: #ffffff !important;
+    border-color: rgba(0,0,0,0.1) !important;
+}
+html.light-mode .pal-banner-primary h2 { color: #111 !important; }
+html.light-mode .pal-banner-primary p,
+html.light-mode .pal-banner-primary strong { color: #444 !important; }
+
+/* Global button light overrides */
+html.light-mode .pal-dashboard-btn-solid {
+    background: #111;
+    color: #fff;
+}
+html.light-mode .pal-dashboard-btn-solid:hover { background: #333; }
+html.light-mode .pal-dashboard-btn-ghost {
+    color: #555;
+    border-color: rgba(0,0,0,0.15);
+}
+html.light-mode .pal-dashboard-btn-ghost:hover {
+    color: #111;
+    border-color: rgba(0,0,0,0.3);
+}
+html.light-mode .pal-dashboard-banner {
+    background: #fff;
+    border-color: rgba(0,0,0,0.08);
+}
+html.light-mode .pal-dashboard-banner h2 { color: #111 !important; }
+html.light-mode .pal-dashboard-banner p,
+html.light-mode .pal-dashboard-banner strong { color: #444 !important; }

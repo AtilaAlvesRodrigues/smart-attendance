@@ -3,13 +3,21 @@
 @section('title', 'Relatórios de Presença - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('no-nav')
+@section('nav-left')
+    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        ← Dashboard
+    </a>
+    <button onclick="window.print()" class="pal-nav-btn pal-nav-btn-solid no-print">
+        📄 Gerar PDF
+    </button>
+@endsection
 
-@push('head-scripts')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
-@endpush
+@section('nav-user')
+    <div class="pal-nav-user">
+        <span class="pal-nav-user-role">Professor</span>
+        <span class="pal-nav-user-name">{{ $professor->nome ?? 'Docente' }}</span>
+    </div>
+@endsection
 
 @push('styles')
 <style>
@@ -54,14 +62,14 @@
         background: rgba(255, 255, 255, 0.1) !important;
     }
     .flatpickr-day.selected {
-        background: #6366f1 !important;
-        border-color: #6366f1 !important;
+        background: #333 !important;
+        border-color: #333 !important;
         color: white !important;
-        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4) !important;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1) !important;
     }
     .flatpickr-day.today {
-        border-color: #a855f7 !important;
-        color: #a855f7 !important;
+        border-color: #efefef !important;
+        color: #efefef !important;
     }
     .flatpickr-day.flatpickr-disabled {
         color: rgba(255, 255, 255, 0.1) !important;
@@ -106,7 +114,7 @@
 
     /* Select Options Theme Fix */
     select option {
-        background-color: #1e1b4b !important; /* Indigo Escuro para Tema Escuro */
+        background-color: #222 !important; /* Dark theme */
         color: white !important;
     }
     body.theme-light select option {
@@ -136,14 +144,14 @@
         background: rgba(255, 255, 255, 0.1) !important;
     }
     .flatpickr-day.selected {
-        background: #6366f1 !important;
-        border-color: #6366f1 !important;
+        background: #333 !important;
+        border-color: #333 !important;
         color: white !important;
-        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4) !important;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1) !important;
     }
     .flatpickr-day.today {
-        border-color: #a855f7 !important;
-        color: #a855f7 !important;
+        border-color: #efefef !important;
+        color: #efefef !important;
     }
     .flatpickr-day.flatpickr-disabled {
         color: rgba(255, 255, 255, 0.1) !important;
@@ -186,7 +194,7 @@
         color: rgba(0, 0, 0, 0.1) !important;
     }
     body.theme-light .flatpickr-day.selected {
-        background: #4f46e5 !important;
+        background: #111 !important;
         color: white !important;
     }
 </style>
@@ -199,39 +207,20 @@
         <div class="blob top-[-100px] left-[-100px] no-print"></div>
         <div class="blob-2 no-print"></div>
 
-        <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal no-print">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('dashboard.professor') }}" class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-indigo-500/50 hover:scale-110 transition-transform">
-                        R
-                    </a>
-                    <div>
-                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none uppercase">Relatórios</h1>
-                        <a href="{{ route('dashboard.professor') }}" class="text-xs font-bold text-white/70 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar ao Dashboard</a>
-                    </div>
-                </div>
-
-                <button onclick="window.print()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    Gerar PDF / Imprimir
-                </button>
-            </div>
-        </nav>
-
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
-                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Histórico de Presenças</h2>
-                <p class="text-white/70 font-medium">Filtre por matéria e período para gerar seu relatório.</p>
+                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block">Módulo Relatórios</p>
+                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Histórico de Presenças</h2>
+                <p class="text-white/70 font-medium">Filtre por matéria e período para gerar seu relatório de frequências.</p>
             </div>
 
             <!-- Filtros -->
-            <div class="glass p-6 rounded-3xl border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print">
+            <div class="glass p-6 rounded-sm border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print">
                 <form action="{{ route('professor.relatorios') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div>
                         <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Matéria</label>
-                        <select name="materia_id" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                        <select name="materia_id" class="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all">
                             <option value="">Todas as Matérias</option>
                             @foreach($materias as $materia)
                                 <option value="{{ $materia->id }}" {{ request('materia_id') == $materia->id ? 'selected' : '' }}>
@@ -243,18 +232,18 @@
                     <div>
                         <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Data Início</label>
                         <input type="text" name="data_inicio" value="{{ request('data_inicio') }}" placeholder="DD/MM/AAAA"
-                            class="datepicker w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer">
+                            class="datepicker w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all cursor-pointer">
                     </div>
                     <div>
                         <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Data Fim</label>
                         <input type="text" name="data_fim" value="{{ request('data_fim') }}" placeholder="DD/MM/AAAA"
-                            class="datepicker w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer">
+                            class="datepicker w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all cursor-pointer">
                     </div>
                     <div class="flex gap-2">
-                        <button type="submit" class="flex-grow bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-xl transition-all border border-white/10">
+                        <button type="submit" class="flex-grow bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-sm transition-all border border-white/10">
                             Filtrar
                         </button>
-                        <a href="{{ route('professor.relatorios') }}" class="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white p-2.5 rounded-xl border border-white/10 transition-all" title="Resetar Filtros">
+                        <a href="{{ route('professor.relatorios') }}" class="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white p-2.5 rounded-sm border border-white/10 transition-all" title="Resetar Filtros">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </a>
                     </div>
@@ -262,7 +251,7 @@
             </div>
 
             <!-- Tabela de Resultados -->
-            <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
+            <div class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                     <h3 class="text-xl font-black text-white italic tracking-tighter">Registros Encontrados</h3>
                     <div class="text-xs font-black text-white/70 uppercase tracking-widest">
@@ -292,12 +281,12 @@
                                         <span class="block text-xs text-white/80 font-mono">{{ $presenca->aluno_ra }}</span>
                                     </td>
                                     <td class="py-4 px-6">
-                                        <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-lg text-xs font-black border border-indigo-500/20 uppercase tracking-widest">
+                                        <span class="px-3 py-1 bg-white/10 text-white rounded-sm text-xs font-black border border-white/20 uppercase tracking-widest">
                                             {{ $presenca->materia->nome }}
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 text-right">
-                                        <span class="px-3 py-1 bg-green-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">
+                                        <span class="px-3 py-1 bg-green-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">
                                             Presente
                                         </span>
                                     </td>

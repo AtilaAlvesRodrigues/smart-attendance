@@ -9,7 +9,7 @@ use App\Models\AlunoModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-use App\Http\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 
 class PresencaController extends Controller

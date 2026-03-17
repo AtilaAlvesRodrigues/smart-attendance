@@ -3,7 +3,21 @@
 @section('title', $materia->nome . ' - Gerenciar - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('no-nav')
+@section('nav-left')
+    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        ← Dashboard
+    </a>
+    <a href="{{ route('professor.gerenciar.index') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        ⬅ Voltar às Turmas
+    </a>
+@endsection
+
+@section('nav-user')
+    <div class="pal-nav-user">
+        <span class="pal-nav-user-role">Professor</span>
+        <span class="pal-nav-user-name">{{ $professor->nome ?? 'Docente' }}</span>
+    </div>
+@endsection
 
 @push('styles')
 <style>
@@ -20,16 +34,16 @@
         color: white;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body.theme-light .nota-input {
+    html.light-mode .nota-input {
         background: rgba(0, 0, 0, 0.03);
         border: 1px solid rgba(0, 0, 0, 0.1);
         color: #1e293b;
     }
     .nota-input:focus {
         outline: none;
-        border-color: #a855f7;
-        background: rgba(168, 85, 247, 0.1);
-        box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        border-color: #efefef;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     }
     .nota-input.saving {
         border-color: #f59e0b;
@@ -60,50 +74,29 @@
         <div class="blob top-[-100px] left-[-100px]"></div>
         <div class="blob-2"></div>
 
-        <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('professor.gerenciar.index') }}" class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-indigo-500/50 hover:scale-110 transition-transform">
-                        M
-                    </a>
-                    <div>
-                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none truncate max-w-[200px] md:max-w-none">{{ $materia->nome }}</h1>
-                        <a href="{{ route('professor.gerenciar.index') }}" class="text-xs font-bold text-white/70 hover:text-white uppercase tracking-widest mt-1 block">🛡️ Voltar às Matérias</a>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('dashboard.professor') }}" 
-                       class="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95">
-                        🏠 Dashboard
-                    </a>
-                </div>
-            </div>
-        </nav>
-
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Gerenciamento de Turma</h2>
+                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block">{{ $materia->nome }}</p>
+                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Gerenciamento de Turma</h2>
                 <p class="text-white/70 font-medium italic">Sala: {{ $materia->sala }} · {{ $alunos->count() }} alunos matriculados</p>
             </div>
 
             {{-- Cards de resumo --}}
             <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12 animate-reveal [animation-delay:300ms]">
-                <div class="glass p-6 rounded-3xl border border-white/10 text-center">
-                    <p class="text-3xl font-black text-purple-400 tracking-tighter">{{ $alunos->count() }}</p>
-                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Alunos</p>
+                <div class="glass p-6 rounded-sm border border-white/10 text-center">
+                    <p class="text-3xl font-black tracking-tighter pal-text">{{ $alunos->count() }}</p>
+                    <p class="text-[9px] uppercase font-black tracking-widest mt-2 pal-text-muted">Alunos</p>
                 </div>
-                <div class="glass p-6 rounded-3xl border border-white/10 text-center">
+                <div class="glass p-6 rounded-sm border border-white/10 text-center">
                     <p class="text-3xl font-black text-blue-400 tracking-tighter">{{ $totalAulas }}</p>
-                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Aulas Semestre</p>
+                    <p class="text-[9px] uppercase font-black tracking-widest mt-2 pal-text-muted">Aulas Semestre</p>
                 </div>
-                <div class="glass p-6 rounded-3xl border border-white/10 text-center">
-                    <p class="text-3xl font-black text-indigo-400 tracking-tighter">{{ $aulasRealizadas }}</p>
-                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Realizadas</p>
+                <div class="glass p-6 rounded-sm border border-white/10 text-center">
+                    <p class="text-3xl font-black tracking-tighter pal-text" style="opacity: 0.8">{{ $aulasRealizadas }}</p>
+                    <p class="text-[9px] uppercase font-black tracking-widest mt-2 pal-text-muted">Realizadas</p>
                 </div>
-                <div class="glass p-6 rounded-3xl border border-white/10 text-center">
+                <div class="glass p-6 rounded-sm border border-white/10 text-center">
                     @php
                         $mediaGeral = $alunos->map(function($a) {
                             $notas = collect([$a->pivot->prova1, $a->pivot->trabalho1, $a->pivot->trabalho2, $a->pivot->prova2])->filter(fn($n) => $n !== null);
@@ -111,26 +104,26 @@
                         })->filter(fn($m) => $m !== null);
                     @endphp
                     <p class="text-3xl font-black text-green-400 tracking-tighter">{{ $mediaGeral->isNotEmpty() ? number_format($mediaGeral->avg(), 1) : '--' }}</p>
-                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Média Geral</p>
+                    <p class="text-[9px] uppercase font-black tracking-widest mt-2 pal-text-muted">Média Geral</p>
                 </div>
-                <div class="glass p-6 rounded-3xl border border-white/10 text-center">
+                <div class="glass p-6 rounded-sm border border-white/10 text-center">
                     @php
                         $aprovados = $mediaGeral->filter(fn($m) => $m >= 5)->count();
                     @endphp
                     <p class="text-3xl font-black text-emerald-400 tracking-tighter">{{ $mediaGeral->isNotEmpty() ? round(($aprovados / $mediaGeral->count()) * 100) . '%' : '--' }}</p>
-                    <p class="text-[9px] text-white/70 uppercase font-black tracking-widest mt-2">Taxa Aprovação</p>
+                    <p class="text-[9px] uppercase font-black tracking-widest mt-2 pal-text-muted">Taxa Aprovação</p>
                 </div>
             </div>
 
             {{-- Tabela Container --}}
-            <div class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
+            <div class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-                    <h3 class="text-xl font-black text-white italic tracking-tighter">📋 Alunos Matriculados</h3>
+                    <h3 class="text-xl font-black italic tracking-tighter pal-text">📋 Alunos Matriculados</h3>
                     <div class="flex gap-2">
-                        <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-black text-white/60 uppercase tracking-widest">
+                        <span class="px-3 py-1 bg-white/10 rounded-sm text-xs font-black uppercase tracking-widest pal-text-muted" style="opacity: 0.6">
                             Previstas: {{ $totalAulas }}
                         </span>
-                        <span class="px-3 py-1 bg-indigo-500/20 rounded-lg text-xs font-black text-indigo-400 uppercase tracking-widest border border-indigo-500/20">
+                        <span class="px-3 py-1 bg-white/10 rounded-sm text-xs font-black uppercase tracking-widest border border-white/20 pal-text">
                             Realizadas: {{ $aulasRealizadas }}
                         </span>
                     </div>
@@ -139,7 +132,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
+                            <tr class="text-xs font-black uppercase tracking-[0.2em] border-b border-white/10 pal-text-muted" style="opacity: 0.8">
                                 <th class="py-4 px-6">Aluno</th>
                                 <th class="py-4 px-6 text-center">Presenças</th>
                                 <th class="py-4 px-6 text-center">Faltas</th>
@@ -166,8 +159,8 @@
                                 @endphp
                                 <tr class="hover:bg-white/5 transition-colors group">
                                     <td class="py-4 px-6">
-                                        <span class="block font-bold text-white tracking-tight">{{ $aluno->nome }}</span>
-                                        <span class="block text-xs text-white/80 font-mono">{{ $aluno->ra }}</span>
+                                        <span class="block font-bold tracking-tight pal-text">{{ $aluno->nome }}</span>
+                                        <span class="block text-xs font-mono pal-text-muted">{{ $aluno->ra }}</span>
                                     </td>
                                     
                                     <td class="py-4 px-6 text-center">
@@ -175,12 +168,12 @@
                                             <span class="font-black {{ $percentPresenca >= 75 ? 'text-green-400' : 'text-red-400' }} text-base tracking-tighter">
                                                 {{ $presencas }}
                                             </span>
-                                            <span class="text-[9px] text-white/70 uppercase font-bold">{{ $percentPresenca }}%</span>
+                                            <span class="text-[9px] uppercase font-bold pal-text-muted">{{ $percentPresenca }}%</span>
                                         </div>
                                     </td>
                                     
                                     <td class="py-4 px-6 text-center">
-                                        <span class="px-3 py-1 {{ $faltas > 0 ? 'bg-red-500/20 text-red-400 border-red-500/20' : 'bg-green-500/20 text-green-400 border-green-500/20' }} rounded-lg text-xs font-black border">
+                                        <span class="px-3 py-1 {{ $faltas > 0 ? 'bg-red-500/20 text-red-400 border-red-500/20' : 'bg-green-500/20 text-green-400 border-green-500/20' }} rounded-sm text-xs font-black border">
                                             {{ $faltas }}
                                         </span>
                                     </td>
@@ -211,19 +204,19 @@
                                                 {{ number_format($media, 1) }}
                                             </span>
                                         @else
-                                            <span class="text-white/70 text-xs">--</span>
+                                            <span class="text-xs pal-text-muted">--</span>
                                         @endif
                                     </td>
 
                                     <td class="py-4 px-6 text-right" id="situacao-{{ $aluno->ra }}">
                                         @if($reprovadoFalta)
-                                            <span class="px-3 py-1 bg-red-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-red-500/30">Rep. Falta</span>
+                                            <span class="px-3 py-1 bg-red-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest shadow-lg shadow-red-500/30">Rep. Falta</span>
                                         @elseif($media !== null && $aprovado)
-                                            <span class="px-3 py-1 bg-green-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">Aprovado</span>
+                                            <span class="px-3 py-1 bg-green-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">Aprovado</span>
                                         @elseif($media !== null && !$aprovado)
-                                            <span class="px-3 py-1 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Reprovado</span>
+                                            <span class="px-3 py-1 bg-orange-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Reprovado</span>
                                         @else
-                                            <span class="px-3 py-1 bg-white/5 text-white/70 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/5">Pendente</span>
+                                            <span class="px-3 py-1 bg-white/5 rounded-sm text-[9px] font-black uppercase tracking-widest border border-white/5 pal-text-muted">Pendente</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -237,15 +230,15 @@
             <div class="mt-8 flex flex-wrap gap-8 animate-reveal [animation-delay:500ms]">
                 <div class="flex items-center gap-3">
                     <span class="w-3 h-3 bg-green-400 rounded-full shadow-lg shadow-green-400/50"></span>
-                    <span class="text-xs font-bold text-white/70 uppercase tracking-widest">Aprovado (Média ≥ 5.0)</span>
+                    <span class="text-xs font-bold uppercase tracking-widest pal-text-muted">Aprovado (Média ≥ 5.0)</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="w-3 h-3 bg-red-400 rounded-full shadow-lg shadow-red-400/50"></span>
-                    <span class="text-xs font-bold text-white/70 uppercase tracking-widest">Reprovado por Nota ou Falta</span>
+                    <span class="text-xs font-bold uppercase tracking-widest pal-text-muted">Reprovado por Nota ou Falta</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="w-3 h-3 bg-white/20 rounded-full border border-white/10"></span>
-                    <span class="text-xs font-bold text-white/70 uppercase tracking-widest">Pendente / Em andamento</span>
+                    <span class="text-xs font-bold uppercase tracking-widest pal-text-muted">Pendente / Em andamento</span>
                 </div>
             </div>
         </main>
@@ -337,13 +330,13 @@
                 mediaCell.innerHTML = `<span class="font-black text-lg tracking-tighter ${cor}">${mF}</span>`;
 
                 if (media >= 5) {
-                    situacaoCell.innerHTML = `<span class="px-3 py-1 bg-green-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">Aprovado</span>`;
+                    situacaoCell.innerHTML = `<span class="px-3 py-1 bg-green-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">Aprovado</span>`;
                 } else {
-                    situacaoCell.innerHTML = `<span class="px-3 py-1 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Reprovado</span>`;
+                    situacaoCell.innerHTML = `<span class="px-3 py-1 bg-orange-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Reprovado</span>`;
                 }
             } else {
-                mediaCell.innerHTML = `<span class="text-white/70 text-xs">--</span>`;
-                situacaoCell.innerHTML = `<span class="px-3 py-1 bg-white/5 text-white/70 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/5">Pendente</span>`;
+                mediaCell.innerHTML = `<span class="text-xs pal-text-muted">--</span>`;
+                situacaoCell.innerHTML = `<span class="px-3 py-1 bg-white/5 rounded-sm text-[9px] font-black uppercase tracking-widest border border-white/5 pal-text-muted">Pendente</span>`;
             }
         }
     });

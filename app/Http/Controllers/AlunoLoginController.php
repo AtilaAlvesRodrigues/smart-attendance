@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\AlunoModel;
-use App\Http\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 
 class AlunoLoginController extends BaseController
 {
@@ -17,7 +17,7 @@ class AlunoLoginController extends BaseController
 
     public function attemptAuthentication(Request $request)
     {
-        $request->validate([
+        $request->validate([   
             'ra_email_cpf' => 'required|string|max:255',
             'password' => 'required|string|max:255',
         ]);
@@ -29,12 +29,12 @@ class AlunoLoginController extends BaseController
         $searchFields = ['ra', 'cpf', 'email'];
 
         $aluno = null;
-        foreach ($searchFields as $field) {
+        foreach ($searchFields as $field) {  
             $aluno = AlunoModel::where($field, $login)->first();
             if ($aluno) break;
         }
 
-        if ($aluno && Hash::check($password, $aluno->password)) {
+        if ($aluno && Hash::check($password, $aluno->password)) {   
             Auth::guard('professores')->logout();
             Auth::guard('masters')->logout();
 

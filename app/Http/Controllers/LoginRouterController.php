@@ -3,13 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 
 class LoginRouterController extends BaseController
 {
     public function showLoginForm()
     {
-        return view('index');
+        $activeCodes = [];
+        $materias = \App\Models\Materia::all();
+        
+        foreach ($materias as $materia) {
+            $cacheKey = 'aula_materia_' . $materia->id . '_' . now()->format('Y-m-d');
+            $cacheData = \Illuminate\Support\Facades\Cache::get($cacheKey);
+
+            if (is_array($cacheData) && isset($cacheData['codigo'])) {
+                $activeCodes[] = [
+                    'materia_nome' => $materia->nome,
+                    'codigo' => $cacheData['codigo'],
+                    'sala' => $materia->sala
+                ];
+            }
+        }
+
+        return view('index', compact('activeCodes'));
     }
 
     public function authenticate(Request $request)

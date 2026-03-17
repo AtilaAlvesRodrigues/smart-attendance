@@ -3,28 +3,19 @@
 @section('title', 'Painel do Aluno - Smart Attendance')
 
 @section('body-class', 'gradient-bg')
-@section('no-nav')
+@section('nav-user')
+<div class="pal-nav-user" style="margin-right:0;">
+    <span class="pal-nav-user-role">Aluno</span>
+    <span class="pal-nav-user-name">{{ $aluno->nome ?? 'Estudante' }}</span>
+</div>
+<button id="open-profile" style="width:36px; height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#888; transition:all 0.2s; margin-right:0.5rem;" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#888'">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+</button>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/theme_aluno.css') }}">
+@endpush
 
 @section('content')
-<div style="min-height:100vh; display:flex; flex-direction:column;">
-
-    {{-- Top Nav --}}
-    <nav style="position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:60px; background:rgba(13,13,13,0.95); border-bottom:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(12px);">
-        <a href="{{ url('/') }}" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:0.85rem; letter-spacing:0.1em; color:#efefef; text-decoration:none; text-transform:uppercase;">Smart<span style="color:#777;">Attendance</span></a>
-        <div style="display:flex; align-items:center; gap:1rem;">
-            <div style="text-align:right;">
-                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#777; margin:0;">Aluno</p>
-                <p style="font-size:0.8rem; font-weight:600; color:#efefef; margin:0;">{{ $aluno->nome ?? 'Estudante' }}</p>
-            </div>
-            <button id="open-profile" style="width:36px; height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#888; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#888'">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            </button>
-            <form action="{{ route('logout') }}" method="POST" style="margin:0;">
-                @csrf
-                <button type="submit" style="font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.04em; padding:0.4rem 0.9rem; background:transparent; color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:3px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='#ef4444'; this.style.color='#ef4444'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.7)'">Sair</button>
-            </form>
-        </div>
-    </nav>
 
     {{-- Profile Modal --}}
     <div id="profile-modal" style="display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; padding:1rem;">
@@ -88,61 +79,55 @@
     </div>
 
     {{-- Main Content --}}
-    <main style="padding-top:60px; flex:1; display:flex; flex-direction:column; align-items:center; padding-left:2rem; padding-right:2rem; padding-bottom:4rem;">
+    <main class="pal-main" style="display:flex; flex-direction:column; align-items:center;">
 
         {{-- Pending attendance banner --}}
         @if(session('pending_attendance_code'))
-        <div style="width:100%; max-width:900px; margin-top:2.5rem; background:#111; border:1px solid rgba(255,255,255,0.12); border-radius:4px; padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; flex-wrap:wrap;">
+        <div class="pal-dashboard-banner" style="width:100%; max-width:900px; margin-top:2.5rem; padding:1.5rem 2rem;">
             <div>
                 <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; margin:0 0 0.3rem;">Presença Pendente</p>
                 <p style="font-size:1rem; font-weight:700; color:#efefef; margin:0;">Você tem uma aula aguardando confirmação.</p>
             </div>
             <a href="{{ route('presenca.confirmar', session('pending_attendance_code')) }}"
-                style="background:#efefef; color:#0d0d0d; padding:0.65rem 1.5rem; font-size:0.82rem; font-weight:700; letter-spacing:0.04em; border-radius:3px; text-decoration:none; white-space:nowrap;"
-                onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='#efefef'">
+                class="pal-dashboard-btn pal-dashboard-btn-solid" style="padding:0.65rem 1.5rem; white-space:nowrap;">
                 Confirmar Agora →
             </a>
         </div>
         @endif
 
         {{-- Hero text --}}
-        <div style="width:100%; max-width:900px; margin-top:4rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:3rem;">
+        <div class="pal-content-container" style="margin-top:4rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:3rem;">
             <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.75rem;">Guia de Utilização</p>
-            <h1 style="font-size:clamp(2rem,5vw,3.5rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0;">Como funciona?</h1>
+            <h1 class="pal-always-white" style="font-size:clamp(2rem,5vw,3.5rem); font-weight:900; letter-spacing:-0.04em; margin:0;">Como funciona?</h1>
         </div>
 
-        {{-- Steps grid --}}
-        <div style="width:100%; max-width:900px; display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:3rem;">
-            @foreach([
-                ['01', 'Acesso Rápido', 'Acesse o Smart Attendance com seu RA, e-mail institucional ou CPF de forma segura.'],
-                ['02', 'QR Code Dinâmico', 'Localize o QR Code projetado pelo professor durante a aula.'],
-                ['03', 'Confirmação', 'Escaneie o código com a câmera e receba a confirmação instantânea de presença.'],
-            ] as [$num, $title, $desc])
-            <div style="background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:4px; padding:1.75rem; transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
-                <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; color:#777; margin:0 0 1rem;">{{ $num }}</p>
-                <h3 style="font-size:1rem; font-weight:800; color:#efefef; margin:0 0 0.5rem; letter-spacing:-0.02em;">{{ $title }}</h3>
-                <p style="font-size:0.82rem; color:#bbb; line-height:1.6; margin:0;">{{ $desc }}</p>
+        <div class="pal-content-container">
+            <div class="pal-how-it-works-grid" style="margin-bottom:3rem;">
+                @foreach([
+                    ['01', 'Acesso Rápido', 'Acesse o Smart Attendance com seu RA, e-mail institucional ou CPF de forma segura.'],
+                    ['02', 'QR Code Dinâmico', 'Localize o QR Code projetado pelo professor durante a aula.'],
+                    ['03', 'Confirmação', 'Escaneie o código com a câmera e receba a confirmação instantânea de presença.'],
+                ] as $index => [$num, $title, $desc])
+                <div class="pal-dashboard-card pal-card-delay-{{ $index + 1 }}">
+                    <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; color:#777; margin:0 0 1rem;">{{ $num }}</p>
+                    <h3 style="font-size:1rem; font-weight:800; color:#efefef; margin:0 0 0.5rem; letter-spacing:-0.02em;">{{ $title }}</h3>
+                    <p style="font-size:0.82rem; color:#bbb; line-height:1.6; margin:0;">{{ $desc }}</p>
+                </div>
+                @endforeach
             </div>
-            @endforeach
         </div>
 
         {{-- Actions --}}
-        <div style="width:100%; max-width:900px; display:flex; gap:1rem; flex-wrap:wrap;">
-            <a href="{{ Auth::check() ? route('dashboard') : route('login_form') }}"
-                style="background:#efefef; color:#0d0d0d; padding:0.85rem 2rem; font-size:0.85rem; font-weight:700; letter-spacing:0.04em; border-radius:3px; text-decoration:none; border:1px solid #efefef;"
-                onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='#efefef'">
-                Prosseguir
-            </a>
+        <div class="pal-content-container" style="display:flex; gap:1rem; flex-wrap:wrap;">
             @auth
             <form action="{{ route('logout') }}" method="POST" style="margin:0;">
                 @csrf
-                <button type="submit" style="background:transparent; color:rgba(255,255,255,0.7); padding:0.85rem 2rem; font-size:0.85rem; font-weight:700; letter-spacing:0.04em; border:1px solid rgba(255,255,255,0.1); border-radius:3px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'; this.style.color='#efefef'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.7)'">Encerrar Sessão</button>
+                <button type="submit" class="pal-dashboard-btn pal-dashboard-btn-ghost" style="padding:0.85rem 2rem;">Encerrar Sessão</button>
             </form>
             @endauth
         </div>
 
     </main>
-</div>
 @endsection
 
 @push('scripts')

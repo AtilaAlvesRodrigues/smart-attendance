@@ -6,6 +6,10 @@
 @section('no-nav')
 
 @section('content')
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/theme_master.css') }}">
+    @endpush
     <style>
         @media print {
             body { background: white !important; color: black !important; }
@@ -80,10 +84,10 @@
         <div class="blob-2"></div>
 
         <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal no-print">
+        <nav class="glass mx-6 mt-6 p-4 rounded-sm border border-white/10 relative z-20 backdrop-blur-xl animate-reveal no-print">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-orange-500/50 hover:scale-110 transition-transform">
+                    <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-orange-500 rounded-sm flex items-center justify-center text-white font-black italic shadow-lg shadow-orange-500/50 html-light:shadow-none hover:scale-110 transition-transform">
                         P
                     </a>
                     <div>
@@ -93,7 +97,7 @@
                 </div>
 
                 <div class="hidden md:flex items-center gap-2">
-                    <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                    <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-sm text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex items-center gap-2">
                         📄 Gerar PDF
                     </button>
                 </div>
@@ -103,36 +107,36 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
     
             <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
-                <h2 class="text-4xl font-black text-white tracking-tighter mb-2">Relatório de Presenças</h2>
+                <h2 class="text-4xl font-black tracking-tighter mb-2 pal-always-white">Relatório de Presenças</h2>
                 <p class="text-white/70 font-medium">Acompanhamento centralizado de registros em tempo real.</p>
             </div>
 
             <!-- Filtros -->
-            <div class="glass p-6 rounded-3xl border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print relative z-30">
-                <form action="{{ route('master.presenca') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                    <div class="relative">
+            <div class="glass p-4 md:p-6 rounded-sm border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print relative z-30">
+                <form action="{{ route('master.presenca') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-center">
+                    <div class="relative pal-filter-card pal-card-delay-1">
                         <label class="block text-xs font-black text-white/80 uppercase tracking-[0.2em] mb-2">Professor</label>
                         <input type="text" name="professor" id="input-professor" value="{{ request('professor') }}" autocomplete="off" placeholder="Nome..." 
-                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                            class="w-full bg-white/5 border border-white/10 rounded-sm p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
                         <div id="suggestions-professor" class="suggestion-box"></div>
                     </div>
-                    <div class="relative">
+                    <div class="relative pal-filter-card pal-card-delay-2">
                         <label class="block text-xs font-black text-white/80 uppercase tracking-[0.2em] mb-2">Matéria</label>
                         <input type="text" name="materia" id="input-materia" value="{{ request('materia') }}" autocomplete="off" placeholder="Nome..." 
-                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                            class="w-full bg-white/5 border border-white/10 rounded-sm p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
                         <div id="suggestions-materia" class="suggestion-box"></div>
                     </div>
-                    <div class="relative">
+                    <div class="relative pal-filter-card pal-card-delay-3">
                         <label class="block text-xs font-black text-white/80 uppercase tracking-[0.2em] mb-2">Aluno</label>
                         <input type="text" name="aluno" id="input-aluno" value="{{ request('aluno') }}" autocomplete="off" placeholder="Nome..." 
-                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                            class="w-full bg-white/5 border border-white/10 rounded-sm p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
                         <div id="suggestions-aluno" class="suggestion-box"></div>
                     </div>
                     <div class="flex gap-2 no-print">
-                        <button type="submit" class="flex-grow bg-white text-dark_purple font-black py-3 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl">
+                        <button type="submit" class="flex-grow bg-white/10 html-light:bg-white pal-text font-black py-3 rounded-sm transition-all hover:scale-105 active:scale-95 shadow-xl border border-white/10 html-light:border-transparent">
                             Filtrar
                         </button>
-                        <a href="{{ route('master.presenca') }}" class="px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl flex items-center justify-center text-white transition-all">
+                        <a href="{{ route('master.presenca') }}" class="px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm flex items-center justify-center text-white transition-all">
                             ✖
                         </a>
                     </div>
@@ -140,10 +144,10 @@
             </div>
 
             <!-- Tabela Container -->
-            <div id="printable-content" class="glass rounded-3xl border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms] relative z-10">
+            <div id="printable-content" class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms] relative z-10">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center no-print bg-white/5">
                     <h3 class="text-xl font-black text-white italic tracking-tighter">Registros de Frequência</h3>
-                    <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-black text-white/60 uppercase tracking-widest">
+                    <span class="px-3 py-1 bg-white/10 rounded-sm text-xs font-black text-white/60 uppercase tracking-widest">
                         Total: {{ $presencas->total() }} de registros
                     </span>
                 </div>

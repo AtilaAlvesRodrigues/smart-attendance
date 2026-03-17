@@ -3,7 +3,26 @@
 @section('title', 'Gerando Frequência - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('no-nav')
+@section('nav-left')
+    <div id="timer-container" class="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 py-1.5 px-3 rounded-sm backdrop-blur-md mr-2" style="margin-right:0.5rem">
+        <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-ping" id="timer-dot"></div>
+        <span id="timer-text" class="text-[10px] font-black text-white tracking-widest tabular-nums">--:--:--</span>
+    </div>
+
+    <a href="{{ route('professor.presenca.index') }}" class="pal-nav-btn pal-nav-btn-ghost hidden sm:inline-flex">
+        ⬅ Disciplinas
+    </a>
+    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        🏠 Home
+    </a>
+@endsection
+
+@section('nav-user')
+    <div class="pal-nav-user">
+        <span class="pal-nav-user-role">Professor</span>
+        <span class="pal-nav-user-name">{{ $professor->nome ?? 'Docente' }}</span>
+    </div>
+@endsection
 
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
@@ -12,52 +31,23 @@
         <div class="blob top-[-100px] left-[-100px]"></div>
         <div class="blob-2"></div>
 
-        <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
-            <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-green-500/50">
-                        QR
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-black tracking-tighter text-white italic leading-none">{{ $materia->nome }}</h1>
-                        <p class="text-xs font-bold text-white/70 uppercase tracking-widest mt-1">Chamada em Tempo Real</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    {{-- Timer --}}
-                    <div id="timer-container" class="hidden md:flex items-center gap-3 bg-white/5 border border-white/10 py-2 px-4 rounded-xl backdrop-blur-md">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" id="timer-dot"></div>
-                        <span id="timer-text" class="text-xs font-black text-white tracking-widest tabular-nums">--:--:--</span>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('professor.presenca.index') }}" 
-                           class="hidden sm:block px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all hover:bg-white/10">
-                            Disciplinas
-                        </a>
-                        <a href="{{ route('dashboard.professor') }}" 
-                           class="px-4 py-2 bg-white text-dark_purple rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95">
-                            Home
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <main class="max-w-7xl mx-auto w-full p-6 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+        <main class="max-w-7xl mx-auto w-full p-6 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 flex-grow">
             
+            <div class="lg:col-span-12 animate-reveal [animation-delay:100ms]">
+                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block pal-always-white">Chamada em Tempo Real</p>
+                <h2 class="text-4xl font-black tracking-tighter pal-always-white">{{ $materia->nome }}</h2>
+            </div>
+
             {{-- Coluna Esquerda: QR Code --}}
             <div class="lg:col-span-5 flex flex-col gap-8 animate-reveal [animation-delay:200ms]">
-                <div class="glass p-10 rounded-[2.5rem] border border-white/10 flex flex-col items-center justify-center text-center relative overflow-hidden">
-                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-600/10 blur-3xl"></div>
+                <div class="glass p-10 rounded-sm border border-white/10 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-white/5 blur-3xl"></div>
                     
                     <h2 class="text-2xl font-black text-white tracking-tight mb-8 italic">QR Code de Frequência</h2>
                     
                     <div class="relative group">
-                        <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                        <div id="qrcode" class="relative p-6 rounded-3xl bg-white shadow-2xl"></div>
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-white/20 to-white/5 rounded-sm blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                        <div id="qrcode" class="relative p-6 rounded-sm bg-white shadow-2xl"></div>
                     </div>
 
                     {{-- Timer grande abaixo do QR --}}
@@ -72,14 +62,14 @@
                     </div>
 
                     <div class="mt-8 flex flex-col items-center gap-4">
-                        <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
-                            <code class="text-purple-300 font-black tracking-widest text-sm uppercase">CÓDIGO: {{ $codigo_aula }}</code>
+                        <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-sm">
+                            <code class="text-white font-black tracking-widest text-sm uppercase">CÓDIGO: {{ $codigo_aula }}</code>
                         </div>
                         <p class="text-white/70 text-xs font-bold uppercase tracking-widest leading-relaxed mb-4">
                             Aponte a câmera para o código ou use o link abaixo:
                         </p>
                         <a href="{{ route('presenca.confirmar', $codigo_aula) }}" target="_blank"
-                           class="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 hover:text-white rounded-xl transition-all duration-300 text-xs font-black uppercase tracking-[0.15em] group">
+                           class="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white hover:text-white rounded-sm transition-all duration-300 text-xs font-black uppercase tracking-[0.15em] group">
                             <span>Registrar Presença (Link)</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -88,9 +78,9 @@
                     </div>
                 </div>
 
-                <div class="glass p-8 rounded-3xl border border-white/10 animate-reveal [animation-delay:400ms]">
+                <div class="glass p-8 rounded-sm border border-white/10 animate-reveal [animation-delay:400ms]">
                     <h3 class="font-black text-white mb-6 text-sm uppercase tracking-widest italic flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                        <span class="w-1.5 h-1.5 bg-white/50 rounded-full"></span>
                         Detalhes da Aula
                     </h3>
                     <div class="grid grid-cols-2 gap-6">
@@ -119,14 +109,14 @@
 
             {{-- Coluna Direita: Lista de Presença --}}
             <div class="lg:col-span-7 flex flex-col gap-6 animate-reveal [animation-delay:400ms]">
-                <div class="glass p-8 rounded-[2.5rem] border border-white/10 flex-grow flex flex-col min-h-[600px] overflow-hidden">
+                <div class="glass p-8 rounded-sm border border-white/10 flex-grow flex flex-col min-h-[600px] overflow-hidden">
                     <div class="flex justify-between items-center mb-8">
                         <div>
                             <h2 class="text-3xl font-black text-white tracking-tighter italic">Alunos Presentes</h2>
                             <p class="text-white/70 text-xs font-medium tracking-tight mt-1">Sincronização automática a cada 3s.</p>
                         </div>
-                        <div class="flex items-center gap-3 bg-purple-500 p-3 rounded-2xl shadow-xl shadow-purple-900/40 transform -rotate-3">
-                            <span class="text-white text-3xl font-black leading-none" id="contador-alunos">0</span>
+                        <div class="pal-count-badge flex items-center gap-3 p-3 rounded-sm shadow-xl transform -rotate-3">
+                            <span class="pal-count-number text-3xl font-black leading-none" id="contador-alunos">0</span>
                         </div>
                     </div>
 
@@ -161,10 +151,10 @@
 
     {{-- Glass Expirado Overlay --}}
     <div id="expired-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-xl bg-black/60">
-        <div class="glass p-12 rounded-[3rem] border-2 border-white/10 max-w-md w-full text-center relative overflow-hidden animate-reveal">
+        <div class="glass p-12 rounded-sm border-2 border-white/10 max-w-md w-full text-center relative overflow-hidden animate-reveal">
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 blur-3xl"></div>
             
-            <div class="w-20 h-20 bg-red-500/20 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-8 animate-pulse">
+            <div class="w-20 h-20 bg-red-500/20 rounded-sm flex items-center justify-center text-4xl mx-auto mb-8 animate-pulse">
                 ⏰
             </div>
             
@@ -174,7 +164,7 @@
             </p>
             
             <a href="{{ route('professor.presenca.index') }}" 
-               class="block w-full bg-white text-dark_purple hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-xl text-lg shadow-2xl">
+               class="block w-full bg-white text-black hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-sm text-lg shadow-2xl border border-white/20">
                 Voltar às Disciplinas
             </a>
         </div>
@@ -270,7 +260,7 @@
                             row.innerHTML = `
                                 <td class="py-4 px-2">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-xs font-black text-white group-hover:bg-purple-500/20 transition-colors capitalize">
+                                        <div class="w-8 h-8 bg-white/5 border border-white/10 rounded-sm flex items-center justify-center text-xs font-black text-white group-hover:bg-white/10 transition-colors capitalize">
                                             ${presenca.aluno ? presenca.aluno.nome.charAt(0) : '?'}
                                         </div>
                                         <span class="text-sm font-bold text-white tracking-tight">${presenca.aluno ? presenca.aluno.nome : 'Desconhecido'}</span>
@@ -279,7 +269,7 @@
                                 <td class="py-4 px-2 text-center text-xs font-medium text-white/70 font-mono tracking-wider">${presenca.aluno_ra}</td>
                                 <td class="py-4 px-2 text-center text-xs font-black text-white/60 tabular-nums tracking-widest">${horaFormatada}</td>
                                 <td class="py-4 px-2 text-right">
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-400 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-400 rounded-sm text-[9px] font-black uppercase tracking-widest">
                                         <span class="w-1 h-1 bg-green-500 rounded-full"></span>
                                         Confirmado
                                     </span>

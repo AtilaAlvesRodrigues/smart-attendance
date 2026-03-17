@@ -1,0 +1,136 @@
+/* ============================================================
+   STUDENT THEME — theme_aluno.css
+   Only styles specific to the student dashboard views.
+   Loaded alongside theme.css on student pages only.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   DASHBOARD CARDS
+   ---------------------------------------------------------- */
+.pal-dashboard-card {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 1.75rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+.pal-dashboard-card:hover {
+    border-color: rgba(255,255,255,0.18);
+}
+
+/* ----------------------------------------------------------
+   LIGHT MODE OVERRIDES — student dashboard
+   ---------------------------------------------------------- */
+
+/* Card reveal animations (mirroring professor cards) */
+@keyframes pal-card-reveal {
+    from {
+        background: #111;
+        border-color: rgba(255,255,255,0.07);
+    }
+    to {
+        background: #ffffff;
+        border-color: rgba(0,0,0,0.08);
+    }
+}
+@keyframes pal-card-text-reveal {
+    from { color: #efefef; }
+    to   { color: #111; }
+}
+@keyframes pal-card-sub-reveal {
+    from { color: #bbb; }
+    to   { color: #555; }
+}
+@keyframes pal-card-num-reveal {
+    from { color: #777; }
+    to   { color: #999; }
+}
+
+/* Staggered card reveal — all start dark, turn white in sequence */
+
+/* Card 1: revelations at 1s */
+html.light-mode .pal-card-delay-1 {
+    background: #111;
+    border-color: rgba(255,255,255,0.07);
+    animation: pal-card-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 p:first-child {
+    color: #777;
+    animation: pal-card-num-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 h3 {
+    color: #efefef;
+    animation: pal-card-text-reveal 0.8s ease 1s both;
+}
+html.light-mode .pal-card-delay-1 p:last-child {
+    color: #bbb;
+    animation: pal-card-sub-reveal 0.8s ease 1s both;
+}
+
+/* Card 2: revelations at 2s */
+html.light-mode .pal-card-delay-2 {
+    background: #111;
+    border-color: rgba(255,255,255,0.07);
+    animation: pal-card-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 p:first-child {
+    color: #777;
+    animation: pal-card-num-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 h3 {
+    color: #efefef;
+    animation: pal-card-text-reveal 0.8s ease 2s both;
+}
+html.light-mode .pal-card-delay-2 p:last-child {
+    color: #bbb;
+    animation: pal-card-sub-reveal 0.8s ease 2s both;
+}
+
+/* Card 3: revelations at 3s */
+html.light-mode .pal-card-delay-3 {
+    background: #111;
+    border-color: rgba(255,255,255,0.07);
+    animation: pal-card-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 p:first-child {
+    color: #777;
+    animation: pal-card-num-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 h3 {
+    color: #efefef;
+    animation: pal-card-text-reveal 0.8s ease 3s both;
+}
+html.light-mode .pal-card-delay-3 p:last-child {
+    color: #bbb;
+    animation: pal-card-sub-reveal 0.8s ease 3s both;
+}
+
+/* ----------------------------------------------------------
+   LAYOUT & SCALABILITY
+   ---------------------------------------------------------- */
+.pal-content-container {
+    width: 100%;
+    max-width: 900px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.pal-how-it-works-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .pal-how-it-works-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .pal-content-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

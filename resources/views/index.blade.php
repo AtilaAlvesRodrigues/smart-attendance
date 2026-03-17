@@ -23,7 +23,25 @@
             </div>
         </div>
         <div class="pal-hero-visual">
+            @if(isset($activeCodes) && count($activeCodes) > 0)
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+                @foreach($activeCodes as $index => $code)
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <a href="{{ route('presenca.confirmar', $code['codigo']) }}" 
+                           style="width:220px; height:220px; background:white; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; text-decoration:none; padding: 10px;"
+                           id="qrcode-{{$index}}" data-code="{{ route('presenca.confirmar', $code['codigo']) }}">
+                        </a>
+                        <div style="text-align: center;">
+                            <span style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; display:block; margin-bottom: 0.2rem;">Sessão Ativa</span>
+                            <strong style="color: white; font-size: 1.1rem;">{{ $code['materia_nome'] }}</strong>
+                            <span style="color: #888; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Sala: {{ $code['sala'] }}</span>
+                        </div>
+                    </div>
+                @endforeach
+                </div>
+            @else
             <div class="pal-qr-mock">
+                <!-- Data dots inner visual -->
                 <div class="pal-qr-inner">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" width="120" height="120">
                         <!-- QR Code mock pattern -->
@@ -76,6 +94,7 @@
                     <p class="pal-qr-sub">Escaneie para confirmar presença</p>
                 </div>
             </div>
+            @endif
         </div>
     </div>
     <div class="pal-hero-scroll-hint">
@@ -207,7 +226,7 @@
     <div class="pal-container">
         <div class="pal-stats-grid">
             <div class="pal-stat">
-                <span class="pal-stat-number">< 3s</span>
+                <span class="pal-stat-number">3s</span>
                 <span class="pal-stat-label">Para confirmar presença</span>
             </div>
             <div class="pal-stat">
@@ -232,5 +251,10 @@
         </div>
     </div>
 </section>
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="{{ asset('js/pages/index.js') }}"></script>
+@endpush
 
 @endsection

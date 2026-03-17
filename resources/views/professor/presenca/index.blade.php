@@ -3,7 +3,18 @@
 @section('title', 'Selecionar Matéria - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('no-nav')
+@section('nav-left')
+    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        ← Dashboard
+    </a>
+@endsection
+
+@section('nav-user')
+    <div class="pal-nav-user">
+        <span class="pal-nav-user-role">Professor</span>
+        <span class="pal-nav-user-name">{{ $professor->nome ?? 'Docente' }}</span>
+    </div>
+@endsection
 
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
@@ -12,32 +23,16 @@
         <div class="blob top-[-100px] right-[-100px]"></div>
         <div class="blob-2"></div>
 
-        <!-- Glass Navbar -->
-        <nav class="glass mx-6 mt-6 p-4 rounded-2xl border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-purple-500/50">
-                        P
-                    </div>
-                    <h1 class="text-xl font-black tracking-tighter text-white italic hidden md:block">PRESENÇA DIGITAL</h1>
-                </div>
-
-                <a href="{{ route('dashboard.professor') }}" 
-                    class="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-xs font-bold transition-all hover:scale-105 active:scale-95">
-                    Voltar ao Dashboard
-                </a>
-            </div>
-        </nav>
-
         <main class="max-w-4xl mx-auto w-full p-6 mt-12 relative z-10">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <h2 class="text-4xl font-black text-white tracking-tighter mb-2 italic">Selecione a Disciplina</h2>
-                <p class="text-white/70 font-medium tracking-tight">Escolha qual matéria você irá registrar presença hoje.</p>
+                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block pal-always-white">Módulo Presença Digital</p>
+                <h2 class="text-4xl font-black tracking-tighter mb-2 italic pal-always-white">Selecione a Disciplina</h2>
+                <p class="font-medium tracking-tight pal-always-white">Escolha qual matéria você irá registrar presença hoje.</p>
             </div>
 
             @if($materias->isEmpty())
-                <div class="glass p-10 rounded-3xl border border-yellow-500/30 text-center animate-reveal [animation-delay:400ms]">
+                <div class="glass p-10 rounded-sm border border-yellow-500/30 text-center animate-reveal [animation-delay:400ms]">
                     <div class="text-5xl mb-6">🏜️</div>
                     <h3 class="text-2xl font-black text-white mb-2">Sem Matérias</h3>
                     <p class="text-white/70">Você ainda não possui turmas vinculadas ao seu perfil.</p>
@@ -55,9 +50,9 @@
 
                             <div class="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 class="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-purple-300 transition-colors">{{ $materia->nome }}</h3>
+                                    <h3 class="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-white/80 transition-colors">{{ $materia->nome }}</h3>
                                     <div class="mt-3 flex items-center gap-2">
-                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs font-black text-white/80 tracking-widest uppercase">
+                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-sm text-xs font-black text-white/80 tracking-widest uppercase">
                                             {{ $materia->horario_matutino ? '☀️ Matutino' : ($materia->horario_noturno ? '🌙 Noturno' : '⛅ Vespertino') }}
                                         </span>
                                     </div>
@@ -74,19 +69,19 @@
                             @if($materia->active_code)
                                 <a href="{{ route('professor.presenca.gerar', $materia->id) }}" 
                                    target="_blank"
-                                   class="block w-full bg-green-600 hover:bg-green-500 text-white text-center py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-green-900/40 hover:scale-[1.02] active:scale-95">
+                                   class="block w-full bg-green-600 hover:bg-green-500 text-white text-center py-4 rounded-sm font-black text-lg transition-all shadow-xl shadow-green-900/40 hover:scale-[1.02] active:scale-95">
                                     Acessar QR Code
                                 </a>
                             @else
                                 @if($hasActiveCode)
                                     <button onclick="mostrarPopup('{{ $materia->nome }}')"
-                                       class="block w-full bg-white/5 border border-white/10 text-white/70 text-center py-4 rounded-xl font-black text-lg cursor-not-allowed">
+                                       class="block w-full bg-white/5 border border-white/10 text-white/70 text-center py-4 rounded-sm font-black text-lg cursor-not-allowed">
                                         Indisponível (Conflito)
                                     </button>
                                 @else
                                     <a href="{{ route('professor.presenca.gerar', $materia->id) }}" 
                                        target="_blank"
-                                       class="block w-full bg-purple-600 hover:bg-purple-500 text-white text-center py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-purple-900/40 hover:scale-[1.02] active:scale-95">
+                                       class="block w-full bg-white hover:bg-white/90 text-black text-center py-4 rounded-sm font-black text-lg transition-all shadow-xl shadow-white/20 hover:scale-[1.02] active:scale-95">
                                         Gerar QR Code
                                     </a>
                                 @endif
@@ -103,7 +98,7 @@
         <div class="glass p-10 rounded-[2.5rem] border-2 border-white/10 max-w-md w-full text-center relative overflow-hidden animate-reveal">
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-yellow-500/10 blur-3xl"></div>
             
-            <div class="w-20 h-20 bg-yellow-500/20 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-8 animate-bounce">
+            <div class="w-20 h-20 bg-yellow-500/20 rounded-sm flex items-center justify-center text-4xl mx-auto mb-8 animate-bounce">
                 ⚠️
             </div>
             
@@ -112,10 +107,10 @@
                 Você já possui um QR Code de frequência ativo para outra disciplina no sistema.
             </p>
             
-            <div id="popup-materia" class="mb-10 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-yellow-300 font-bold text-sm inline-block"></div>
+            <div id="popup-materia" class="mb-10 px-4 py-2 bg-white/5 border border-white/10 rounded-sm text-yellow-300 font-bold text-sm inline-block"></div>
             
             <button onclick="fecharPopup()" 
-                class="w-full bg-white/10 hover:bg-white text-white hover:text-dark_purple font-black py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-95">
+                class="w-full bg-white/10 hover:bg-white text-white hover:text-black font-black py-4 rounded-sm transition-all hover:scale-[1.02] active:scale-95">
                 Entendido
             </button>
         </div>
