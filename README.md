@@ -67,42 +67,43 @@ Este projeto utiliza **Laravel 8** com **PHP 8.2**. Siga as etapas abaixo para c
 
 ## 🧩 Pré-requisitos
 
-* **PHP** (versão 8.2 ou compatível com Laravel 8): [https://php.net/downloads.php](https://php.net/downloads.php)
-* **Composer** (gerenciador de dependências PHP): [https://getcomposer.org](https://getcomposer.org/)
-* **Git** (opcional, mas recomendado): [https://git-scm.com](https://git-scm.com/)
-* **Postgres** (versão 17.6 será o banco de dados utilizado): [https://postgresql-downloads](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+* **PHP** (versão 8.2 ou compatível): [https://php.net/downloads.php](https://php.net/downloads.php)
+* **Composer** (Gerenciador de dependências PHP): [https://getcomposer.org](https://getcomposer.org/)
+* **Node.js & NPM** (Obrigatório para o Vite/Front-end): [https://nodejs.org/](https://nodejs.org/)
+* **Postgres** (versão 17.6 recomendada): [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+* **Git**: [https://git-scm.com](https://git-scm.com/)
 
 ---
 
-## Configuração do PHP no Windows (Variáveis de Ambiente)
+## 💻 Configuração do Ambiente (Windows)
 
-Se você está no Windows e baixou o ZIP do PHP, siga estes passos para torná-lo acessível globalmente:
+### 1. Configuração do PHP (Variáveis de Ambiente)
+Se você baixou o ZIP do PHP:
+1. Extraia o conteúdo para `C:\php`.
+2. Pesquise por **"Configurações avançadas do sistema"** > **Variáveis de Ambiente**.
+3. Em **Variáveis do Sistema**, edite a variável `Path`.
+4. Clique em **Novo** e adicione: `C:\php`.
 
-1.  **Extraia o PHP:**
-    * Crie uma pasta no caminho raiz do seu disco: `C:\php`
-    * Extraia o conteúdo do arquivo ZIP do PHP para dentro desta nova pasta (`C:\php`).
+### 2. Configuração do `php.ini`
+Abra o terminal (Git Bash) e digite `code C:\php\php.ini` ou abra o arquivo manualmente em `C:\php\php.ini`. Certifique-se de ativar as seguintes extensões (remova o `;` do início das linhas):
 
-2.  **Adicionar ao PATH do Sistema:**
-    * Pesquise no Windows por **"Configurações avançadas do sistema"**.
-    * Na aba **Avançado**, clique em **"Variáveis de Ambiente"**.
-    * Na seção **"Variáveis do Sistema"**, encontre e selecione a variável **`Path`** e clique em **"Editar..."**.
-    * Clique em **"Novo"** e adicione o caminho:
-        ```
-        C:\php
-        ```
-    * Clique em **"OK"** em todas as janelas para salvar.
+```ini
+extension_dir = "C:\php\ext"
+extension=fileinfo
+extension=zip
+extension=pdo_pgsql
+extension=pgsql
+```
 
 ---
 
 ## Configuração Inicial do Git (Git Bash)
 
  **Registrando o usuário (Faça isso apenas uma vez por máquina):**
-    
    
     git config --global user.name "Seu Nome Aqui"
  
     git config --global user.email "Seu Email Aqui"
-    
 
 ---
 ## 🛠️ Primeira Instalação do PHP (Configuração do `php.ini`)
@@ -163,7 +164,6 @@ Somente de installar o composer
 composer global require laravel/installer
 ```
 
-
 ### ⚠️ Usando o Composer (Criando o projeto):
 
 ```bash
@@ -196,10 +196,40 @@ composer install
 composer update
 ```
 ---
+
+## Configurar Front-end (Vite) ⚠️
+
+```ini
+# Instala as dependências do Node.js
+npm install
+
+# Compila os assets e gera o manifesto em public/build
+npm run build
+```
+
+---
 *No Termenial Digite:* 
 ```bash
 php artisan serve
 ```
+```ini
+npm run dev
+```
+---
+
+🧪 Solução de Problemas
+
+Erro: Vite manifest not found
+
+Se o erro persistir, limpe o cache de visualização e gere o build novamente:
+
+```ini
+php artisan view:clear
+php artisan config:clear
+npm run build
+```
+---
+
 ### Caso tudo esteja certo esta sera a tela que deve aparecer: 
 <img width="1122" height="507" alt="image" src="https://github.com/user-attachments/assets/eb97908c-2810-4a30-9b6f-6010223a5a1f" />
 
@@ -228,12 +258,13 @@ php artisan migrate
 
 ---
 
-# 💾Rodando Migrações e Seeds (Recomendado para Primeira Configuração)
+## 💾Rodando Migrações e Seeds (Recomendado para Primeira Configuração)
 
 Para limpar o banco de dados anterior, rodar as migrações e popular o banco de dados com dados de teste/iniciais (seeds), use o comando:
 ```bash
 php artisan migrate:fresh --seed
 ```
+
 
 ## 🧪 Testando
 
