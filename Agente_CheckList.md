@@ -163,8 +163,16 @@ Nunca altere a lógica fundamental de autenticação sem validação do backend 
 ---
 
 ## 📋 11. TABELAS E LISTAGENS DE DADOS
-Para garantir legibilidade em Relatórios e Dashboards:
-- **Títulos de Página**: SEMPRE use `.pal-title` (ex: "Histórico de Presenças"). Nunca use `pal-always-white`.
+Para garantir legibilidade em Relatórios, Dashboards Prof/Aluno e Módulos Master:
+- **Títulos de Página**: SEMPRE use `.pal-title` (ex: "Histórico de Presenças", "Visão Geral do Sistema"). Nunca use `pal-always-white`.
+- **Eyebrows (Sobrancelhas)**: Use `.pal-eyebrow` para rótulos pequenos acima de títulos (ex: "Módulo Presença Digital", "Guia de Utilização").
+- **Alinhamento**: Em sessões de Guia ou Introdução (ex: "Como funciona?"), centralize o título e a sobrancelha para melhor equilíbrio visual.
+
+---
+
+## ✨ 12. ANIMAÇÕES E INTERAÇÕES (Premium Feel)
+- **Efeito Tilt**: Todos os cards de seleção ou ação (Matérias, Passos do Guia) devem usar a classe `.tilt-card` e o script de inclinação 3D para feedback interativo.
+- **Transições de Tema**: Garanta que mudanças de cor (especialmente em cards com delay) usem `@keyframes` para suavizar a transição entre dark e light mode.
 - **Textos em Tabelas**: 
   - Nome/Dado Principal: Classe `.pal-text` (font-bold).
   - RA/Meta-info/Subtexto: Classe `.pal-subtitle` (font-mono ou font-medium).

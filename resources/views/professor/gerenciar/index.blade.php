@@ -41,7 +41,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-reveal [animation-delay:400ms]">
                     @foreach($materias as $index => $materia)
                         <a href="{{ route('professor.gerenciar.materia', $materia->id) }}" 
-                           class="group glass p-8 rounded-sm border border-white/10 hover:border-indigo-400/30 transition-all duration-500 hover:-translate-y-2 relative overflow-hidden flex flex-col h-full [animation-delay:{{ ($index + 4) * 100 }}ms] animate-reveal">
+                           class="group glass p-8 rounded-sm border border-white/10 hover:border-indigo-400/30 transition-all duration-500 hover:-translate-y-2 relative overflow-hidden flex flex-col h-full [animation-delay:{{ ($index + 4) * 100 }}ms] animate-reveal tilt-card">
                             
                             <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-600/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
@@ -88,3 +88,25 @@
         </main>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Tilt effect
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.tilt-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rotateX = (y - rect.height/2) / 15;
+                const rotateY = (rect.width/2 - x) / 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    });
+</script>
+@endpush

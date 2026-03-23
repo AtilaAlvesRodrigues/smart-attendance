@@ -99,9 +99,9 @@
         @endif
 
         {{-- Hero text --}}
-        <div class="pal-content-container" style="margin-top:4rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:3rem;">
-            <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.75rem;">Guia de Utilização</p>
-            <h1 class="pal-always-white" style="font-size:clamp(2rem,5vw,3.5rem); font-weight:900; letter-spacing:-0.04em; margin:0;">Como funciona?</h1>
+        <div class="pal-content-container" style="margin-top:4rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:3rem; text-align:center;">
+            <p class="pal-eyebrow" style="margin-bottom:0.75rem;">Guia de Utilização</p>
+            <h1 class="pal-title">Como funciona?</h1>
         </div>
 
         <div class="pal-content-container">
@@ -111,7 +111,7 @@
                     ['02', 'QR Code Dinâmico', 'Localize o QR Code projetado pelo professor durante a aula.'],
                     ['03', 'Confirmação', 'Escaneie o código com a câmera e receba a confirmação instantânea de presença.'],
                 ] as $index => [$num, $title, $desc])
-                <div class="pal-dashboard-card pal-card-delay-{{ $index + 1 }}">
+                <div class="pal-dashboard-card tilt-card pal-card-delay-{{ $index + 1 }}">
                     <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; color:#777; margin:0 0 1rem;">{{ $num }}</p>
                     <h3 style="font-size:1rem; font-weight:800; color:#efefef; margin:0 0 0.5rem; letter-spacing:-0.02em;">{{ $title }}</h3>
                     <p style="font-size:0.82rem; color:#bbb; line-height:1.6; margin:0;">{{ $desc }}</p>
@@ -149,5 +149,23 @@
     closeBtn.addEventListener('click', () => toggleModal(false));
     overlay.addEventListener('click', () => toggleModal(false));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleModal(false); });
+
+    // Tilt effect
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.tilt-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rotateX = (y - rect.height/2) / 15;
+                const rotateY = (rect.width/2 - x) / 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    });
 </script>
 @endpush

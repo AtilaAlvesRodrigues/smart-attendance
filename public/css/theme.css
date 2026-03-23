@@ -44,6 +44,11 @@ html.light-mode .pal-nav-user-role { color: #666 !important; }
 html.light-mode .pal-nav-user-name { color: #111 !important; }
 html.light-mode .pal-site-footer p { color: #555555 !important; }
 
+html.light-mode .pal-title { color: #111 !important; }
+html.light-mode .pal-subtitle { color: #555 !important; }
+html.light-mode .pal-eyebrow { color: #777 !important; }
+html.light-mode .pal-text { color: #111 !important; }
+
 
 
 /* Global Base */
@@ -357,6 +362,30 @@ html.light-mode .pal-profile-field-value { color: #1e293b; }
 }
 .pal-btn-outline:hover { border-color: var(--pal-white); transform: translateY(-1px); }
 .pal-btn-outline:active { transform: scale(0.97); }
+
+.pal-dashboard-btn-ghost {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    color: #efefef;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.pal-dashboard-btn-ghost:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+html.light-mode .pal-dashboard-btn-ghost {
+    background: rgba(0,0,0,0.03) !important;
+    border-color: rgba(0,0,0,0.1) !important;
+    color: #111 !important;
+}
+html.light-mode .pal-dashboard-btn-ghost:hover {
+    background: rgba(0,0,0,0.05) !important;
+    border-color: rgba(0,0,0,0.2) !important;
+}
 
 /* STAT CARDS */
 .pal-stat-card {

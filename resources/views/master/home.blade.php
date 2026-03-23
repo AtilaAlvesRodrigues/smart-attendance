@@ -71,9 +71,9 @@
 
     {{-- Header --}}
     <div class="border-b border-white/5 pb-8 mb-10">
-        <p class="font-mono text-xs font-bold tracking-[0.2em] uppercase text-white/50 mb-2">Admin Master</p>
-        <h1 class="pal-always-white" style="font-size:clamp(2rem,5vw,3.5rem); font-weight:900; letter-spacing:-0.04em; margin:0;">Visão Geral do Sistema</h1>
-        <p class="pal-page-sub text-white/60">Controle total de usuários, turmas e registros de presença.</p>
+        <p class="pal-eyebrow mb-2">Admin Master</p>
+        <h1 class="pal-title">Visão Geral do Sistema</h1>
+        <p class="pal-subtitle">Controle total de usuários, turmas e registros de presença.</p>
     </div>
 
     {{-- Stats --}}
@@ -83,9 +83,9 @@
             [$alunosCount, 'Alunos'],
             [$materiasCount, 'Matérias'],
         ] as [$count, $label])
-        <div class="p-8 rounded-sm shadow-xl transition-all animate-fade-in" style="background-color: var(--pal-white); color: var(--pal-black);">
-            <p class="text-5xl font-black tracking-tighter leading-none mb-3">{{ $count }}</p>
-            <p class="font-mono text-xs font-bold tracking-widest uppercase opacity-70 m-0">{{ $label }}</p>
+        <div class="pal-stat-card shadow-xl transition-all animate-fade-in">
+            <p class="number mb-3">{{ $count }}</p>
+            <p class="label m-0">{{ $label }}</p>
         </div>
         @endforeach
     </div>
@@ -100,23 +100,23 @@
         @php
             [$url, $title, $desc] = $item;
         @endphp
-        <a href="{{ $url }}" class="group glass block p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline hover:-translate-y-1 pal-card-delay-{{ $index + 1 }}">
-            <h3 class="text-lg font-black tracking-tight text-white mb-2">{{ $title }}</h3>
-            <p class="text-sm text-white/60 leading-relaxed mb-6">{{ $desc }}</p>
-            <span class="font-mono text-[10px] font-bold tracking-[0.15em] uppercase text-white/50 group-hover:text-white transition-colors border-b border-white/20 pb-1">Explorar &rarr;</span>
+        <a href="{{ $url }}" class="group glass block p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline hover:-translate-y-1 pal-card-delay-{{ $index + 1 }} tilt-card">
+            <h3 class="text-lg font-black tracking-tight pal-text mb-2">{{ $title }}</h3>
+            <p class="text-sm pal-subtitle leading-relaxed mb-6">{{ $desc }}</p>
+            <span class="font-mono text-[10px] font-bold tracking-[0.15em] uppercase pal-text-muted group-hover:pal-text transition-colors border-b border-white/20 pb-1">Explorar &rarr;</span>
         </a>
         @endforeach
     </div>
 
     {{-- Large Action --}}
-    <a href="{{ route('master.presenca') }}" class="group glass block p-10 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline hover:-translate-y-1">
+    <a href="{{ route('master.presenca') }}" class="group glass block p-10 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline hover:-translate-y-1 tilt-card">
         <div class="flex items-center justify-between gap-8 flex-wrap">
             <div>
-                <p class="font-mono text-xs font-bold tracking-widest uppercase text-white/50 mb-3">Módulo</p>
-                <h3 class="text-3xl font-black tracking-tighter text-white mb-3">Central de Chamada QR Code</h3>
-                <p class="text-sm text-white/60 m-0">Monitore presenças em tempo real e acesse o log completo de atividades.</p>
+                <p class="pal-eyebrow mb-3">Módulo</p>
+                <h3 class="text-3xl font-black tracking-tighter pal-text mb-3">Central de Chamada QR Code</h3>
+                <p class="text-sm pal-subtitle m-0">Monitore presenças em tempo real e acesse o log completo de atividades.</p>
             </div>
-            <span class="bg-white text-black px-8 py-4 text-sm font-bold tracking-wide rounded-sm whitespace-nowrap group-hover:bg-gray-100 transition-colors">Acessar Central &rarr;</span>
+            <span class="pal-btn-primary px-8 py-4 text-sm font-bold tracking-wide rounded-sm whitespace-nowrap group-hover:bg-indigo-600 group-hover:text-white transition-colors">Acessar Central &rarr;</span>
         </div>
     </a>
 
@@ -138,6 +138,24 @@
     if (closeBtn) closeBtn.addEventListener('click', () => toggleModal(false));
     if (overlay) overlay.addEventListener('click', () => toggleModal(false));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleModal(false); });
+
+    // Tilt effect
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.tilt-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rotateX = (y - rect.height/2) / 15;
+                const rotateY = (rect.width/2 - x) / 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    });
 </script>
 @endpush
 @endsection

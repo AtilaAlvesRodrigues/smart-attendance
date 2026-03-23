@@ -26,16 +26,16 @@
         <main class="max-w-4xl mx-auto w-full p-6 mt-12 relative z-10">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block pal-always-white">Módulo Presença Digital</p>
-                <h2 class="text-4xl font-black tracking-tighter mb-2 italic pal-always-white">Selecione a Disciplina</h2>
-                <p class="font-medium tracking-tight pal-always-white">Escolha qual matéria você irá registrar presença hoje.</p>
+                <p class="pal-eyebrow" style="margin-bottom:0.5rem">Módulo Presença Digital</p>
+                <h2 class="pal-title">Selecione a Disciplina</h2>
+                <p class="pal-subtitle">Escolha qual matéria você irá registrar presença hoje.</p>
             </div>
 
             @if($materias->isEmpty())
                 <div class="glass p-10 rounded-sm border border-yellow-500/30 text-center animate-reveal [animation-delay:400ms]">
                     <div class="text-5xl mb-6">🏜️</div>
-                    <h3 class="text-2xl font-black text-white mb-2">Sem Matérias</h3>
-                    <p class="text-white/70">Você ainda não possui turmas vinculadas ao seu perfil.</p>
+                    <h3 class="text-2xl font-black pal-text mb-2">Sem Matérias</h3>
+                    <p class="pal-subtitle">Você ainda não possui turmas vinculadas ao seu perfil.</p>
                 </div>
             @else
                 @php $hasActiveCode = $materias->contains(fn($m) => $m->active_code); @endphp
@@ -50,9 +50,9 @@
 
                             <div class="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 class="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-white/80 transition-colors">{{ $materia->nome }}</h3>
+                                    <h3 class="text-2xl font-black pal-text tracking-tight leading-tight group-hover:text-indigo-400 transition-colors">{{ $materia->nome }}</h3>
                                     <div class="mt-3 flex items-center gap-2">
-                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-sm text-xs font-black text-white/80 tracking-widest uppercase">
+                                        <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-sm text-xs font-black pal-subtitle tracking-widest uppercase">
                                             {{ $materia->horario_matutino ? '☀️ Matutino' : ($materia->horario_noturno ? '🌙 Noturno' : '⛅ Vespertino') }}
                                         </span>
                                     </div>
@@ -102,8 +102,8 @@
                 ⚠️
             </div>
             
-            <h2 class="text-3xl font-black text-white tracking-tighter mb-4 italic">Conflito Ativo</h2>
-            <p class="text-white/70 leading-relaxed mb-6 font-medium">
+            <h2 class="text-3xl font-black pal-text tracking-tighter mb-4 italic">Conflito Ativo</h2>
+            <p class="pal-subtitle leading-relaxed mb-6 font-medium">
                 Você já possui um QR Code de frequência ativo para outra disciplina no sistema.
             </p>
             

@@ -67,17 +67,17 @@
         </div>
     </div>
 
-    <main class="pal-main">
+    <main class="pal-main" style="padding-top: 1rem;">
 
         {{-- Header --}}
-        <div class="pal-section-header" style="padding:3rem 0 2rem; border-bottom:1px solid rgba(255,255,255,0.07); margin-bottom:2.5rem;">
+        <div class="pal-section-header" style="padding:1.5rem 0 1rem; border-bottom:1px solid rgba(255,255,255,0.07); margin-bottom:1.5rem;">
             <p class="pal-eyebrow">Painel Docente</p>
             <h1 class="pal-title">Painel de Controle</h1>
             <p class="pal-subtitle">Gerencie suas aulas e registros de presença em tempo real.</p>
         </div>
 
         {{-- Cards --}}
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2.5rem;">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem;">
 
             {{-- Card: QR (primary - reveals at 1s) --}}
             <div class="pal-dashboard-card pal-card-primary pal-card-delay-1">
