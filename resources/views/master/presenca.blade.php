@@ -104,6 +104,48 @@
             </div>
         </nav>
 
+        {{-- User Profile Modal --}}
+        <div id="profile-modal" class="pal-modal-overlay" style="display:none; z-index:100;">
+            <div id="close-profile-overlay" style="position:absolute; inset:0;"></div>
+            <div class="pal-modal-content">
+                <div class="pal-modal-header">
+                    <div>
+                        <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Painel de Controle</p>
+                        <h2 class="pal-always-white" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Perfil Master</h2>
+                    </div>
+                    <button id="close-profile" class="pal-profile-btn" style="border-color:rgba(255,255,255,0.1); color:#888;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="pal-modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+                        <div class="pal-profile-field">
+                            <p class="pal-profile-field-label">Nome de Exibição</p>
+                            <p class="pal-profile-field-value">Administrador Master</p>
+                        </div>
+                        <div class="pal-profile-field">
+                            <p class="pal-profile-field-label">Nível de Acesso</p>
+                            <p class="pal-profile-field-value">Controle Total (Sudo)</p>
+                        </div>
+                        <div class="pal-profile-field" style="grid-column: span 2;">
+                            <p class="pal-profile-field-label">E-mail do Sistema</p>
+                            <p class="pal-profile-field-value">{{ auth()->user()->email ?? 'master@smartattendance.com' }}</p>
+                        </div>
+                    </div>
+
+                    <hr class="pal-divider" style="margin-bottom:1.5rem;">
+                    <p class="pal-eyebrow" style="margin-bottom:1rem;">Segurança</p>
+
+                    <div class="pal-profile-field" style="background:rgba(34, 197, 94, 0.05); border-color:rgba(34, 197, 94, 0.1);">
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            <span style="width:8px; height:8px; background:#22c55e; border-radius:50%; display:inline-block;" class="animate-pulse"></span>
+                            <p class="pal-profile-field-value" style="color:#22c55e; font-size:11px;">Sessão Autenticada com Firewall Ativo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
     
             <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
@@ -133,12 +175,21 @@
                         <div id="suggestions-aluno" class="suggestion-box"></div>
                     </div>
                     <div class="flex gap-2 no-print">
-                        <button type="submit" class="flex-grow bg-white/10 html-light:bg-white pal-text font-black py-3 rounded-sm transition-all hover:scale-105 active:scale-95 shadow-xl border border-white/10 html-light:border-transparent">
+                        <button type="submit" class="flex-grow bg-white/10 html-light:bg-white font-black py-3 rounded-sm transition-all hover:scale-105 active:scale-95 shadow-xl border border-white/10 html-light:border-transparent">
                             Filtrar
                         </button>
                         <a href="{{ route('master.presenca') }}" class="px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm flex items-center justify-center text-white transition-all">
                             ✖
                         </a>
+                    </div>
+                    <div class="flex gap-4 no-print border-l border-white/10 pl-4 items-center">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">Master</p>
+                            <p class="text-xs font-bold text-white leading-none">Admin</p>
+                        </div>
+                        <button id="open-profile" type="button" class="pal-profile-btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -240,6 +291,22 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Profile Modal Logic
+        const pModal = document.getElementById('profile-modal');
+        const openPBtn = document.getElementById('open-profile');
+        const closePBtn = document.getElementById('close-profile');
+        const pOverlay = document.getElementById('close-profile-overlay');
+
+        function togglePModal(show) {
+            pModal.style.display = show ? 'flex' : 'none';
+            document.body.style.overflow = show ? 'hidden' : '';
+        }
+
+        if (openPBtn) openPBtn.addEventListener('click', () => togglePModal(true));
+        if (closePBtn) closePBtn.addEventListener('click', () => togglePModal(false));
+        if (pOverlay) pOverlay.addEventListener('click', () => togglePModal(false));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') togglePModal(false); });
+
         const setupAutocomplete = (inputId, suggestionId, url, renderItem) => {
             const input = document.getElementById(inputId);
             const box = document.getElementById(suggestionId);

@@ -13,9 +13,9 @@
     <div class="login-wrapper">
 
         <div class="login-header">
-            <p class="login-overline">Portal do Aluno</p>
-            <h1 class="login-title">Smart Attendance</h1>
-            <p class="login-subtitle">CEUB — Sistema de Presença Inteligente</p>
+            <p class="pal-eyebrow">Portal do Aluno</p>
+            <h1 class="pal-title">Smart Attendance</h1>
+            <p class="pal-subtitle">CEUB — Sistema de Presença Inteligente</p>
         </div>
 
         <div class="glass login-card">
@@ -30,14 +30,14 @@
                 @enderror
 
                 <div>
-                    <label class="login-label">Matrícula / RA / CPF / E-Mail</label>
+                    <label class="pal-eyebrow">Matrícula / RA / CPF / E-Mail</label>
                     <input type="text" name="ra_email_cpf" value="{{ old('ra_email_cpf') }}" required
                         class="login-input"
                         placeholder="ex: 12345678 ou nome@email.com">
                 </div>
 
                 <div>
-                    <label class="login-label">Senha</label>
+                    <label class="pal-eyebrow">Senha</label>
                     <div class="login-password-wrapper">
                         <input type="password" name="password" id="pal-password" required
                             class="login-input login-input-password">

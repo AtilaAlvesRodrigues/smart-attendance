@@ -110,7 +110,7 @@
             <div id="popup-materia" class="mb-10 px-4 py-2 bg-white/5 border border-white/10 rounded-sm text-yellow-300 font-bold text-sm inline-block"></div>
             
             <button onclick="fecharPopup()" 
-                class="w-full bg-white/10 hover:bg-white text-white hover:text-black font-black py-4 rounded-sm transition-all hover:scale-[1.02] active:scale-95">
+                class="w-full bg-[#efefef] text-[#050505] hover:bg-[#0d0d0d] hover:text-[#efefef] font-black py-4 rounded-sm transition-all hover:scale-[1.02] active:scale-95 border border-white/10">
                 Entendido
             </button>
         </div>

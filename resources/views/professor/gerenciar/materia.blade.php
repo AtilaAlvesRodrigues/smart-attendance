@@ -77,9 +77,9 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block">{{ $materia->nome }}</p>
-                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Gerenciamento de Turma</h2>
-                <p class="text-white/70 font-medium italic">Sala: {{ $materia->sala }} · {{ $alunos->count() }} alunos matriculados</p>
+                <p class="pal-eyebrow" style="margin-bottom:0.55rem">{{ $materia->nome }}</p>
+                <h2 class="pal-title">Gerenciamento de Turma</h2>
+                <p class="pal-subtitle font-medium italic">Sala: {{ $materia->sala }} · {{ $alunos->count() }} alunos matriculados</p>
             </div>
 
             {{-- Cards de resumo --}}
@@ -132,7 +132,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-black uppercase tracking-[0.2em] border-b border-white/10 pal-text-muted" style="opacity: 0.8">
+                            <tr class="pal-subtitle font-black uppercase tracking-[0.2em] border-b border-white/10" style="font-size:0.65rem">
                                 <th class="py-4 px-6">Aluno</th>
                                 <th class="py-4 px-6 text-center">Presenças</th>
                                 <th class="py-4 px-6 text-center">Faltas</th>

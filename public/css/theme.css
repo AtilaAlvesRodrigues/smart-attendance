@@ -11,6 +11,7 @@ html.light-mode {
 
 /* Light Mode Overrides (High Specificity to override inline and tailwind) */
 html.light-mode body { background-color: #f5f5f7 !important; color: #111111 !important; }
+html.light-mode .gradient-bg { background: #f5f5f7 !important; }
 html.light-mode .glass { background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important; }
 
 /* Tailwind Overrides */
@@ -27,7 +28,10 @@ html.light-mode [style*="color:#efefef"] { color: #111111 !important; }
 html.light-mode [style*="color:#efefef}"] { color: #111111 !important; }
 html.light-mode [style*="color:#777"], html.light-mode [style*="color:#888"], html.light-mode [style*="color:#999"], html.light-mode [style*="color:#aaa"], html.light-mode [style*="color:#bbb"], html.light-mode [style*="color:#555"], html.light-mode [style*="color:#444"], html.light-mode [style*="color:#333"] { color: #555555 !important; }
 html.light-mode [style*="border:1px solid rgba(255,255,255"] { border-color: rgba(0,0,0,0.1) !important; }
+html.light-mode [style*="border: 1px solid rgba(255,255,255"] { border-color: rgba(0,0,0,0.1) !important; }
 html.light-mode [style*="border-bottom:1px solid rgba(255,255,255"] { border-bottom-color: rgba(0,0,0,0.1) !important; }
+html.light-mode [style*="border-bottom: 1px solid rgba(255,255,255"] { border-bottom-color: rgba(0,0,0,0.1) !important; }
+html.light-mode [style*="box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5)"] { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important; }
 html.light-mode [style*="background:#efefef"] { background-color: #111111 !important; color: #ffffff !important; border-color: #111 !important; }
 html.light-mode [style*="color:#0d0d0d"] { color: #ffffff !important; }
 html.light-mode [style*="stroke:#efefef"] { stroke: #111111 !important; }
@@ -166,6 +170,33 @@ body {
     margin-top: 0.5rem;
 }
 
+/* STANDARDIZED TYPOGRAPHY (From Agente_CheckList) */
+.pal-eyebrow {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--pal-gray);
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.pal-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: var(--pal-white);
+    line-height: 1.1;
+    margin: 0;
+}
+
+.pal-subtitle {
+    font-size: 0.88rem;
+    color: var(--pal-light-gray);
+    margin-top: 0.4rem;
+}
+
 /* ALWAYS-WHITE UTILITIES — forces white text regardless of theme */
 .pal-always-white       { color: #ffffff !important; }
 .pal-always-white-muted { color: rgba(255,255,255,0.7) !important; }
@@ -183,6 +214,100 @@ body {
 .pal-count-number {
     color: var(--pal-white);
 }
+
+/* PROFILE BUTTON (Global) */
+.pal-profile-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #888;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.pal-profile-btn:hover {
+    border-color: rgba(255,255,255,0.3);
+    color: #efefef;
+}
+
+html.light-mode .pal-profile-btn {
+    background: #f1f5f9;
+    border-color: rgba(0,0,0,0.1);
+    color: #64748b;
+}
+html.light-mode .pal-profile-btn:hover {
+    color: #1e293b;
+    border-color: rgba(0,0,0,0.2);
+}
+
+/* MODAL GLOBAL STYLES */
+.pal-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+}
+.pal-modal-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 640px;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+.pal-modal-header {
+    padding: 1.75rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.pal-modal-body {
+    padding: 2rem;
+}
+.pal-profile-field {
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 3px;
+    padding: 1rem;
+}
+.pal-profile-field-label {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #777;
+    margin: 0 0 0.4rem;
+}
+.pal-profile-field-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #efefef;
+    margin: 0;
+    word-break: break-all;
+}
+
+html.light-mode .pal-modal-content { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+html.light-mode .pal-modal-header { border-bottom-color: rgba(0,0,0,0.08); }
+html.light-mode .pal-profile-field { background: #f8fafc; border-color: rgba(0,0,0,0.05); }
+html.light-mode .pal-profile-field-label { color: #64748b; }
+html.light-mode .pal-profile-field-value { color: #1e293b; }
 
 /* TAG / OVERLINE */
 .pal-tag {

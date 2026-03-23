@@ -13,13 +13,60 @@
 @endsection
 
 @section('nav-user')
-    <div class="pal-nav-user">
-        <span class="pal-nav-user-role">Acesso Root</span>
-        <span class="pal-nav-user-name">{{ $master->nome ?? 'Administrador' }}</span>
+    <div class="pal-nav-actions" style="gap:0.5rem">
+        <div class="pal-nav-user">
+            <span class="pal-nav-user-role">Acesso Root</span>
+            <span class="pal-nav-user-name">{{ $master->nome ?? 'Administrador' }}</span>
+        </div>
+        <button id="open-profile" class="pal-profile-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </button>
     </div>
 @endsection
 
 @section('content')
+{{-- User Profile Modal --}}
+<div id="profile-modal" class="pal-modal-overlay" style="display:none;">
+    <div id="close-profile-overlay" style="position:absolute; inset:0;"></div>
+    <div class="pal-modal-content">
+        <div class="pal-modal-header">
+            <div>
+                <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Painel de Controle</p>
+                <h2 class="pal-always-white" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Perfil Master</h2>
+            </div>
+            <button id="close-profile" class="pal-profile-btn" style="border-color:rgba(255,255,255,0.1); color:#888;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="pal-modal-body">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+                <div class="pal-profile-field">
+                    <p class="pal-profile-field-label">Nome de Exibição</p>
+                    <p class="pal-profile-field-value">Administrador Master</p>
+                </div>
+                <div class="pal-profile-field">
+                    <p class="pal-profile-field-label">Nível de Acesso</p>
+                    <p class="pal-profile-field-value">Controle Total (Sudo)</p>
+                </div>
+                <div class="pal-profile-field" style="grid-column: span 2;">
+                    <p class="pal-profile-field-label">E-mail do Sistema</p>
+                    <p class="pal-profile-field-value">{{ auth()->user()->email ?? 'master@smartattendance.com' }}</p>
+                </div>
+            </div>
+
+            <hr class="pal-divider" style="margin-bottom:1.5rem;">
+            <p class="pal-eyebrow" style="margin-bottom:1rem;">Segurança</p>
+
+            <div class="pal-profile-field" style="background:rgba(34, 197, 94, 0.05); border-color:rgba(34, 197, 94, 0.1);">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <span style="width:8px; height:8px; background:#22c55e; border-radius:50%; display:inline-block;" class="animate-pulse"></span>
+                    <p class="pal-profile-field-value" style="color:#22c55e; font-size:11px;">Sessão Autenticada com Firewall Ativo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <main class="pal-main animate-reveal">
 
     {{-- Header --}}
@@ -74,4 +121,23 @@
     </a>
 
 </main>
+@push('scripts')
+<script>
+    // Profile Modal Logic
+    const modal = document.getElementById('profile-modal');
+    const openBtn = document.getElementById('open-profile');
+    const closeBtn = document.getElementById('close-profile');
+    const overlay = document.getElementById('close-profile-overlay');
+
+    function toggleModal(show) {
+        modal.style.display = show ? 'flex' : 'none';
+        document.body.style.overflow = show ? 'hidden' : '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', () => toggleModal(true));
+    if (closeBtn) closeBtn.addEventListener('click', () => toggleModal(false));
+    if (overlay) overlay.addEventListener('click', () => toggleModal(false));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleModal(false); });
+</script>
+@endpush
 @endsection
