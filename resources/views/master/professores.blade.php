@@ -47,8 +47,8 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Corpo Docente</h2>
-                <p class="text-white/70 font-medium">Controle de acessos, turmas e registros de professores.</p>
+                <h2 class="text-4xl font-black tracking-tighter pal-title">Corpo Docente</h2>
+                <p class="pal-subtitle font-medium">Controle de acessos, turmas e registros de professores.</p>
             </div>
 
             <!-- Professores Section -->

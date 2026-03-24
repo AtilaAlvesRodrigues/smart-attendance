@@ -109,7 +109,7 @@
     </div>
 
     {{-- Large Action --}}
-    <a href="{{ route('master.presenca') }}" class="group glass block p-10 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline hover:-translate-y-1 tilt-card">
+    <a href="{{ route('master.presenca') }}" class="group glass block p-10 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline">
         <div class="flex items-center justify-between gap-8 flex-wrap">
             <div>
                 <p class="pal-eyebrow mb-3">Módulo</p>

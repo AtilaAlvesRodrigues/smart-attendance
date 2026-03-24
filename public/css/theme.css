@@ -313,6 +313,33 @@ html.light-mode .pal-profile-field { background: #f8fafc; border-color: rgba(0,0
 html.light-mode .pal-profile-field-label { color: #64748b; }
 html.light-mode .pal-profile-field-value { color: #1e293b; }
 
+/* FILTER INPUT — tema-aware */
+.pal-filter-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    padding: 0.75rem;
+    color: var(--pal-white);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pal-filter-input::placeholder { color: var(--pal-gray); }
+.pal-filter-input:focus {
+    border-color: rgba(255,165,60,0.5);
+    box-shadow: 0 0 0 3px rgba(255,165,60,0.1);
+}
+html.light-mode .pal-filter-input {
+    background: rgba(0,0,0,0.04);
+    border-color: rgba(0,0,0,0.12);
+    color: #111111;
+}
+html.light-mode .pal-filter-input::placeholder { color: #999999; }
+html.light-mode .pal-filter-input:focus {
+    border-color: rgba(234,88,12,0.4);
+    box-shadow: 0 0 0 3px rgba(234,88,12,0.08);
+}
+
 /* TAG / OVERLINE */
 .pal-tag {
     font-family: 'Space Grotesk', monospace;
@@ -361,6 +388,47 @@ html.light-mode .pal-profile-field-value { color: #1e293b; }
 }
 .pal-btn-outline:hover { border-color: var(--pal-white); transform: translateY(-1px); }
 .pal-btn-outline:active { transform: scale(0.97); }
+
+/* ACTION BUTTON — tema-aware, mesmo visual em dark E light mode */
+.pal-btn-action {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    font-weight: 900;
+    font-size: 1.125rem;
+    letter-spacing: 0.01em;
+    background: var(--pal-white);
+    color: var(--pal-black);
+    border: none;
+    border-radius: 2px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+.pal-btn-action:hover  { opacity: 0.88; transform: scaleX(1.01) translateY(-1px); }
+.pal-btn-action:active { transform: scale(0.97); opacity: 1; }
+
+/* Estado desabilitado — mesmo para light e dark */
+.pal-btn-action-disabled {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    font-weight: 900;
+    font-size: 1.125rem;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 2px;
+    cursor: not-allowed;
+}
+html.light-mode .pal-btn-action-disabled {
+    background: rgba(0,0,0,0.05);
+    color: rgba(0,0,0,0.3);
+    border-color: rgba(0,0,0,0.08);
+}
 
 .pal-dashboard-btn-ghost {
     background: rgba(255,255,255,0.05);

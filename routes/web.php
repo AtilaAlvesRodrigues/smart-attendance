@@ -104,6 +104,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
             Route::get('/professores', [MasterSearchController::class, 'searchProfessores'])->name('master.search.professores');
             Route::get('/alunos', [MasterSearchController::class, 'searchAlunos'])->name('master.search.alunos');
             Route::get('/materias', [MasterSearchController::class, 'searchMaterias'])->name('master.search.materias');
+            Route::get('/presencas', [MasterSearchController::class, 'searchPresencas'])->name('master.search.presencas');
         });
     });
 

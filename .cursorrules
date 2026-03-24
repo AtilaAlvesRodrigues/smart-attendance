@@ -1,3 +1,9 @@
+# Regras Globais do Agente (Smart Attendance)
+Antes de iniciar qualquer planejamento, alteração de código, correção de bugs ou refatoração neste projeto, você DEVE obrigatoriamente ler o arquivo de checklist localizado em:
+[C:\Users\atila.rodrigues\Desktop\smart-attendance\Agente_CheckList.md](cci:7://file:///c:/Users/atila.rodrigues/Desktop/smart-attendance/Agente_CheckList.md:0:0-0:0)
+Siga rigorosamente todos os protocolos, regras de design (Premium Glassmorphism), convenções de classes CSS (`.pal-*`) e as 5 regras do **Protocolo de Testes e Validação (Regressão)** descritas ao final do arquivo.
+
+
 # Agente_CheckList — Diretrizes de Master/UI
 
 Este arquivo serve como o "Caminho das Pedras" para a criação e modificação de páginas no Smart Attendance. Sempre consulte este checklist para garantir consistência estética e funcional (Premium Glassmorphism).
@@ -11,6 +17,7 @@ Toda página deve estender o layout principal e usar as seções corretas:
     - `@section('nav-left')`: Botões de "Voltar" ou ações primárias da esquerda.
     - `@section('nav-user')`: Info do usuário logado.
         - **Padrão**: Envolver em `<div class="pal-nav-actions" style="gap:0.5rem">` contendo o bloco `.pal-nav-user` e o botão `.pal-profile-btn`.
+        - **🔒 REGRA OBRIGATÓRIA**: O botão de perfil do usuário (`#open-profile` + `.pal-profile-btn`) deve estar **SEMPRE no header/nav**, nunca em cards de filtro, formulários ou seções de conteúdo. Isso vale inclusive para páginas com nav customizado (como `master/presenca.blade.php` que usa `@section('no-nav')` e constrói seu próprio `<nav>`): o perfil vai no lado direito desse nav, ao lado das ações globais (PDF, links).
 - **Styles/Scripts**: Usar `@push('styles')` e `@push('scripts')`.
 
 ## 2. Elementos de Design Obrigatórios
@@ -142,6 +149,11 @@ Para manter a integridade funcional ao criar novas rotas/controllers:
 - **Mudança de Cor de Texto**: No hover, a cor do texto/letra deve mudar para garantir contraste (ex: de preto para branco).
 - **Acessibilidade de Tema**: Se um botão for `white` em dark mode, ele deve se tornar `black` em light mode (usar variáveis ou overrides automáticos de hex como `#efefef`).
 - **Problema do "Texto Escuro em Fundo Escuro"**: No Light Mode, evite usar classes que invertem tanto o fundo quanto o texto para a mesma cor (ex: `bg-white` e `pal-text` simultaneamente podem causar invisibilidade).
+- **🎨 REGRA DE CONSISTÊNCIA DE COR**: **Botões com a mesma ação DEVEM ter a mesma cor em todas as páginas e contextos**, independente de onde aparecem. A cor do botão comunica a intenção da ação — mudar isso cria confusão visual e quebra a identidade do sistema.
+  - ✅ `Gerar QR Code` → sempre `background:#050505; color:#efefef` (dark) / `background:#efefef; color:#050505` (light)
+  - ✅ `Confirmar / Salvar` → sempre verde (`#22c55e`)
+  - ✅ `Cancelar / Sair` → sempre outline/ghost ou vermelho sutil
+  - ⚠️ **Exceção permitida**: Quando um botão está **desabilitado** (ex: conflito de horário, sem permissão), ele pode receber estilo diferente (`bg-white/5`, `cursor-not-allowed`) para sinalizar a indisponibilidade. Mas deve ser óbvio que é um estado especial, não a cor padrão do botão.
 
 ## 9. Arquivos de Referência
 - **CSS Global**: `public/css/theme.css`
@@ -178,3 +190,55 @@ Para garantir legibilidade em Relatórios, Dashboards Prof/Aluno e Módulos Mast
   - RA/Meta-info/Subtexto: Classe `.pal-subtitle` (font-mono ou font-medium).
 - **Cabeçalhos de Tabela (`th`)**: Use `.pal-subtitle` com `font-black uppercase tracking-widest`.
 - **Contrast Check**: Teste sempre se as linhas da tabela (`hover:bg-white/5`) e os divisores (`divide-white/5`) são visíveis em Light Mode (o `theme.css` cuida da maioria, mas evite cores fixas no Blade).
+
+---
+
+## 🐛 13. BUGS CONHECIDOS E SOLUÇÕES APLICADAS
+
+### Bug: Botão "Gerar QR Code" quase transparente (presença/index)
+- **Arquivo**: `resources/views/professor/presenca/index.blade.php`
+- **Causa**: O botão usa a classe Tailwind `bg-white`, que é sobrescrita pelo `theme.css` via `html.light-mode .bg-white { background-color: #111111 !important }`. Mesmo fora do light-mode, a classe `text-black` combinada com o card escuro pode gerar baixo contraste e aparência "invisível" quando nenhum QR Code está ativo.
+- **Solução Aplicada** (24/03/2026): Substituído `bg-white text-black` por `style="background:#efefef; color:#050505"` (inline) + eventos `onmouseover/onmouseout` para hover manual. Isso garante contraste correto independente do tema e dos overrides do `theme.css`.
+- **Regra Geral**: **Botões de ação primária nunca devem usar classes Tailwind de cor que possam ser sobrescritas pelo sistema de tema.** Use sempre `style="background:#efefef; color:#050505"` para botões claros (dark mode) ou variáveis `--pal-*` quando possível.
+
+### Bug: Inputs de pesquisa não mudam de cor no tema (master/presenca)
+- **Arquivo**: `resources/views/master/presenca.blade.php`
+- **Causa**: Inputs usavam `class="bg-white/5 border border-white/10 text-white"` (Tailwind). Em light mode, `bg-white/5` vira `rgba(0,0,0,0.04)` (quase branco sobre fundo branco), tornando o campo mal visível. O placeholder também não se adaptava.
+- **Solução Aplicada** (24/03/2026): Criada a classe `.pal-filter-input` no `theme.css` com overrides explícitos para `html.light-mode`, cobrindo background, cor do texto, cor do placeholder e ring de foco.
+- **Regra Geral**: **Inputs de formulário NUNCA devem usar classes Tailwind puras de cor.** Usar sempre `.pal-filter-input` (ou criar equivalente com variáveis `--pal-*` e override light-mode explícito no CSS).
+
+### Bug: Perfil do usuário aparecia abaixo do botão de filtrar (master/presenca)
+- **Arquivo**: `resources/views/master/presenca.blade.php`
+- **Causa**: O bloco de perfil estava como 5º item dentro de um `grid-cols-4`, causando overflow para a linha seguinte.
+- **Solução Aplicada** (24/03/2026): Perfil movido para fora do `<form>`, posicionado em uma linha de cabeçalho acima dos campos de filtro, alinhado à direita.
+- **Regra Geral**: **Elementos de UI que não fazem parte do formulário (perfil, ações globais) NUNCA devem estar dentro do `<form>`.** Posicionar sempre fora, usando flex/grid no container pai.
+
+### Bug: Filtros de pesquisa redirecionavam para a página inicial com query vazia (master/presenca)
+- **Arquivo**: `resources/views/master/presenca.blade.php`
+- **Causa**: O JS do autocomplete (linha ~300) submetia o formulário inteiro apenas chamando `form.submit()`. Campos HTML `<input>` vazios eram enviados na URL como `?professor=Valor&materia=&aluno=`, o que causava um comportamento estranho de roteamento no backend, perdendo o filtro do item que acabara de ser clicado.
+- **Solução Aplicada** (24/03/2026): A submissão via `form.submit()` com inputs desativados (`el.disabled = true`) apresentava problemas em certos navegadores. A solução definitiva foi interceptar o clique com JS, construir uma nova URL usando `URLSearchParams` apenas com os parâmetros que possuem valor (`el.value.trim() !== ''`), e redirecionar ativamente usando `window.location.href = url.toString()`.
+- **Regra Geral**: **Em fomulários de filtro (método GET), a melhor prática para evitar query strings sujas (`&campo=`) é construir a URL manualmente via `URLSearchParams` no Javascript e aplicar o redirecionamento via `window.location.href`**, contornando o comportamento padrão do `<form>`.
+
+---
+
+## 🧪 14. PROTOCOLO DE TESTES E VALIDAÇÃO (Regressão)
+
+Para garantir que novos problemas não sejam introduzidos ao consertar bugs antigos, **todos os agentes** devem realizar os seguintes testes antes de dar a tarefa como concluída:
+
+1. **Teste Visual de Contraste (Light/Dark Mode)**:
+   - Todo novo texto, título ou card deve ser verificado mental e logicamente quanto ao comportamento em Light Mode. 
+   - Se adicionou a classe `pal-always-white`, justifique por que não usou `pal-title` ou `pal-text`.
+
+2. **Teste de Interação (Event Listeners)**:
+   - Ao modificar ou remover um formulário nativo (ex: trocar `form` por `fetch` assíncrono), verifique se todos os inputs estão sendo lidos corretamente pelo Javascript.
+   - Pressione Enter nos inputs modificados para prever se o formulário será enviado equivocadamente (se houver `<form>`). Se sim, use `e.preventDefault()`.
+
+3. **Validação de Queries Backend (Filtros)**:
+   - Toda rota que recebe parâmetros de busca (`?q=` ou `?professor=`) deve ter os dados filtrados com validação no backend para evitar quebra ao receber null/vazio.
+   - Conferir se os relacionamentos do Eloquent (`with('aluno')`, etc.) continuam intactos ao reescrever métodos de Controller.
+
+4. **Regra de "One Feature, Double Check"**:
+   - Sempre que uma feature de outra página for "copiada" (ex: "faça o mesmo método da página X"), revise se o contexto da página alvo (slots de `@section`, scripts injetados, arquivos CSS carregados) suporta a cópia diretamente, ou se precisa de adaptações. Exemplo clássico: copiei uma searchbar da Navbar, mas a página precisava de 3 separadas.
+
+5. **Acompanhamento no Walkthrough**:
+   - Qualquer modificação arquitetural num formulário ou endpoint JSON deve ser registrada explicitamente no arquivo `walkthrough.md` para revisão pelo desenvolvedor raiz do projeto.
