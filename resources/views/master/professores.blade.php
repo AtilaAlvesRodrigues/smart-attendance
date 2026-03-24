@@ -3,8 +3,24 @@
 @section('title', 'Gerenciar Professores - Master')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('no-nav')
 
+@section('nav-left')
+    <a href="{{ route('dashboard.master') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        ← Dashboard
+    </a>
+@endsection
+
+@section('nav-user')
+<div class="pal-nav-actions" style="gap:0.5rem">
+    <div class="pal-nav-user">
+        <span class="pal-nav-user-role">Acesso Root</span>
+        <span class="pal-nav-user-name">Admin</span>
+    </div>
+    <button id="open-profile" type="button" class="pal-profile-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+    </button>
+</div>
+@endsection
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
         
@@ -28,17 +44,7 @@
                 <div class="flex items-center gap-4">
                     <div class="hidden md:block mr-2">
                         <input type="text" id="search-professores" placeholder="Pesquisar..." 
-                            class="px-4 py-1.5 bg-white/5 border border-white/10 rounded-sm text-white text-[11px] font-medium focus:outline-none focus:ring-1 focus:ring-white/30 transition-all w-48">
-                    </div>
-                    
-                    <div class="flex items-center gap-3 border-l border-white/10 pl-4">
-                        <div class="text-right hidden sm:block">
-                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">Master</p>
-                            <p class="text-xs font-bold text-white leading-none">Admin</p>
-                        </div>
-                        <button id="open-profile" class="pal-profile-btn">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </button>
+                            class="px-4 py-1.5 bg-black/10 border border-black/10 rounded-sm text-current text-[11px] font-medium focus:outline-none focus:ring-1 focus:ring-black/20 transition-all w-48 pal-filter-input">
                     </div>
                 </div>
             </div>

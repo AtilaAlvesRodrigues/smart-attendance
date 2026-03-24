@@ -17,7 +17,9 @@ Toda página deve estender o layout principal e usar as seções corretas:
     - `@section('nav-left')`: Botões de "Voltar" ou ações primárias da esquerda.
     - `@section('nav-user')`: Info do usuário logado.
         - **Padrão**: Envolver em `<div class="pal-nav-actions" style="gap:0.5rem">` contendo o bloco `.pal-nav-user` e o botão `.pal-profile-btn`.
-        - **🔒 REGRA OBRIGATÓRIA**: O botão de perfil do usuário (`#open-profile` + `.pal-profile-btn`) deve estar **SEMPRE no header/nav**, nunca em cards de filtro, formulários ou seções de conteúdo. Isso vale inclusive para páginas com nav customizado (como `master/presenca.blade.php` que usa `@section('no-nav')` e constrói seu próprio `<nav>`): o perfil vai no lado direito desse nav, ao lado das ações globais (PDF, links).
+        - **🔒 REGRA OBRIGATÓRIA (Nav-User Consistency)**: O botão de perfil do usuário (`#open-profile` + `.pal-profile-btn`) deve estar **SEMPRE no cabeçalho global** (Navbar), posicionado **exatamente ao lado do botão "Sair"** via `@section('nav-user')`. 
+            - Em páginas de listagem (`professores`, `alunos`, `materias`), nunca utilize `@section('no-nav')` se precisar manter o acesso rápido ao logout e ao perfil unificado.
+            - O perfil nunca deve ser movido para dentro de formulários de busca, cards de filtro ou outras seções de conteúdo.
 - **Styles/Scripts**: Usar `@push('styles')` e `@push('scripts')`.
 
 ## 2. Elementos de Design Obrigatórios
