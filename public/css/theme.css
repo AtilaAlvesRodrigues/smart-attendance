@@ -25,7 +25,7 @@ html.light-mode .border-white\/5, html.light-mode .border-white\/10, html.light-
 html.light-mode [style*="background:#111"] { background-color: #ffffff !important; border-color: rgba(0,0,0,0.1) !important; }
 html.light-mode [style*="background:#0d0d0d"] { background-color: #fcfcfc !important; }
 html.light-mode [style*="color:#efefef"] { color: #111111 !important; }
-html.light-mode [style*="color:#efefef}"] { color: #111111 !important; }
+html.light-mode [style*="color:#efefef"] { color: #111111 !important; }
 html.light-mode [style*="color:#777"], html.light-mode [style*="color:#888"], html.light-mode [style*="color:#999"], html.light-mode [style*="color:#aaa"], html.light-mode [style*="color:#bbb"], html.light-mode [style*="color:#555"], html.light-mode [style*="color:#444"], html.light-mode [style*="color:#333"] { color: #555555 !important; }
 html.light-mode [style*="border:1px solid rgba(255,255,255"] { border-color: rgba(0,0,0,0.1) !important; }
 html.light-mode [style*="border: 1px solid rgba(255,255,255"] { border-color: rgba(0,0,0,0.1) !important; }
