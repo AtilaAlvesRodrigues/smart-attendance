@@ -1,10 +1,9 @@
 # Regras Globais do Agente (Smart Attendance)
-Antes de iniciar qualquer planejamento, alteração de código, correção de bugs ou refatoração neste projeto, você DEVE obrigatoriamente ler o arquivo de checklist localizado em:
-[C:\Users\atila.rodrigues\Desktop\smart-attendance\Agente_CheckList.md](cci:7://file:///c:/Users/atila.rodrigues/Desktop/smart-attendance/Agente_CheckList.md:0:0-0:0)
+Antes de iniciar qualquer planejamento, alteração de código, correção de bugs ou refatoração neste projeto, você DEVE obrigatoriamente ler as regras e protocolos documentados neste arquivo (`.cursorrules`).
 Siga rigorosamente todos os protocolos, regras de design (Premium Glassmorphism), convenções de classes CSS (`.pal-*`) e as 5 regras do **Protocolo de Testes e Validação (Regressão)** descritas ao final do arquivo.
 
 
-# Agente_CheckList — Diretrizes de Master/UI
+# Smart Attendance — Diretrizes de Master/UI e Checklist Global
 
 Este arquivo serve como o "Caminho das Pedras" para a criação e modificação de páginas no Smart Attendance. Sempre consulte este checklist para garantir consistência estética e funcional (Premium Glassmorphism).
 
@@ -157,7 +156,11 @@ Para manter a integridade funcional ao criar novas rotas/controllers:
   - ✅ `Cancelar / Sair` → sempre outline/ghost ou vermelho sutil
   - ⚠️ **Exceção permitida**: Quando um botão está **desabilitado** (ex: conflito de horário, sem permissão), ele pode receber estilo diferente (`bg-white/5`, `cursor-not-allowed`) para sinalizar a indisponibilidade. Mas deve ser óbvio que é um estado especial, não a cor padrão do botão.
 
-## 9. Arquivos de Referência
+## 10. Viewport e Visibilidade (UX)
+- **Hero-Fold Visibility (Regra da Seta)**: O conteúdo da seção Hero (`.pal-hero`) deve ser sempre compacto o suficiente para que o "Scroll Hint" (seta de 'Como funciona') seja visível imediatamente ao carregar a página em resoluções padrão (notebooks 13-15").
+- **Ajustes de Altura**: Utilize `min-height: calc(100vh - 60px)` na seção Hero para compensar a Navbar fixa. Se o conteúdo interno exceder ~730px de altura útil, reduza gaps (`gap`), paddings verticais e o tamanho do QR Mock.
+
+## 11. Arquivos de Referência
 - **CSS Global**: `public/css/theme.css`
 - **CSS Professor**: `public/css/theme_professor.css` (específico para cards e dashboard).
 - **Layout Blade**: `resources/views/layouts/theme.blade.php`
@@ -244,3 +247,86 @@ Para garantir que novos problemas não sejam introduzidos ao consertar bugs anti
 
 5. **Acompanhamento no Walkthrough**:
    - Qualquer modificação arquitetural num formulário ou endpoint JSON deve ser registrada explicitamente no arquivo `walkthrough.md` para revisão pelo desenvolvedor raiz do projeto.
+
+---
+
+## 🚀 15. MELHORES PRÁTICAS E REQUISITOS TÉCNICOS
+
+Para elevar a qualidade do projeto Smart Attendance aos padrões Premium, siga estas diretrizes adicionais:
+
+### Acessibilidade e SEO
+- **Ícones Soltos**: Botões que contêm apenas ícones (ex: Perfil, Sair, Filtros) DEVEM obrigatoriamente ter o atributo `aria-label` ou `title` para leitores de tela.
+- **Títulos Dinâmicos**: O título da página (`@yield('title')`) deve ser específico para cada tela (ex: "Relatório de Frequência - Smart Attendance").
+- **Imagens**: Sempre inclua o atributo `alt` descritivo. Para imagens de perfil ou ilustrações, use substitutos de fallback caso o asset não seja carregado (ex: iniciais do nome ou ícone genérico).
+
+### Javascript e Frontend Moderno
+- **Abstração AJAX**: Priorize o uso de `fetch` em vez de bibliotecas pesadas como jQuery para novas funcionalidades. Use `async/await` para manter o código limpo.
+- **Debounce em Pesquisas**: Ao implementar buscas assíncronas (como `setupMultiSearch`), considere um pequeno delay ou debounce se o volume de dados crescer, evitando disparos excessivos ao backend.
+- **Manipulação de URL**: Em filtros do tipo GET, utilize sempre a API `URLSearchParams` para garantir que a URL permaneça limpa e sem parâmetros vazios (`&campo=`).
+
+### Assets e Manutenção
+- **Cache Busting**: Ao referenciar arquivos CSS ou JS customizados no Blade, utilize o helper `asset('path') . '?v=' . filemtime(public_path('path'))` para garantir que as alterações sejam aplicadas imediatamente no navegador do usuário.
+- **Links Absolutos**: Evite links relativos dentro do Blade. Use sempre os helpers `route()`, `url()` ou `asset()`.
+- **Placeholder de Imagens**: Nunca deixe imagens quebradas no layout. Utilize o sistema de `storage` do Laravel corretamente e verifique se o link simbólico (`php artisan storage:link`) está ativo.
+- **📅 REGRA DE ATUALIZAÇÃO**: Toda vez que este arquivo (`.cursorrules`) for modificado ou receber uma nova regra, a linha **"Última Atualização"** no final do arquivo DEVE ser obrigatoriamente atualizada com a data atual (DD/MM/AAAA) e uma breve descrição da mudança.
+
+---
+
+## 🛡️ 16. SEGURANÇA E PROTEÇÃO DE DADOS (Anti-Leak)
+
+Para garantir a integridade do sistema e evitar o vazamento de informações sensíveis (CPFs, senhas, tokens):
+
+### Proteção de Dados Sensíveis
+- **Mass Assignment**: Todos os Models DEVEM usar `$fillable` ou `$guarded` para prevenir atribuição em massa não autorizada.
+- **Hidden Fields**: Campos sensíveis como `password`, `remember_token`, `cpf` e `ra` devem ser incluídos no array `$hidden` dos Models quando não forem estritamente necessários em respostas JSON/API.
+- **Logs de Erro**: NUNCA registre dados sensíveis em `Log::info()` ou `Log::error()`. Utilize filtros de sanitização se precisar logar payloads de requisição.
+
+### Prevenção de Injeção e XSS
+- **Output Sanitization**: Utilize sempre `{{ $variavel }}` no Blade. O uso de `{!! $variavel !!}` é estritamente proibido, a menos que o conteúdo tenha sido explicitamente sanitizado com uma biblioteca de Purifier.
+- **SQL Injection**: NUNCA utilize `DB::raw()` com parâmetros concatenados. Use sempre bindings do Query Builder ou métodos do Eloquent.
+- **Validation First**: Toda requisição que altere o estado do banco (POST/PUT/PATCH) deve passar por uma `FormRequest` ou `Validator` rigoroso, impedindo tipos de dados inesperados.
+
+### Autenticação e Sessões
+- **Middleware de Proteção**: Verifique sempre se as rotas Master estão protegidas pelo middleware `auth:masters` e se não há rotas administrativas expostas publicamente.
+- **CSRF Protection**: O token `@csrf` é obrigatório em TODOS os formulários. Em chamadas AJAX, o header `X-CSRF-TOKEN` deve ser enviado automaticamente (ver `app.js`).
+
+---
+
+## 17. COMANDOS DE PERSISTÊNCIA (Agente)
+- **Gatilho "ANOTE" (Persistência Direta)**: Sempre que o usuário mencionar a palavra **"anote"** no chat, o assistente deve obrigatoriamente realizar uma **atualização direta, imediata e persistente** nas regras, configurações ou registros do arquivo `.cursorrules`. Isso garante que decisões de design, correções de bugs e novas diretrizes sejam gravadas fisicamente no arquivo para que o conhecimento seja herdado em todas as gerações futuras do assistente (não é apenas uma nota temporária, mas uma mudança no "DNA" do projeto).
+
+---
+
+## 18. FUNCIONALIDADES PRINCIPAIS POR PERFIL
+Para garantir que as novas páginas de informação (`/aluno/saiba-mais` e `/professor/saiba-mais`) reflitam a verdade do sistema:
+
+### 👨‍🎓 Perfil: ALUNO
+- **Confirmação Instantânea**: Registro de presença via QR Code dinâmico em menos de 3 segundos.
+- **Gestão de Faltas**: Dashboard com percentual de assiduidade em tempo real por disciplina.
+- **Alertas de Risco**: Notificações visuais (vermelho/amarelo) quando o limite de faltas está próximo.
+- **Histórico Acadêmico**: Acesso rápido a datas de presença e justificativas.
+
+### 👨‍🏫 Perfil: PROFESSOR
+- **Geração de QR Code**: Criação de códigos únicos por aula com tempo de expiração customizável.
+- **Chamada Inteligente**: Monitoramento em tempo real dos alunos que escaneiam o código em sala.
+- **Relatórios Consolidados**: Filtros por data, aluno e matéria com exportação simplificada.
+- **Gestão de Turmas**: Lançamento de notas e visão geral do progresso da disciplina.
+
+---
+
+## 19. ARQUITETURA DE DEMONSTRAÇÃO INTERATIVA
+Sempre que uma nova funcionalidade for adicionada, os ambientes de demonstração (`/aluno/demonstracao` e `/professor/demonstracao`) devem ser atualizados seguindo estes padrões rigorosos:
+
+- **Branding de Demonstração**: Seções que levam às interfaces de demo (ex: na Homepage) devem ser obrigatoriamente identificadas com a tag `DEMONSTRAÇÃO` e títulos claros como "Demonstração dos Perfis" para evitar confusão com o fluxo real de autenticação.
+- **Paridade Estrutural**: Ambos os dashboards (Aluno/Professor) devem possuir um banner de destaque no topo (`pal-dashboard-banner`) para a ação principal imediata.
+- **Paridade de Tema (Modo Claro)**: As demonstrações devem suportar perfeitamente o Modo Claro. Cards principais devem utilizar as classes `pal-card-delay-1`, `2` e `3` para herdar a animação de "revelação" (reveal to white) presente nos dashboards oficiais.
+- **Neutralidade de Marca**: É terminantemente proibido o uso de "CEUB" ou identificações institucionais em textos, tooltips ou emails de mock. Utilize termos genéricos como "Instituicao" e e-mail `@instituicao.edu.br`.
+- **Simulação de Autenticação**: O Navbar deve ocultar botões de login (`hide-nav-defaults`) e exibir "Perfil" e "Sair" para simular o estado logado.
+- **Interatividade de Feedback**: Use `.pal-demo-toast` para confirmar ações simuladas com feedback visual instantâneo.
+- **Segurança de Viewport**: 
+    - Use `.pal-info-tooltip-down` apenas em elementos no topo (Navbar/Modais). 
+    - Botões de ação em banners devem usar a posição padrão (acima) com `white-space: normal` e largura expandida.
+
+---
+
+**Última Atualização**: 24/03/2026 - Implementada a arquitetura de demonstração interativa (Mock Dashboards) de alta fidelidade e normas de Viewport Safety via gatilho "anote".

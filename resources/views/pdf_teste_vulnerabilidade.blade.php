@@ -76,7 +76,7 @@
                         <td><strong>LT-03</strong></td>
                         <td><span class="test-positive">Positivo</span></td>
                         <td>Acesso via Email Institucional (Aluno)</td>
-                        <td>Login com email @aluno.ceub.edu.br</td>
+                        <td>Login com email @aluno.instituicao.edu.br</td>
                         <td>Redirecionar para tela de Leitura</td>
                         <td><span class="status-pass">PASS</span></td>
                     </tr>
@@ -92,7 +92,7 @@
                         <td><strong>LT-05</strong></td>
                         <td><span class="test-positive">Positivo</span></td>
                         <td>Acesso via Email Institucional (Professor)</td>
-                        <td>Login com email @professor.ceub.edu.br</td>
+                        <td>Login com email @professor.instituicao.edu.br</td>
                         <td>Redirecionar para tela de Geração</td>
                         <td><span class="status-pass">PASS</span></td>
                     </tr>
@@ -175,14 +175,14 @@
                         <td><strong>CT-01</strong></td>
                         <td><span class="test-positive">Positivo</span></td>
                         <td>Sucesso: Wi-Fi e Tempo OK</td>
-                        <td>Aluno logado, Wi-Fi CEUB, QR válido (5 min)</td>
+                        <td>Aluno logado, Wi-Fi Institucional, QR válido (5 min)</td>
                         <td>Registrar presença com sucesso</td>
                         <td><span class="status-pass">PASS</span></td>
                     </tr>
                     <tr>
                         <td><strong>CT-02</strong></td>
                         <td><span class="test-negative">Negativo</span></td>
-                        <td>Falha: Fora do Wi-Fi CEUB</td>
+                        <td>Falha: Fora do Wi-Fi Institucional</td>
                         <td>Aluno em rede externa (4G)</td>
                         <td>Bloqueio com erro de rede</td>
                         <td><span class="status-pass">PASS</span></td>
