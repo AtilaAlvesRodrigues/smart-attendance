@@ -61,217 +61,97 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 # 🚀 Smart-Attendance — Guia de Instalação
 
-Este projeto utiliza **Laravel 8** com **PHP 8.2**. Siga as etapas abaixo para configurar o ambiente e rodar a aplicação localmente.
+O **Smart-Attendance** é uma solução moderna para gestão de presença, built com **Laravel 12** e **PHP 8.2**. Siga as etapas abaixo para configurar o ambiente e rodar a aplicação localmente.
 
 ---
 
 ## 🧩 Pré-requisitos
 
-* **PHP** (versão 8.2 ou compatível): [https://php.net/downloads.php](https://php.net/downloads.php)
-* **Composer** (Gerenciador de dependências PHP): [https://getcomposer.org](https://getcomposer.org/)
-* **Node.js & NPM** (Obrigatório para o Vite/Front-end): [https://nodejs.org/](https://nodejs.org/)
-* **Postgres** (versão 17.6 recomendada): [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+* **PHP** (versão 8.2+): [https://php.net/downloads.php](https://php.net/downloads.php)
+* **Composer**: [https://getcomposer.org](https://getcomposer.org/)
+* **Node.js & NPM**: [https://nodejs.org/](https://nodejs.org/)
+* **PostgreSQL** (versão 17+ recomendada): [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 * **Git**: [https://git-scm.com](https://git-scm.com/)
 
 ---
 
 ## 💻 Configuração do Ambiente (Windows)
 
-### 1. Configuração do PHP (Variáveis de Ambiente)
-Se você baixou o ZIP do PHP:
-1. Extraia o conteúdo para `C:\php`.
-2. Pesquise por **"Configurações avançadas do sistema"** > **Variáveis de Ambiente**.
-3. Em **Variáveis do Sistema**, edite a variável `Path`.
-4. Clique em **Novo** e adicione: `C:\php`.
-
-### 2. Configuração do `php.ini`
-Abra o terminal (Git Bash) e digite `code C:\php\php.ini` ou abra o arquivo manualmente em `C:\php\php.ini`. Certifique-se de ativar as seguintes extensões (remova o `;` do início das linhas):
+### 1. Configuração do PHP (`php.ini`)
+Certifique-se de que as seguintes extensões estão habilitadas no seu `php.ini` (geralmente em `C:\php\php.ini`):
 
 ```ini
-extension_dir = "C:\php\ext"
 extension=fileinfo
 extension=zip
 extension=pdo_pgsql
 extension=pgsql
 ```
 
----
-
-## Configuração Inicial do Git (Git Bash)
-
- **Registrando o usuário (Faça isso apenas uma vez por máquina):**
-   
-    git config --global user.name "Seu Nome Aqui"
- 
-    git config --global user.email "Seu Email Aqui"
-
----
-## 🛠️ Primeira Instalação do PHP (Configuração do `php.ini`)
-
-Após extrair o PHP para `C:\php`, você precisa garantir que a extensão `fileinfo` esteja habilitada no seu `php.ini`.
-
- **Caso não saiba qual o arquivo `php.ini`**
-
-<img width="614" height="564" alt="image" src="https://github.com/user-attachments/assets/a39437e1-cef9-47ad-9b3f-51f1ce05873c" />
-
-Execute o comando abaixo no seu **Git Bash/Terminal** para **abrir o arquivo de configuração** no VS Code (assumindo que o VS Code está no PATH):
-
-   ```bash
-   code C:\php\php.ini
-   ```
-
-## 1. Abrir o Terminal ou abra o local da pasta e selecione o arquivo `php.ini` 
-
-* **Windows:**
-    * Navegue até a pasta raiz do projeto.
-    * Clique com o botão direito e selecione **"Git Bash Here"** ou **"Abrir no Terminal"**.
-    * Alternativamente, você pode usar **PowerShell** ou **Prompt de Comando** após configurar o PATH do PHP.
-
-Dentro do arquivo que abrir, localize e remova o ponto e vírgula (`;`) do início da linha para ativá-lo:
-
-**Mude em:**
-```ini
-extension=fileinfo
-```
-
-```ini
-extension=zip
-```
-
-
-```ini
-extension=pdo_pgsql
-```
-
-```ini
-extension=pgsql
-```
-
-**Modifique de:**
-```ini
-;extension_dir = "ext"
-```
-**Para**
-```ini
-extension_dir = "C:\php\ext"
-```
+### 2. Configurações de Banco de Dados (PostgreSQL)
+Crie um banco de dados chamado `smart_attendance` no seu PostgreSQL.
 
 ---
 
-## 2. Instalar o Instalador Global do Laravel (Única vez)
-Somente de installar o composer
-```bash
-composer global require laravel/installer
-```
-
-### ⚠️ Usando o Composer (Criando o projeto):
+## 🛠️ Instalação Passo a Passo
 
 ```bash
-composer create-project laravel/laravel --stability=stable --prefer-dist nome-do-projeto
-```
+# 1. Clonar o repositório
+git clone https://github.com/AtilaAlvesRodrigues/smart-attendance.git
+cd smart-attendance
 
-## 3. Acessar o diretório do projeto
-
-```bash
-cd nome-do-projeto/
-```
-
-
-
-## 4. Abrir o VS Code na pasta do projeto
-
-```bash
-code .
-```
-
-
-Ao abrir o VScode digite no terminal 
-
-```bash
+# 2. Instalar dependências do PHP
 composer install
-```
-**Em seguida**
 
-```bash
-composer update
-```
----
+# 3. Configurar o ambiente
+cp .env.example .env
+php artisan key:generate
 
-## Configurar Front-end (Vite) ⚠️
-
-```ini
-# Instala as dependências do Node.js
+# 4. Instalar e compilar dependências do Front-end
 npm install
-
-# Compila os assets e gera o manifesto em public/build
 npm run build
-```
 
----
-*No Termenial Digite:* 
-```bash
+# 5. Configurar o Banco de Dados no .env
+# Abra o arquivo .env e ajuste as credenciais:
+# DB_CONNECTION=pgsql
+# DB_PORT=5432
+# DB_DATABASE=smart_attendance
+# DB_USERNAME=postgres
+# DB_PASSWORD=sua_senha_aqui
+
+# 6. Rodar as migrações e popular o banco (Seeds)
+php artisan migrate --seed
+
+# 7. Iniciar o servidor
 php artisan serve
 ```
-```ini
-npm run dev
-```
----
 
-🧪 Solução de Problemas
-
-Erro: Vite manifest not found
-
-Se o erro persistir, limpe o cache de visualização e gere o build novamente:
-
-```ini
-php artisan view:clear
-php artisan config:clear
-npm run build
-```
----
-
-### Caso tudo esteja certo esta sera a tela que deve aparecer: 
-<img width="1122" height="507" alt="image" src="https://github.com/user-attachments/assets/eb97908c-2810-4a30-9b6f-6010223a5a1f" />
-
----
-## 5. Configurando o Banco de Dados
-
-*Depois de fazer a instalação do Postgres e Fazer a criação do Banco de Dados  `Smart-Attendance`*
-
-Dentro do arquivo `.env` Procure e faça as seguintes alterações no codigo:
-```bash
-DB_CONNECTION=pgsql
-DB_HOST= Já estara preenchido
-DB_PORT=5432
-DB_DATABASE=Smart-Attendance
-DB_USERNAME=postgres
-DB_PASSWORD=Sua senha Aqui
-```
-Em seguida digite o seguinte codigo no terminal
-```bash
-php artisan migrate
-```
-
-*Se tudo der certo a mensagem que deve aparecer sera esta:*
-
-<img width="775" height="206" alt="image" src="https://github.com/user-attachments/assets/927b1423-b453-4862-ae74-bad2d12e2762" />
+> [!TIP]
+> Você também pode usar o comando de atalho: `composer setup` para automatizar boa parte deste processo.
 
 ---
 
-## 💾Rodando Migrações e Seeds (Recomendado para Primeira Configuração)
+## 💾 Comandos Úteis
 
-Para limpar o banco de dados anterior, rodar as migrações e popular o banco de dados com dados de teste/iniciais (seeds), use o comando:
-```bash
-php artisan migrate:fresh --seed
-```
+| Comando | Descrição |
+| --- | --- |
+| `php artisan migrate:fresh --seed` | Limpa o banco e recria as tabelas com dados de teste. |
+| `npm run dev` | Inicia o servidor de desenvolvimento do Vite. |
+| `php artisan db:seed` | Apenas popula o banco (sem apagar dados). |
 
+---
 
-## 🧪 Testando
+## 🧪 Usuários de Teste
 
-Acesse o projeto no navegador:
+Após rodar o comando `--seed`, você pode usar estas credenciais:
 
-```
-http://localhost:8000
-```
+| Perfil | Email | Senha |
+| --- | --- | --- |
+| **Admin Master** | `master@admin.com` | `senha123` |
+| **Professor** | `professor@teste.com` | `senha123` |
+| **Aluno** | `aluno.teste@site.com` | `senha123` |
 
-Verifique se o front-end e a autenticação estão funcionando corretamente.
+---
+
+## 🤝 Contribuições
+
+Este projeto faz parte de um sistema acadêmico de controle de presença. Sinta-se à vontade para abrir PRs ou Issues!
