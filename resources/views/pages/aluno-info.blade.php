@@ -1,6 +1,6 @@
 @extends('layouts.theme')
 
-@section('title', 'Login Aluno - Smart Attendance')
+@section('title', 'Para Alunos - Smart Attendance')
 
 @section('body-class', 'gradient-bg')
 
@@ -12,34 +12,26 @@
 <div class="login-container">
     <div class="login-wrapper">
 
-        <div class="login-header">
-            <p class="pal-eyebrow">Portal do Aluno</p>
+        <div class="login-header animate-reveal">
+            <p class="pal-eyebrow pal-info-tooltip" data-tooltip="Este é o ponto de entrada para todas as suas funcionalidades acadêmicas.">Portal do Aluno</p>
             <h1 class="pal-title">Smart Attendance</h1>
-            <p class="pal-subtitle">Instituição — Sistema de Presença Inteligente</p>
+            <p class="pal-subtitle">Sistema de Presença Inteligente</p>
         </div>
 
-        <div class="glass login-card">
+        <div class="glass login-card animate-reveal" style="animation-delay: 0.1s">
 
-            <form method="POST" action="{{ route('login.aluno') }}" class="login-form">
-                @csrf
-
-                @error('ra_email_cpf')
-                <div class="login-error">
-                    {{ $message }}
-                </div>
-                @enderror
-
-                <div>
+            <div class="login-form">
+                <div class="mb-6 pal-info-tooltip" data-tooltip="Insira seu número de matrícula oficial ou e-mail acadêmico para se identificar no sistema.">
                     <label class="pal-eyebrow">Matrícula / RA / CPF / E-Mail</label>
-                    <input type="text" name="ra_email_cpf" value="{{ old('ra_email_cpf') }}" required
+                    <input type="text" readonly
                         class="login-input"
                         placeholder="ex: 12345678 ou nome@email.com">
                 </div>
 
-                <div>
+                <div class="mb-6 pal-info-tooltip" data-tooltip="A mesma senha utilizada no portal acadêmico institucional para garantir sua segurança.">
                     <label class="pal-eyebrow">Senha</label>
                     <div class="login-password-wrapper">
-                        <input type="password" name="password" id="pal-password" required
+                        <input type="password" readonly
                             class="login-input login-input-password">
                         <button type="button" class="login-password-btn">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -47,28 +39,24 @@
                     </div>
                 </div>
 
-                <label class="login-checkbox-label">
-                    <input type="checkbox" name="remember" class="login-checkbox">
+                <label class="login-checkbox-label pal-info-tooltip" data-tooltip="Mantém sua sessão ativa para registros de presença mais rápidos em aulas futuras.">
+                    <input type="checkbox" disabled class="login-checkbox">
                     Permanecer conectado
                 </label>
 
-                <button type="submit" class="login-btn">
-                    Acessar Sistema
-                </button>
-            </form>
+                <a href="{{ route('aluno.demo') }}" class="login-btn pal-info-tooltip" style="text-decoration:none; display:flex; align-items:center; justify-content:center;" data-tooltip="Clique para ver como funciona o seu painel de presença em tempo real.">
+                    Acessar Sistema (Demonstração)
+                </a>
+            </div>
 
         </div>
 
-        <div class="login-back">
+        <div class="login-back animate-reveal" style="animation-delay: 0.2s">
             <a href="{{ route('login_form') }}" class="pal-product-link" style="color:var(--pal-gray); border-bottom:1px solid var(--pal-gray);">
-                ← Trocar Perfil
+                ← Voltar para seleção
             </a>
         </div>
 
     </div>
 </div>
 @endsection
-
-@push('scripts')
-    <script src="{{ asset('js/pages/login.js') }}"></script>
-@endpush

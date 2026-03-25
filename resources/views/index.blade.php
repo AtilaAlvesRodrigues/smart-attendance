@@ -1,40 +1,44 @@
 @extends('layouts.theme')
 
-@section('title', 'Smart Attendance — Presença Inteligente')
+@section('title', 'Início - Smart Attendance')
 
 @section('content')
+    <!-- Background Blobs -->
+    <div class="blob"></div>
+    <div class="blob-2"></div>
+    <div class="blob-3"></div>
 
 {{-- ===== HERO SECTION ===== --}}
-<section id="hero" class="pal-hero">
+<section id="hero" class="pal-hero animate-reveal">
     <div class="pal-container">
+        
+        <!-- Text Content -->
         <div class="pal-hero-content">
             <p class="pal-overline">Sistema de Presença Inteligente</p>
             <h1 class="pal-hero-title">
-                Controle de<br>
-                Presença<br>
+                Controle de Presença<br>
                 <em>para Todos.</em>
             </h1>
             <p class="pal-hero-sub">
                 Automatize o registro de frequência com QR Code dinâmico. Simples para o aluno. Poderoso para o docente.
             </p>
-            <div class="pal-hero-actions">
-                <a href="{{ route('login.aluno.form') }}" class="pal-btn-primary">Entrar como Aluno</a>
-                <a href="{{ route('login.professor.form') }}" class="pal-btn-outline">Entrar como Professor</a>
-            </div>
         </div>
+
+        <!-- QR Code Visual -->
         <div class="pal-hero-visual">
             @if(isset($activeCodes) && count($activeCodes) > 0)
                 <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
                 @foreach($activeCodes as $index => $code)
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
                         <a href="{{ route('presenca.confirmar', $code['codigo']) }}" 
-                           style="width:220px; height:220px; background:white; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; text-decoration:none; padding: 10px;"
-                           id="qrcode-{{$index}}" data-code="{{ route('presenca.confirmar', $code['codigo']) }}">
+                           style="width:240px; height:240px; background:white; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; text-decoration:none; padding: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);"
+                           id="qrcode-{{$index}}" data-code="{{ route('presenca.confirmar', $code['codigo']) }}"
+                           aria-label="Escritar QR Code para confirmar presença em {{ $code['materia_nome'] }}">
                         </a>
                         <div style="text-align: center;">
-                            <span style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; display:block; margin-bottom: 0.2rem;">Sessão Ativa</span>
-                            <strong style="color: white; font-size: 1.1rem;">{{ $code['materia_nome'] }}</strong>
-                            <span style="color: #888; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Sala: {{ $code['sala'] }}</span>
+                            <span style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; display:block; margin-bottom: 0.5rem;">Sessão Ativa</span>
+                            <strong style="color: white; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em;">{{ $code['materia_nome'] }}</strong>
+                            <span style="color: #888; display: block; font-size: 0.85rem; margin-top: 0.3rem;">Sala: {{ $code['sala'] }}</span>
                         </div>
                     </div>
                 @endforeach
@@ -44,7 +48,6 @@
                 <!-- Data dots inner visual -->
                 <div class="pal-qr-inner">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" width="120" height="120">
-                        <!-- QR Code mock pattern -->
                         <rect x="10" y="10" width="30" height="30" rx="2" fill="white"/>
                         <rect x="15" y="15" width="20" height="20" rx="1" fill="#0d0d0d"/>
                         <rect x="18" y="18" width="14" height="14" rx="1" fill="white"/>
@@ -54,41 +57,7 @@
                         <rect x="10" y="60" width="30" height="30" rx="2" fill="white"/>
                         <rect x="15" y="65" width="20" height="20" rx="1" fill="#0d0d0d"/>
                         <rect x="18" y="68" width="14" height="14" rx="1" fill="white"/>
-                        <!-- Data dots -->
-                        <rect x="48" y="10" width="6" height="6" fill="white"/>
-                        <rect x="56" y="10" width="6" height="6" fill="white"/>
-                        <rect x="44" y="18" width="6" height="6" fill="white"/>
-                        <rect x="52" y="18" width="6" height="6" fill="white"/>
-                        <rect x="44" y="26" width="6" height="6" fill="white"/>
-                        <rect x="56" y="26" width="6" height="6" fill="white"/>
-                        <rect x="48" y="34" width="6" height="6" fill="white"/>
-                        <rect x="10" y="44" width="6" height="6" fill="white"/>
-                        <rect x="18" y="44" width="6" height="6" fill="white"/>
-                        <rect x="26" y="44" width="6" height="6" fill="white"/>
-                        <rect x="34" y="44" width="6" height="6" fill="white"/>
-                        <rect x="42" y="44" width="6" height="6" fill="white"/>
-                        <rect x="50" y="44" width="6" height="6" fill="white"/>
-                        <rect x="58" y="44" width="6" height="6" fill="white"/>
-                        <rect x="66" y="44" width="6" height="6" fill="white"/>
-                        <rect x="74" y="44" width="6" height="6" fill="white"/>
-                        <rect x="82" y="44" width="6" height="6" fill="white"/>
-                        <rect x="44" y="52" width="6" height="6" fill="white"/>
-                        <rect x="52" y="52" width="6" height="6" fill="white"/>
-                        <rect x="60" y="52" width="6" height="6" fill="white"/>
-                        <rect x="68" y="52" width="6" height="6" fill="white"/>
-                        <rect x="76" y="52" width="6" height="6" fill="white"/>
-                        <rect x="44" y="60" width="6" height="6" fill="white"/>
-                        <rect x="60" y="60" width="6" height="6" fill="white"/>
-                        <rect x="76" y="60" width="6" height="6" fill="white"/>
-                        <rect x="52" y="68" width="6" height="6" fill="white"/>
-                        <rect x="60" y="68" width="6" height="6" fill="white"/>
-                        <rect x="68" y="68" width="6" height="6" fill="white"/>
-                        <rect x="44" y="76" width="6" height="6" fill="white"/>
-                        <rect x="52" y="76" width="6" height="6" fill="white"/>
-                        <rect x="68" y="76" width="6" height="6" fill="white"/>
-                        <rect x="76" y="76" width="6" height="6" fill="white"/>
-                        <rect x="60" y="84" width="6" height="6" fill="white"/>
-                        <rect x="76" y="84" width="6" height="6" fill="white"/>
+                        <rect x="48" y="10" width="6" height="6" fill="white"/><rect x="56" y="10" width="6" height="6" fill="white"/><rect x="44" y="18" width="6" height="6" fill="white"/><rect x="52" y="18" width="6" height="6" fill="white"/><rect x="44" y="26" width="6" height="6" fill="white"/><rect x="56" y="26" width="6" height="6" fill="white"/><rect x="48" y="34" width="6" height="6" fill="white"/><rect x="10" y="44" width="6" height="6" fill="white"/><rect x="18" y="44" width="6" height="6" fill="white"/><rect x="26" y="44" width="6" height="6" fill="white"/><rect x="34" y="44" width="6" height="6" fill="white"/><rect x="42" y="44" width="6" height="6" fill="white"/><rect x="50" y="44" width="6" height="6" fill="white"/><rect x="58" y="44" width="6" height="6" fill="white"/><rect x="66" y="44" width="6" height="6" fill="white"/><rect x="74" y="44" width="6" height="6" fill="white"/><rect x="82" y="44" width="6" height="6" fill="white"/><rect x="44" y="52" width="6" height="6" fill="white"/><rect x="52" y="52" width="6" height="6" fill="white"/><rect x="60" y="52" width="6" height="6" fill="white"/><rect x="68" y="52" width="6" height="6" fill="white"/><rect x="76" y="52" width="6" height="6" fill="white"/><rect x="44" y="60" width="6" height="6" fill="white"/><rect x="60" y="60" width="6" height="6" fill="white"/><rect x="76" y="60" width="6" height="6" fill="white"/><rect x="52" y="68" width="6" height="6" fill="white"/><rect x="60" y="68" width="6" height="6" fill="white"/><rect x="68" y="68" width="6" height="6" fill="white"/><rect x="44" y="76" width="6" height="6" fill="white"/><rect x="52" y="76" width="6" height="6" fill="white"/><rect x="68" y="76" width="6" height="6" fill="white"/><rect x="76" y="76" width="6" height="6" fill="white"/><rect x="60" y="84" width="6" height="6" fill="white"/><rect x="76" y="84" width="6" height="6" fill="white"/>
                     </svg>
                     <p class="pal-qr-label">QR CODE DINÂMICO</p>
                     <p class="pal-qr-sub">Escaneie para confirmar presença</p>
@@ -96,7 +65,15 @@
             </div>
             @endif
         </div>
+
+        <!-- Hero Actions -->
+        <div class="pal-hero-actions">
+            <a href="{{ route('login.aluno.form') }}" class="pal-btn-primary" aria-label="Entrar no sistema como Aluno">Entrar como Aluno</a>
+            <a href="{{ route('login.professor.form') }}" class="pal-btn-outline" aria-label="Entrar no sistema como Professor">Entrar como Professor</a>
+        </div>
+
     </div>
+    
     <div class="pal-hero-scroll-hint">
         <span>↓</span>
         <span>Como funciona</span>
@@ -112,7 +89,7 @@
         <span class="pal-sep">✦</span>
         <span>FREQUÊNCIA INTELIGENTE</span>
         <span class="pal-sep">✦</span>
-        <span>CEUB</span>
+        <span>INSTITUIÇÃO</span>
         <span class="pal-sep">✦</span>
         <span>SMART ATTENDANCE</span>
         <span class="pal-sep">✦</span>
@@ -120,7 +97,7 @@
         <span class="pal-sep">✦</span>
         <span>FREQUÊNCIA INTELIGENTE</span>
         <span class="pal-sep">✦</span>
-        <span>CEUB</span>
+        <span>INSTITUIÇÃO</span>
         <span class="pal-sep">✦</span>
         <span>SMART ATTENDANCE</span>
         <span class="pal-sep">✦</span>
@@ -128,7 +105,7 @@
         <span class="pal-sep">✦</span>
         <span>FREQUÊNCIA INTELIGENTE</span>
         <span class="pal-sep">✦</span>
-        <span>CEUB</span>
+        <span>INSTITUIÇÃO</span>
         <span class="pal-sep">✦</span>
     </div>
 </div>
@@ -189,11 +166,11 @@
 <section id="perfis" class="pal-light-section">
     <div class="pal-container">
         <div class="pal-section-top">
-            <p class="pal-tag pal-tag-dark">SELECIONE SEU PERFIL</p>
-            <h2 class="pal-section-title-dark">Quem é você?</h2>
+            <p class="pal-tag pal-tag-dark">DEMONSTRAÇÃO</p>
+            <h2 class="pal-section-title-dark">Demonstração dos Perfis</h2>
         </div>
         <div class="pal-profiles-grid">
-            <a href="{{ route('login.aluno.form') }}" class="pal-profile-card">
+            <a href="{{ route('aluno.info') }}" class="pal-profile-card">
                 <div class="pal-profile-number">01</div>
                 <div class="pal-profile-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -203,9 +180,9 @@
                 </div>
                 <h3 class="pal-profile-title">ALUNO</h3>
                 <p class="pal-profile-sub">Confirme sua presença via QR Code. Acompanhe suas faltas em tempo real.</p>
-                <span class="pal-profile-cta">Acessar →</span>
+                <span class="pal-profile-cta">Saber Mais →</span>
             </a>
-            <a href="{{ route('login.professor.form') }}" class="pal-profile-card">
+            <a href="{{ route('professor.info') }}" class="pal-profile-card">
                 <div class="pal-profile-number">02</div>
                 <div class="pal-profile-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -215,7 +192,7 @@
                 </div>
                 <h3 class="pal-profile-title">PROFESSOR</h3>
                 <p class="pal-profile-sub">Gere QR Codes, gerencie chamadas e visualize relatórios de frequência.</p>
-                <span class="pal-profile-cta">Acessar →</span>
+                <span class="pal-profile-cta">Saber Mais →</span>
             </a>
         </div>
     </div>
@@ -254,7 +231,7 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="{{ asset('js/pages/index.js') }}"></script>
+<script src="{{ asset('js/pages/index.js') }}?v={{ filemtime(public_path('js/pages/index.js')) }}"></script>
 @endpush
 
 @endsection

@@ -34,8 +34,8 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 flex-grow">
             
             <div class="lg:col-span-12 animate-reveal [animation-delay:100ms]">
-                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block pal-always-white">Chamada em Tempo Real</p>
-                <h2 class="text-4xl font-black tracking-tighter pal-always-white">{{ $materia->nome }}</h2>
+                <p class="pal-eyebrow" style="margin-bottom:0.5rem">Chamada em Tempo Real</p>
+                <h2 class="pal-title">{{ $materia->nome }}</h2>
             </div>
 
             {{-- Coluna Esquerda: QR Code --}}
@@ -43,7 +43,7 @@
                 <div class="glass p-10 rounded-sm border border-white/10 flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <div class="absolute -top-24 -right-24 w-48 h-48 bg-white/5 blur-3xl"></div>
                     
-                    <h2 class="text-2xl font-black text-white tracking-tight mb-8 italic">QR Code de Frequência</h2>
+                    <h2 class="text-2xl font-black pal-text tracking-tight mb-8">QR Code de Frequência</h2>
                     
                     <div class="relative group">
                         <div class="absolute -inset-0.5 bg-gradient-to-r from-white/20 to-white/5 rounded-sm blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
@@ -85,16 +85,16 @@
                     </h3>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="flex flex-col">
-                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Semestre</span>
-                            <span class="text-white font-bold">{{ $semestre }}º Semestre</span>
+                            <span class="pal-eyebrow" style="font-size:0.65rem; margin-bottom:0.2rem">Semestre</span>
+                            <span class="pal-text font-bold">{{ $semestre }}º Semestre</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Período</span>
-                            <span class="text-white font-bold">{{ $horario == 'M' ? 'Matutino' : ($horario == 'V' ? 'Vespertino' : 'Noturno') }}</span>
+                            <span class="pal-eyebrow" style="font-size:0.65rem; margin-bottom:0.2rem">Período</span>
+                            <span class="pal-text font-bold">{{ $horario == 'M' ? 'Matutino' : ($horario == 'V' ? 'Vespertino' : 'Noturno') }}</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Data</span>
-                            <span class="text-white font-bold">{{ \Carbon\Carbon::now()->format('d/m/Y') }}</span>
+                            <span class="pal-eyebrow" style="font-size:0.65rem; margin-bottom:0.2rem">Data</span>
+                            <span class="pal-text font-bold">{{ \Carbon\Carbon::now()->format('d/m/Y') }}</span>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-white/70 uppercase tracking-widest mb-1">Status</span>
@@ -112,8 +112,8 @@
                 <div class="glass p-8 rounded-sm border border-white/10 flex-grow flex flex-col min-h-[600px] overflow-hidden">
                     <div class="flex justify-between items-center mb-8">
                         <div>
-                            <h2 class="text-3xl font-black text-white tracking-tighter italic">Alunos Presentes</h2>
-                            <p class="text-white/70 text-xs font-medium tracking-tight mt-1">Sincronização automática a cada 3s.</p>
+                            <h2 class="text-3xl font-black pal-text tracking-tighter">Alunos Presentes</h2>
+                            <p class="pal-subtitle mt-1">Sincronização automática a cada 3s.</p>
                         </div>
                         <div class="pal-count-badge flex items-center gap-3 p-3 rounded-sm shadow-xl transform -rotate-3">
                             <span class="pal-count-number text-3xl font-black leading-none" id="contador-alunos">0</span>
@@ -158,13 +158,13 @@
                 ⏰
             </div>
             
-            <h2 class="text-4xl font-black text-white tracking-tighter mb-4 italic">Chamada Encerrada</h2>
-            <p class="text-white/70 leading-relaxed mb-10 font-medium">
+            <h2 class="pal-title mb-4">Chamada Encerrada</h2>
+            <p class="pal-subtitle mb-10">
                 O tempo de validade deste QR Code expirou. Para uma nova chamada, inicie outra sessão.
             </p>
             
             <a href="{{ route('professor.presenca.index') }}" 
-               class="block w-full bg-white text-black hover:scale-[1.02] active:scale-95 transition-all font-black py-4 rounded-sm text-lg shadow-2xl border border-white/20">
+               class="pal-btn-primary w-full justify-center py-4">
                 Voltar às Disciplinas
             </a>
         </div>

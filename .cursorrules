@@ -1,0 +1,332 @@
+# Regras Globais do Agente (Smart Attendance)
+Antes de iniciar qualquer planejamento, alteração de código, correção de bugs ou refatoração neste projeto, você DEVE obrigatoriamente ler as regras e protocolos documentados neste arquivo (`.cursorrules`).
+Siga rigorosamente todos os protocolos, regras de design (Premium Glassmorphism), convenções de classes CSS (`.pal-*`) e as 5 regras do **Protocolo de Testes e Validação (Regressão)** descritas ao final do arquivo.
+
+
+# Smart Attendance — Diretrizes de Master/UI e Checklist Global
+
+Este arquivo serve como o "Caminho das Pedras" para a criação e modificação de páginas no Smart Attendance. Sempre consulte este checklist para garantir consistência estética e funcional (Premium Glassmorphism).
+
+## 1. Estrutura Base (Blade Layout)
+Toda página deve estender o layout principal e usar as seções corretas:
+- **Base**: `@extends('layouts.theme')`
+- **Título**: `@section('title', 'Nome da Página - Smart Attendance')`
+- **Body Class**: `@section('body-class', 'gradient-bg relative min-h-screen flex flex-col')`
+- **Nav Custom**:
+    - `@section('nav-left')`: Botões de "Voltar" ou ações primárias da esquerda.
+    - `@section('nav-user')`: Info do usuário logado.
+        - **Padrão**: Envolver em `<div class="pal-nav-actions" style="gap:0.5rem">` contendo o bloco `.pal-nav-user` e o botão `.pal-profile-btn`.
+        - **🔒 REGRA OBRIGATÓRIA (Nav-User Consistency)**: O botão de perfil do usuário (`#open-profile` + `.pal-profile-btn`) deve estar **SEMPRE no cabeçalho global** (Navbar), posicionado **exatamente ao lado do botão "Sair"** via `@section('nav-user')`. 
+            - Em páginas de listagem (`professores`, `alunos`, `materias`), nunca utilize `@section('no-nav')` se precisar manter o acesso rápido ao logout e ao perfil unificado.
+            - O perfil nunca deve ser movido para dentro de formulários de busca, cards de filtro ou outras seções de conteúdo.
+- **Styles/Scripts**: Usar `@push('styles')` e `@push('scripts')`.
+
+## 2. Elementos de Design Obrigatórios
+Para manter o visual premium e consistente:
+- **Blobs de Fundo**: Adicionar no início do `@section('content')`:
+  ```html
+  <div class="blob top-[-100px] left-[-100px]"></div>
+  <div class="blob-2"></div>
+  ```
+- **Main Container**: `<main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">`
+- **Header da Seção**:
+  ```html
+  <div class="mb-12 animate-reveal">
+      <p class="pal-overline mb-2">Módulo Exemplo</p>
+      <h2 class="text-4xl font-black tracking-tighter pal-always-white">Título Grande</h2>
+      <p class="text-white/70 font-medium">Subtítulo explicativo ou instrução.</p>
+  </div>
+  ```
+
+## 3. Sistema de Cores e Temas (Light/Dark)
+- **Variáveis CSS**: Priorizar o uso de variáveis de `--pal-*` definidas em `public/css/theme.css`.
+- **Mecanismo de Tema Automático (Attribute Selectors)**:
+    - O sistema utiliza seletores `html.light-mode [style*="..."]` no `theme.css` para inverter cores de estilos inline automaticamente.
+    - **Atenção**: Ao usar cores hexadecimais em estilos inline, utilize padrões comuns como `#efefef` ou `#111` para que o seletor consiga capturá-los e invertê-los no Light Mode.
+- **Contraste no Theme Switch**:
+    - **Regra de Ouro**: Sempre verifique se o fundo do componente não coincide com o fundo da página no Light Mode (`html.light-mode`).
+    - **Bordas em Light Mode**: Bordas brancas semitransparentes (`rgba(255,255,255,0.1)`) desaparecem no Light Mode. Use a classe `.pal-icon-box` ou similares que possuam override para `rgba(0,0,0,0.1)`.
+- **Always White**: Use `.pal-always-white` para textos que devem permanecer brancos mesmo em light mode (geralmente sobre gradientes ou blobs coloridos).
+
+## 4. Componentes Reutilizáveis
+### Glass Cards
+Use a classe `.glass` com bordas sutis:
+```html
+<div class="glass p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all">
+    <!-- Conteúdo -->
+</div>
+```
+
+### Tabelas (Data Display)
+Estrutura padrão de listagem:
+- Tabela dentro de uma `.glass` com `overflow-hidden`.
+- Headers em `text-xs font-black uppercase tracking-[0.2em]`.
+- Listras de divisão: `.divide-y .divide-white/5`.
+- Hover nas linhas: `.hover:bg-white/5`.
+
+### Modais
+Use a estrutura de `#info-modal` com `dashboard_modal.js` para detalhes dinâmicos.
+- Fundo: `backdrop-blur-md bg-black/60`.
+- Conteúdo: `.glass rounded-sm border border-white/10`.
+
+### Barras de Progresso (Frequência/Status)
+Usar para indicar limites ou progresso:
+```html
+<div style="height:3px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;">
+    <div style="height:100%; width:{{ $percent }}%; background:{{ $barColor }}; transition:width 1s ease;"></div>
+</div>
+```
+- Cores dinâmicas sugeridas: Verde (`#22c55e`), Amarelo (`#eab308`), Vermelho (`#ef4444`).
+
+### Páginas de Feedback (Sucesso/Erro)
+Layout centralizado para confirmações ou avisos:
+- **Icon Container**: 64x64px, borda 12% branca, ícone centralizado.
+- **Textos**: Overline (Space Grotesk) -> H1 (Font-900) -> P (Subtitle).
+- **Info Card**: Bloco de informação secundária opcional com `background:rgba(18,18,18,0.98)` e borda 8%.
+
+### Formulários e Inputs
+Para páginas de login ou configurações:
+- **Labels**: Classe `.login-label` (Space Grotesk, 0.75rem, bold, uppercase).
+- **Inputs**: Classe `.login-input` (fundo `#111`, bordas 10%, transition no focus).
+- **Mensagens de Erro**: Classe `.login-error` (fundo vermelho 8%, borda vermelha 25%, texto claro).
+- **Password Toggle**: Botão absoluto à direita com ícone de olho.
+
+### Banners e Dashboards
+- **Banner Principal**: Classe `.pal-dashboard-banner` (flex-wrap, border-radius 4px, fundo `#111` ou `white`).
+- **Typography Professor**: 
+    - `.pal-eyebrow`: Space Grotesk, 0.75rem, uppercase, cinza.
+    - `.pal-title`: Font-900, tracking-tighter, clamp(2rem-3rem).
+    - `.pal-subtitle`: 0.88rem, cinza suave.
+
+### Animações e Efeitos Premium
+- **Staggered Reveal (Cards)**: Usar classes `.pal-card-delay-1`, `.pal-card-delay-2`, `.pal-card-delay-3` para que os cards apareçam em sequência.
+- **Micro-interações**: Adicionar `transition: all 0.2s` em todos os elementos interativos.
+- **Cursor Glow**: O sistema possui um `#pal-cursor-glow` global (não remover).
+- **Status Pulsante**: Usar `.animate-pulse` em `w-2 h-2 rounded-full` para estados "On-line" ou "Ativo".
+
+### Gestão e Tabelas Avançadas
+- **Inputs em Tabelas**: Classe `.nota-input` para edição inline (Glassmorphism).
+    - Estados: `.saving` (laranja), `.saved` (verde), `.error` (vermelho).
+- **Situação em Badges**: Classe `.shadow-lg` com cores vibrantes (ex: `bg-green-500 shadow-green-500/30`) para estados finais (Aprovado/Reprovado).
+- **Grid de Estatísticas**: Grid de 5 colunas (`grid-cols-5 gap-6`) com `.glass` e texto grande (`text-3xl font-black`) para resumos.
+- **Legendas**: Bloco inferior com `flex-wrap gap-8` e pontos coloridos explicativos.
+
+## 5. Páginas de Erro e Feedback
+Para erros como 419, 404, etc:
+- **Icon Container**: 64x64px (`w-16 h-16`), borda 12% branca, ícone centralizado.
+- **Tipografia**: Overline (Eyebrow) -> H1 (Title) -> P (Subtitle).
+- **Buttons**: Usar `.pal-btn-primary` e `.pal-btn-outline` para consistência de tema e contraste.
+
+## 6. Perfil de Usuário (Modal)
+O perfil de usuário deve seguir o padrão da página de aluno, sendo acessível via modal:
+- **Trigger**: Botão na Navbar (lado direito, junto à info do usuário) usando a classe `.pal-profile-btn`.
+- **Classes Globais (CSS)**:
+    - `.pal-modal-overlay`: Fundo escuro fixo com `backdrop-blur-md`.
+    - `.pal-modal-content`: Card glass centralizado (`max-width:640px`).
+    - `.pal-profile-field`: Bloco de informação (Label + Valor).
+- **Conteúdo por Role**: 
+    - **Alunos**: Nome, Email, RA, CPF + Lista de Matérias (Faltas/Progresso).
+    - **Professores**: Nome, Email, CPF + Lista de Disciplinas lecionadas.
+    - **Masters**: Nome ("Administrador Master"), Email, Função ("Controle Total").
+- **Lógica**: Utilizar JavaScript para toggle (`id="profile-modal"`, `id="open-profile"`, `id="close-profile"`). Manter consistência com `dashboard_modal.js` se for dinâmico, ou script local se fixo.
+
+## 7. Arquitetura e Backend (Lógica de Negócio)
+Para manter a integridade funcional ao criar novas rotas/controllers:
+- **Guards e Roles**:
+    - Alunos: `auth:alunos`, role `aluno`. PK é `ra`.
+    - Professores: `auth:professores`, role `professor`. PK é `id`.
+    - Masters: `auth:masters`, role `master`.
+- **Relacionamentos e Pivots**:
+    - Notas e frequências específicas são armazenadas na tabela pivot `aluno_materia`.
+    - Use `DB::table('aluno_materia')` para updates diretos de notas para performance.
+- **Sessões Temporárias (QR Code)**:
+    - Utilizar `Cache::put/get` com chaves únicas (`aula_materia_{id}_{data}`) para controlar a validade dos códigos de aula.
+- **Padrão de Listagem**:
+    - Sempre utilizar `paginate(10)` ou `paginate(20)` em controllers de busca/master.
+    - Filtros dinâmicos: Usar `$request->filled('campo')` para construir queries condicionais.
+
+## 8. REGRAS CRÍTICAS PARA BOTÕES (Interaction)
+- **Não Transparência no Hover**: Botões DEVEM ter fundo **sólido** ao passar o mouse.
+- **Mudança de Cor de Texto**: No hover, a cor do texto/letra deve mudar para garantir contraste (ex: de preto para branco).
+- **Acessibilidade de Tema**: Se um botão for `white` em dark mode, ele deve se tornar `black` em light mode (usar variáveis ou overrides automáticos de hex como `#efefef`).
+- **Problema do "Texto Escuro em Fundo Escuro"**: No Light Mode, evite usar classes que invertem tanto o fundo quanto o texto para a mesma cor (ex: `bg-white` e `pal-text` simultaneamente podem causar invisibilidade).
+- **🎨 REGRA DE CONSISTÊNCIA DE COR**: **Botões com a mesma ação DEVEM ter a mesma cor em todas as páginas e contextos**, independente de onde aparecem. A cor do botão comunica a intenção da ação — mudar isso cria confusão visual e quebra a identidade do sistema.
+  - ✅ `Gerar QR Code` → sempre `background:#050505; color:#efefef` (dark) / `background:#efefef; color:#050505` (light)
+  - ✅ `Confirmar / Salvar` → sempre verde (`#22c55e`)
+  - ✅ `Cancelar / Sair` → sempre outline/ghost ou vermelho sutil
+  - ⚠️ **Exceção permitida**: Quando um botão está **desabilitado** (ex: conflito de horário, sem permissão), ele pode receber estilo diferente (`bg-white/5`, `cursor-not-allowed`) para sinalizar a indisponibilidade. Mas deve ser óbvio que é um estado especial, não a cor padrão do botão.
+
+## 10. Viewport e Visibilidade (UX)
+- **Hero-Fold Visibility (Regra da Seta)**: O conteúdo da seção Hero (`.pal-hero`) deve ser sempre compacto o suficiente para que o "Scroll Hint" (seta de 'Como funciona') seja visível imediatamente ao carregar a página em resoluções padrão (notebooks 13-15").
+- **Ajustes de Altura**: Utilize `min-height: calc(100vh - 60px)` na seção Hero para compensar a Navbar fixa. Se o conteúdo interno exceder ~730px de altura útil, reduza gaps (`gap`), paddings verticais e o tamanho do QR Mock.
+
+## 11. Arquivos de Referência
+- **CSS Global**: `public/css/theme.css`
+- **CSS Professor**: `public/css/theme_professor.css` (específico para cards e dashboard).
+- **Layout Blade**: `resources/views/layouts/theme.blade.php`
+- **Exemplo de Página**: `resources/views/master/professores.blade.php`
+
+---
+
+## 🛑 10. PRECAUÇÕES CRÍTICAS (No-Go Zones)
+Nunca altere a lógica fundamental de autenticação sem validação do backend (Ex: Painel de Controle invisível):
+- **Cores Literais com `!important`**: Evite usar `color: #efefef !important` em classes globais sem fornecer o override correspondente em `html.light-mode`. Isso impede que o motor de inversão funcione.
+
+- **Atributo `name` em Logins**: NÃO altere os nomes dos inputs (`cpf_email` no professor, `ra_email_cpf` no aluno). Isso quebra a captura de dados no Controller e impede o login.
+  - *Exemplo de Erro a evitar*: Mudar `cpf_email` para `ra_email_cpf` no formulário de professor quebra o acesso de docentes e masters.
+- **CSRF Token**: Nunca remova `@csrf` dos formulários.
+- **Routes de Auth**: Não altere nomes de rotas como `login.aluno` ou `login.professor` sem atualizar todos os redirects nos Controllers.
+
+---
+
+## 📋 11. TABELAS E LISTAGENS DE DADOS
+Para garantir legibilidade em Relatórios, Dashboards Prof/Aluno e Módulos Master:
+- **Títulos de Página**: SEMPRE use `.pal-title` (ex: "Histórico de Presenças", "Visão Geral do Sistema"). Nunca use `pal-always-white`.
+- **Eyebrows (Sobrancelhas)**: Use `.pal-eyebrow` para rótulos pequenos acima de títulos (ex: "Módulo Presença Digital", "Guia de Utilização").
+- **Alinhamento**: Em sessões de Guia ou Introdução (ex: "Como funciona?"), centralize o título e a sobrancelha para melhor equilíbrio visual.
+
+---
+
+## ✨ 12. ANIMAÇÕES E INTERAÇÕES (Premium Feel)
+- **Efeito Tilt**: Todos os cards de seleção ou ação (Matérias, Passos do Guia) devem usar a classe `.tilt-card` e o script de inclinação 3D para feedback interativo.
+- **Transições de Tema**: Garanta que mudanças de cor (especialmente em cards com delay) usem `@keyframes` para suavizar a transição entre dark e light mode.
+- **Textos em Tabelas**: 
+  - Nome/Dado Principal: Classe `.pal-text` (font-bold).
+  - RA/Meta-info/Subtexto: Classe `.pal-subtitle` (font-mono ou font-medium).
+- **Cabeçalhos de Tabela (`th`)**: Use `.pal-subtitle` com `font-black uppercase tracking-widest`.
+- **Contrast Check**: Teste sempre se as linhas da tabela (`hover:bg-white/5`) e os divisores (`divide-white/5`) são visíveis em Light Mode (o `theme.css` cuida da maioria, mas evite cores fixas no Blade).
+
+---
+
+## 🐛 13. BUGS CONHECIDOS E SOLUÇÕES APLICADAS
+
+### Bug: Botão "Gerar QR Code" quase transparente (presença/index)
+- **Arquivo**: `resources/views/professor/presenca/index.blade.php`
+- **Causa**: O botão usa a classe Tailwind `bg-white`, que é sobrescrita pelo `theme.css` via `html.light-mode .bg-white { background-color: #111111 !important }`. Mesmo fora do light-mode, a classe `text-black` combinada com o card escuro pode gerar baixo contraste e aparência "invisível" quando nenhum QR Code está ativo.
+- **Solução Aplicada** (24/03/2026): Substituído `bg-white text-black` por `style="background:#efefef; color:#050505"` (inline) + eventos `onmouseover/onmouseout` para hover manual. Isso garante contraste correto independente do tema e dos overrides do `theme.css`.
+- **Regra Geral**: **Botões de ação primária nunca devem usar classes Tailwind de cor que possam ser sobrescritas pelo sistema de tema.** Use sempre `style="background:#efefef; color:#050505"` para botões claros (dark mode) ou variáveis `--pal-*` quando possível.
+
+### Bug: Inputs de pesquisa não mudam de cor no tema (master/presenca)
+- **Arquivo**: `resources/views/master/presenca.blade.php`
+- **Causa**: Inputs usavam `class="bg-white/5 border border-white/10 text-white"` (Tailwind). Em light mode, `bg-white/5` vira `rgba(0,0,0,0.04)` (quase branco sobre fundo branco), tornando o campo mal visível. O placeholder também não se adaptava.
+- **Solução Aplicada** (24/03/2026): Criada a classe `.pal-filter-input` no `theme.css` com overrides explícitos para `html.light-mode`, cobrindo background, cor do texto, cor do placeholder e ring de foco.
+- **Regra Geral**: **Inputs de formulário NUNCA devem usar classes Tailwind puras de cor.** Usar sempre `.pal-filter-input` (ou criar equivalente com variáveis `--pal-*` e override light-mode explícito no CSS).
+
+### Bug: Perfil do usuário aparecia abaixo do botão de filtrar (master/presenca)
+- **Arquivo**: `resources/views/master/presenca.blade.php`
+- **Causa**: O bloco de perfil estava como 5º item dentro de um `grid-cols-4`, causando overflow para a linha seguinte.
+- **Solução Aplicada** (24/03/2026): Perfil movido para fora do `<form>`, posicionado em uma linha de cabeçalho acima dos campos de filtro, alinhado à direita.
+- **Regra Geral**: **Elementos de UI que não fazem parte do formulário (perfil, ações globais) NUNCA devem estar dentro do `<form>`.** Posicionar sempre fora, usando flex/grid no container pai.
+
+### Bug: Filtros de pesquisa redirecionavam para a página inicial com query vazia (master/presenca)
+- **Arquivo**: `resources/views/master/presenca.blade.php`
+- **Causa**: O JS do autocomplete (linha ~300) submetia o formulário inteiro apenas chamando `form.submit()`. Campos HTML `<input>` vazios eram enviados na URL como `?professor=Valor&materia=&aluno=`, o que causava um comportamento estranho de roteamento no backend, perdendo o filtro do item que acabara de ser clicado.
+- **Solução Aplicada** (24/03/2026): A submissão via `form.submit()` com inputs desativados (`el.disabled = true`) apresentava problemas em certos navegadores. A solução definitiva foi interceptar o clique com JS, construir uma nova URL usando `URLSearchParams` apenas com os parâmetros que possuem valor (`el.value.trim() !== ''`), e redirecionar ativamente usando `window.location.href = url.toString()`.
+- **Regra Geral**: **Em fomulários de filtro (método GET), a melhor prática para evitar query strings sujas (`&campo=`) é construir a URL manualmente via `URLSearchParams` no Javascript e aplicar o redirecionamento via `window.location.href`**, contornando o comportamento padrão do `<form>`.
+
+---
+
+## 🧪 14. PROTOCOLO DE TESTES E VALIDAÇÃO (Regressão)
+
+Para garantir que novos problemas não sejam introduzidos ao consertar bugs antigos, **todos os agentes** devem realizar os seguintes testes antes de dar a tarefa como concluída:
+
+1. **Teste Visual de Contraste (Light/Dark Mode)**:
+   - Todo novo texto, título ou card deve ser verificado mental e logicamente quanto ao comportamento em Light Mode. 
+   - Se adicionou a classe `pal-always-white`, justifique por que não usou `pal-title` ou `pal-text`.
+
+2. **Teste de Interação (Event Listeners)**:
+   - Ao modificar ou remover um formulário nativo (ex: trocar `form` por `fetch` assíncrono), verifique se todos os inputs estão sendo lidos corretamente pelo Javascript.
+   - Pressione Enter nos inputs modificados para prever se o formulário será enviado equivocadamente (se houver `<form>`). Se sim, use `e.preventDefault()`.
+
+3. **Validação de Queries Backend (Filtros)**:
+   - Toda rota que recebe parâmetros de busca (`?q=` ou `?professor=`) deve ter os dados filtrados com validação no backend para evitar quebra ao receber null/vazio.
+   - Conferir se os relacionamentos do Eloquent (`with('aluno')`, etc.) continuam intactos ao reescrever métodos de Controller.
+
+4. **Regra de "One Feature, Double Check"**:
+   - Sempre que uma feature de outra página for "copiada" (ex: "faça o mesmo método da página X"), revise se o contexto da página alvo (slots de `@section`, scripts injetados, arquivos CSS carregados) suporta a cópia diretamente, ou se precisa de adaptações. Exemplo clássico: copiei uma searchbar da Navbar, mas a página precisava de 3 separadas.
+
+5. **Acompanhamento no Walkthrough**:
+   - Qualquer modificação arquitetural num formulário ou endpoint JSON deve ser registrada explicitamente no arquivo `walkthrough.md` para revisão pelo desenvolvedor raiz do projeto.
+
+---
+
+## 🚀 15. MELHORES PRÁTICAS E REQUISITOS TÉCNICOS
+
+Para elevar a qualidade do projeto Smart Attendance aos padrões Premium, siga estas diretrizes adicionais:
+
+### Acessibilidade e SEO
+- **Ícones Soltos**: Botões que contêm apenas ícones (ex: Perfil, Sair, Filtros) DEVEM obrigatoriamente ter o atributo `aria-label` ou `title` para leitores de tela.
+- **Títulos Dinâmicos**: O título da página (`@yield('title')`) deve ser específico para cada tela (ex: "Relatório de Frequência - Smart Attendance").
+- **Imagens**: Sempre inclua o atributo `alt` descritivo. Para imagens de perfil ou ilustrações, use substitutos de fallback caso o asset não seja carregado (ex: iniciais do nome ou ícone genérico).
+
+### Javascript e Frontend Moderno
+- **Abstração AJAX**: Priorize o uso de `fetch` em vez de bibliotecas pesadas como jQuery para novas funcionalidades. Use `async/await` para manter o código limpo.
+- **Debounce em Pesquisas**: Ao implementar buscas assíncronas (como `setupMultiSearch`), considere um pequeno delay ou debounce se o volume de dados crescer, evitando disparos excessivos ao backend.
+- **Manipulação de URL**: Em filtros do tipo GET, utilize sempre a API `URLSearchParams` para garantir que a URL permaneça limpa e sem parâmetros vazios (`&campo=`).
+
+### Assets e Manutenção
+- **Cache Busting**: Ao referenciar arquivos CSS ou JS customizados no Blade, utilize o helper `asset('path') . '?v=' . filemtime(public_path('path'))` para garantir que as alterações sejam aplicadas imediatamente no navegador do usuário.
+- **Links Absolutos**: Evite links relativos dentro do Blade. Use sempre os helpers `route()`, `url()` ou `asset()`.
+- **Placeholder de Imagens**: Nunca deixe imagens quebradas no layout. Utilize o sistema de `storage` do Laravel corretamente e verifique se o link simbólico (`php artisan storage:link`) está ativo.
+- **📅 REGRA DE ATUALIZAÇÃO**: Toda vez que este arquivo (`.cursorrules`) for modificado ou receber uma nova regra, a linha **"Última Atualização"** no final do arquivo DEVE ser obrigatoriamente atualizada com a data atual (DD/MM/AAAA) e uma breve descrição da mudança.
+
+---
+
+## 🛡️ 16. SEGURANÇA E PROTEÇÃO DE DADOS (Anti-Leak)
+
+Para garantir a integridade do sistema e evitar o vazamento de informações sensíveis (CPFs, senhas, tokens):
+
+### Proteção de Dados Sensíveis
+- **Mass Assignment**: Todos os Models DEVEM usar `$fillable` ou `$guarded` para prevenir atribuição em massa não autorizada.
+- **Hidden Fields**: Campos sensíveis como `password`, `remember_token`, `cpf` e `ra` devem ser incluídos no array `$hidden` dos Models quando não forem estritamente necessários em respostas JSON/API.
+- **Logs de Erro**: NUNCA registre dados sensíveis em `Log::info()` ou `Log::error()`. Utilize filtros de sanitização se precisar logar payloads de requisição.
+
+### Prevenção de Injeção e XSS
+- **Output Sanitization**: Utilize sempre `{{ $variavel }}` no Blade. O uso de `{!! $variavel !!}` é estritamente proibido, a menos que o conteúdo tenha sido explicitamente sanitizado com uma biblioteca de Purifier.
+- **SQL Injection**: NUNCA utilize `DB::raw()` com parâmetros concatenados. Use sempre bindings do Query Builder ou métodos do Eloquent.
+- **Validation First**: Toda requisição que altere o estado do banco (POST/PUT/PATCH) deve passar por uma `FormRequest` ou `Validator` rigoroso, impedindo tipos de dados inesperados.
+
+### Autenticação e Sessões
+- **Middleware de Proteção**: Verifique sempre se as rotas Master estão protegidas pelo middleware `auth:masters` e se não há rotas administrativas expostas publicamente.
+- **CSRF Protection**: O token `@csrf` é obrigatório em TODOS os formulários. Em chamadas AJAX, o header `X-CSRF-TOKEN` deve ser enviado automaticamente (ver `app.js`).
+
+---
+
+## 17. COMANDOS DE PERSISTÊNCIA (Agente)
+- **Gatilho "ANOTE" (Persistência Direta)**: Sempre que o usuário mencionar a palavra **"anote"** no chat, o assistente deve obrigatoriamente realizar uma **atualização direta, imediata e persistente** nas regras, configurações ou registros do arquivo `.cursorrules`. Isso garante que decisões de design, correções de bugs e novas diretrizes sejam gravadas fisicamente no arquivo para que o conhecimento seja herdado em todas as gerações futuras do assistente (não é apenas uma nota temporária, mas uma mudança no "DNA" do projeto).
+
+---
+
+## 18. FUNCIONALIDADES PRINCIPAIS POR PERFIL
+Para garantir que as novas páginas de informação (`/aluno/saiba-mais` e `/professor/saiba-mais`) reflitam a verdade do sistema:
+
+### 👨‍🎓 Perfil: ALUNO
+- **Confirmação Instantânea**: Registro de presença via QR Code dinâmico em menos de 3 segundos.
+- **Gestão de Faltas**: Dashboard com percentual de assiduidade em tempo real por disciplina.
+- **Alertas de Risco**: Notificações visuais (vermelho/amarelo) quando o limite de faltas está próximo.
+- **Histórico Acadêmico**: Acesso rápido a datas de presença e justificativas.
+
+### 👨‍🏫 Perfil: PROFESSOR
+- **Geração de QR Code**: Criação de códigos únicos por aula com tempo de expiração customizável.
+- **Chamada Inteligente**: Monitoramento em tempo real dos alunos que escaneiam o código em sala.
+- **Relatórios Consolidados**: Filtros por data, aluno e matéria com exportação simplificada.
+- **Gestão de Turmas**: Lançamento de notas e visão geral do progresso da disciplina.
+
+---
+
+## 19. ARQUITETURA DE DEMONSTRAÇÃO INTERATIVA
+Sempre que uma nova funcionalidade for adicionada, os ambientes de demonstração (`/aluno/demonstracao` e `/professor/demonstracao`) devem ser atualizados seguindo estes padrões rigorosos:
+
+- **Branding de Demonstração**: Seções que levam às interfaces de demo (ex: na Homepage) devem ser obrigatoriamente identificadas com a tag `DEMONSTRAÇÃO` e títulos claros como "Demonstração dos Perfis" para evitar confusão com o fluxo real de autenticação.
+- **Paridade Estrutural**: Ambos os dashboards (Aluno/Professor) devem possuir um banner de destaque no topo (`pal-dashboard-banner`) para a ação principal imediata.
+- **Paridade de Tema (Modo Claro)**: As demonstrações devem suportar perfeitamente o Modo Claro. Cards principais devem utilizar as classes `pal-card-delay-1`, `2` e `3` para herdar a animação de "revelação" (reveal to white) presente nos dashboards oficiais.
+- **Neutralidade de Marca**: É terminantemente proibido o uso de "CEUB" ou identificações institucionais em textos, tooltips ou emails de mock. Utilize termos genéricos como "Instituicao" e e-mail `@instituicao.edu.br`.
+- **Simulação de Autenticação**: O Navbar deve ocultar botões de login (`hide-nav-defaults`) e exibir "Perfil" e "Sair" para simular o estado logado.
+- **Interatividade de Feedback**: Use `.pal-demo-toast` para confirmar ações simuladas com feedback visual instantâneo.
+- **Segurança de Viewport**: 
+    - Use `.pal-info-tooltip-down` apenas em elementos no topo (Navbar/Modais). 
+    - Botões de ação em banners devem usar a posição padrão (acima) com `white-space: normal` e largura expandida.
+
+---
+
+**Última Atualização**: 24/03/2026 - Implementada a arquitetura de demonstração interativa (Mock Dashboards) de alta fidelidade e normas de Viewport Safety via gatilho "anote".

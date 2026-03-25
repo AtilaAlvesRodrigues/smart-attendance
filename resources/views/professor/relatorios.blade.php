@@ -210,9 +210,9 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
-                <p class="pal-overline mb-2 border border-white/10 px-3 py-1 bg-white/5 rounded-sm inline-block">Módulo Relatórios</p>
-                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Histórico de Presenças</h2>
-                <p class="text-white/70 font-medium">Filtre por matéria e período para gerar seu relatório de frequências.</p>
+                <p class="pal-eyebrow" style="margin-bottom:0.5rem">Módulo Relatórios</p>
+                <h2 class="pal-title">Histórico de Presenças</h2>
+                <p class="pal-subtitle">Filtre por matéria e período para gerar seu relatório de frequências.</p>
             </div>
 
             <!-- Filtros -->
@@ -253,8 +253,8 @@
             <!-- Tabela de Resultados -->
             <div class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-                    <h3 class="text-xl font-black text-white italic tracking-tighter">Registros Encontrados</h3>
-                    <div class="text-xs font-black text-white/70 uppercase tracking-widest">
+                    <h3 class="text-xl font-black pal-text italic tracking-tighter">Registros Encontrados</h3>
+                    <div class="pal-subtitle font-black uppercase tracking-widest" style="font-size:0.65rem">
                         Total: {{ $presencas->total() }} registros
                     </div>
                 </div>
@@ -262,7 +262,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
+                            <tr class="pal-subtitle font-black uppercase tracking-[0.2em] border-b border-white/10" style="font-size:0.65rem">
                                 <th class="py-4 px-6">Data / Hora</th>
                                 <th class="py-4 px-6">Aluno</th>
                                 <th class="py-4 px-6">Matéria</th>
@@ -273,15 +273,15 @@
                             @forelse($presencas as $presenca)
                                 <tr class="hover:bg-white/5 transition-colors group">
                                     <td class="py-4 px-6">
-                                        <span class="block font-bold text-white tracking-tight">{{ $presenca->created_at->format('d/m/Y') }}</span>
-                                        <span class="block text-xs text-white/80 font-mono">{{ $presenca->created_at->format('H:i:s') }}</span>
+                                        <span class="block font-bold pal-text tracking-tight">{{ $presenca->created_at->format('d/m/Y') }}</span>
+                                        <span class="block pal-subtitle font-mono" style="font-size:0.7rem">{{ $presenca->created_at->format('H:i:s') }}</span>
                                     </td>
                                     <td class="py-4 px-6">
-                                        <span class="block font-bold text-white tracking-tight">{{ $presenca->aluno->nome }}</span>
-                                        <span class="block text-xs text-white/80 font-mono">{{ $presenca->aluno_ra }}</span>
+                                        <span class="block font-bold pal-text tracking-tight">{{ $presenca->aluno->nome }}</span>
+                                        <span class="block pal-subtitle font-mono" style="font-size:0.75rem">{{ $presenca->aluno_ra }}</span>
                                     </td>
                                     <td class="py-4 px-6">
-                                        <span class="px-3 py-1 bg-white/10 text-white rounded-sm text-xs font-black border border-white/20 uppercase tracking-widest">
+                                        <span class="px-3 py-1 bg-white/10 pal-text rounded-sm text-[10px] font-black border border-white/20 uppercase tracking-widest">
                                             {{ $presenca->materia->nome }}
                                         </span>
                                     </td>

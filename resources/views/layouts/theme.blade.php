@@ -11,7 +11,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 
     <script>
         // Initialize theme instantly to prevent flash
@@ -44,14 +44,16 @@
                 </form>
             @else
                 @yield('nav-right')
-                @if(request()->routeIs('login.professor.form'))
-                    <a href="{{ route('login.aluno.form') }}" class="pal-nav-btn pal-nav-btn-ghost">Aluno</a>
-                @elseif(request()->routeIs('login.aluno.form'))
-                    <a href="{{ route('login.professor.form') }}" class="pal-nav-btn pal-nav-btn-ghost">Professor</a>
-                @else
-                    <a href="{{ route('login.professor.form') }}" class="pal-nav-btn pal-nav-btn-ghost">Professor</a>
-                    <a href="{{ route('login.aluno.form') }}" class="pal-nav-btn pal-nav-btn-solid">Entrar</a>
-                @endif
+                @unless(View::hasSection('hide-nav-defaults'))
+                    @if(request()->routeIs('login.professor.form'))
+                        <a href="{{ route('login.aluno.form') }}" class="pal-nav-btn pal-nav-btn-ghost">Aluno</a>
+                    @elseif(request()->routeIs('login.aluno.form'))
+                        <a href="{{ route('login.professor.form') }}" class="pal-nav-btn pal-nav-btn-ghost">Professor</a>
+                    @else
+                        <a href="{{ route('login.professor.form') }}" class="pal-nav-btn pal-nav-btn-ghost">Professor</a>
+                        <a href="{{ route('login.aluno.form') }}" class="pal-nav-btn pal-nav-btn-solid">Entrar</a>
+                    @endif
+                @endunless
             @endauth
         </div>
     </nav>

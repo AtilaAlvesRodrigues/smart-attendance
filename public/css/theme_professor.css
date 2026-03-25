@@ -77,7 +77,6 @@
     border-color: rgba(255,255,255,0.3);
     color: #efefef;
 }
-
 /* DASHBOARD BANNER (bottom active session area) */
 .pal-dashboard-banner {
     background: #111;
@@ -91,6 +90,14 @@
     flex-wrap: wrap;
 }
 
+/* Specific icon boxes to handle border contrast in light mode */
+.pal-icon-box {
+    transition: border-color 0.3s;
+}
+html.light-mode .pal-icon-box {
+    border-color: rgba(0,0,0,0.1) !important;
+}
+
 /* ----------------------------------------------------------
    LIGHT MODE OVERRIDES — professor dashboard
    ---------------------------------------------------------- */
@@ -98,6 +105,7 @@ html.light-mode .pal-section-header {
     border-bottom-color: rgba(0,0,0,0.08) !important;
 }
 html.light-mode .pal-eyebrow   { color: #777 !important; }
+html.light-mode .pal-title     { color: #111 !important; }
 html.light-mode .pal-subtitle  { color: #555 !important; }
 
 /* Muted cards: dark by default, reveal to white after 3s in light mode */

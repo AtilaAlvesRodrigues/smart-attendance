@@ -57,6 +57,14 @@ Route::post('/login/professor', [ProfessorLoginController::class, 'attemptAuthen
     ->middleware('throttle:10,3')
     ->name('login.professor');
 
+// Informational "Saiba Mais" Pages
+Route::get('/aluno/saiba-mais', function () { return view('pages.aluno-info'); })->name('aluno.info');
+Route::get('/professor/saiba-mais', function () { return view('pages.professor-info'); })->name('professor.info');
+
+// Interactive Demonstration Dashboards
+Route::get('/aluno/demonstracao', function () { return view('pages.aluno-demo'); })->name('aluno.demo');
+Route::get('/professor/demonstracao', function () { return view('pages.professor-demo'); })->name('professor.demo');
+
 Route::post('/login', function (Request $request) {
     return redirect()->route('login.aluno');
 })->name('login');
@@ -104,6 +112,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
             Route::get('/professores', [MasterSearchController::class, 'searchProfessores'])->name('master.search.professores');
             Route::get('/alunos', [MasterSearchController::class, 'searchAlunos'])->name('master.search.alunos');
             Route::get('/materias', [MasterSearchController::class, 'searchMaterias'])->name('master.search.materias');
+            Route::get('/presencas', [MasterSearchController::class, 'searchPresencas'])->name('master.search.presencas');
         });
     });
 

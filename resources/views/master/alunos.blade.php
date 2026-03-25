@@ -3,8 +3,24 @@
 @section('title', 'Gerenciar Alunos - Master')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('no-nav')
 
+@section('nav-left')
+    <a href="{{ route('dashboard.master') }}" class="pal-nav-btn pal-nav-btn-ghost">
+        ← Dashboard
+    </a>
+@endsection
+
+@section('nav-user')
+<div class="pal-nav-actions" style="gap:0.5rem">
+    <div class="pal-nav-user">
+        <span class="pal-nav-user-role">Acesso Root</span>
+        <span class="pal-nav-user-name">Admin</span>
+    </div>
+    <button id="open-profile" type="button" class="pal-profile-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+    </button>
+</div>
+@endsection
 @section('content')
     <div class="flex-grow flex flex-col relative overflow-hidden">
         
@@ -25,9 +41,11 @@
                     </div>
                 </div>
 
-                <div class="hidden md:block">
-                    <input type="text" id="search-alunos" placeholder="Pesquisar por nome ou RA..." 
-                        class="px-5 py-2 bg-white/5 border border-white/10 rounded-sm text-white text-xs font-medium focus:outline-none focus:ring-1 focus:ring-white/30 transition-all w-64">
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:block mr-2">
+                        <input type="text" id="search-alunos" placeholder="Pesquisar..." 
+                            class="px-4 py-1.5 bg-black/10 border border-black/10 rounded-sm text-current text-[11px] font-medium focus:outline-none focus:ring-1 focus:ring-black/20 transition-all w-48 pal-filter-input">
+                    </div>
                 </div>
             </div>
         </nav>
@@ -35,8 +53,8 @@
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
-                <h2 class="text-4xl font-black tracking-tighter pal-always-white">Base de Discentes</h2>
-                <p class="text-white/70 font-medium">Gerenciamento centralizado de matrículas e dados acadêmicos.</p>
+                <h2 class="text-4xl font-black tracking-tighter pal-title">Base de Discentes</h2>
+                <p class="pal-subtitle font-medium">Gerenciamento centralizado de matrículas e dados acadêmicos.</p>
             </div>
 
             <!-- Alunos Section -->
@@ -110,6 +128,48 @@
             </div>
         </div>
     </div>
+
+    <!-- User Profile Modal -->
+    <div id="profile-modal" class="pal-modal-overlay" style="display:none; z-index:100;">
+        <div id="close-profile-overlay" style="position:absolute; inset:0;"></div>
+        <div class="pal-modal-content">
+            <div class="pal-modal-header">
+                <div>
+                    <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Painel de Controle</p>
+                    <h2 class="pal-always-white" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Perfil Master</h2>
+                </div>
+                <button id="close-profile" class="pal-profile-btn" style="border-color:rgba(255,255,255,0.1); color:#888;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="pal-modal-body">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+                    <div class="pal-profile-field">
+                        <p class="pal-profile-field-label">Nome de Exibição</p>
+                        <p class="pal-profile-field-value">Administrador Master</p>
+                    </div>
+                    <div class="pal-profile-field">
+                        <p class="pal-profile-field-label">Nível de Acesso</p>
+                        <p class="pal-profile-field-value">Controle Total (Sudo)</p>
+                    </div>
+                    <div class="pal-profile-field" style="grid-column: span 2;">
+                        <p class="pal-profile-field-label">E-mail do Sistema</p>
+                        <p class="pal-profile-field-value">{{ auth()->user()->email ?? 'master@smartattendance.com' }}</p>
+                    </div>
+                </div>
+
+                <hr class="pal-divider" style="margin-bottom:1.5rem;">
+                <p class="pal-eyebrow" style="margin-bottom:1rem;">Segurança</p>
+
+                <div class="pal-profile-field" style="background:rgba(34, 197, 94, 0.05); border-color:rgba(34, 197, 94, 0.1);">
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <span style="width:8px; height:8px; background:#22c55e; border-radius:50%; display:inline-block;" class="animate-pulse"></span>
+                        <p class="pal-profile-field-value" style="color:#22c55e; font-size:11px;">Sessão Autenticada com Firewall Ativo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -174,6 +234,22 @@
                     </td>
                 </tr>
             `);
+
+            // Profile Modal Logic
+            const pModal = document.getElementById('profile-modal');
+            const openPBtn = document.getElementById('open-profile');
+            const closePBtn = document.getElementById('close-profile');
+            const pOverlay = document.getElementById('close-profile-overlay');
+
+            function togglePModal(show) {
+                pModal.style.display = show ? 'flex' : 'none';
+                document.body.style.overflow = show ? 'hidden' : '';
+            }
+
+            if (openPBtn) openPBtn.addEventListener('click', () => togglePModal(true));
+            if (closePBtn) closePBtn.addEventListener('click', () => togglePModal(false));
+            if (pOverlay) pOverlay.addEventListener('click', () => togglePModal(false));
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') togglePModal(false); });
         });
     </script>
 @endpush
