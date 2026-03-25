@@ -16,6 +16,8 @@
 [📁 Estrutura](#-estrutura) •
 [🗄️ Banco de Dados](#%EF%B8%8F-banco-de-dados)
 
+O projeto sera implementado no site https://filamentphp.com/
+
 </div>
 
 ---
