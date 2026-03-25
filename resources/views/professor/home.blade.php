@@ -20,6 +20,26 @@
 @endsection
 
 @section('content')
+    {{-- Event QR Modal --}}
+    <div id="event-qr-modal" class="pal-modal-overlay" style="display:none;">
+        <div id="close-event-overlay" style="position:absolute; inset:0;"></div>
+        <div class="pal-modal-content" style="max-width:400px; text-align:center;">
+            <div class="pal-modal-header">
+                <div>
+                    <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Check-in Externo</p>
+                    <h2 class="pal-text" style="font-size:1.4rem;">QR Code do Evento</h2>
+                </div>
+                <button id="close-event-qr" class="pal-profile-btn">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="pal-modal-body" style="padding:2.5rem;">
+                <div id="event-qrcode-container" style="background:white; padding:1.5rem; border-radius:8px; display:inline-block; margin-bottom:1.5rem; box-shadow:0 10px 25px rgba(0,0,0,0.2);"></div>
+                <p class="pal-subtitle" style="font-size:0.8rem;">Aponte a câmera para realizar o check-in automático.</p>
+            </div>
+        </div>
+    </div>
+
     {{-- Profile Modal --}}
     <div id="profile-modal" class="pal-modal-overlay" style="display:none;">
         <div id="close-modal-overlay" style="position:absolute; inset:0;"></div>
@@ -27,9 +47,9 @@
             <div class="pal-modal-header">
                 <div>
                     <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Credenciais Docentes</p>
-                    <h2 class="pal-always-white" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Meu Perfil</h2>
+                    <h2 class="pal-text" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Meu Perfil</h2>
                 </div>
-                <button id="close-profile" class="pal-profile-btn" style="border-color:rgba(255,255,255,0.1); color:#888;">
+                <button id="close-profile" class="pal-profile-btn">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -76,8 +96,25 @@
             <p class="pal-subtitle">Gerencie suas aulas e registros de presença em tempo real.</p>
         </div>
 
+        {{-- NEW PROMINENT BANNER: Eventos & Palestras --}}
+        <div class="pal-dashboard-banner" 
+             style="width:100%; margin-bottom:1.5rem; padding:1.25rem 2rem; border: 1px solid rgba(59, 130, 246, 0.2); background: rgba(59, 130, 246, 0.03); display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:space-between; align-items:center;">
+            <div style="flex:1; min-width:280px; display:flex; align-items:center; gap:1.5rem;">
+                <div class="pal-icon-box" style="width:40px; height:40px; border:1px solid rgba(59, 130, 246, 0.2); border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <svg width="20" height="20" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-3-3 3 3 0 013 3z"/></svg>
+                </div>
+                <div>
+                    <h3 class="pal-text font-black" style="font-size:1.1rem; margin:0 0 0.2rem;">Palestra / Apresentação</h3>
+                    <p class="pal-subtitle" style="margin:0;">Check-in externo via QR Code para sessões abertas ao público.</p>
+                </div>
+            </div>
+            <a href="{{ route('professor.evento.presenca') }}" class="pal-dashboard-btn pal-dashboard-btn-solid" style="background:#3b82f6; color:white;">
+                Gerar QR Evento →
+            </a>
+        </div>
+
         {{-- Cards --}}
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
 
             {{-- Card: QR (primary - reveals at 1s) --}}
             <div class="pal-dashboard-card pal-card-primary pal-card-delay-1">
@@ -170,14 +207,45 @@
     const closeBtn = document.getElementById('close-profile');
     const overlay = document.getElementById('close-modal-overlay');
 
-    function toggleModal(show) {
-        modal.style.display = show ? 'flex' : 'none';
+    const eventModal = document.getElementById('event-qr-modal');
+    const closeEventBtn = document.getElementById('close-event-qr');
+    const eventOverlay = document.getElementById('close-event-overlay');
+    let eventQrGenerated = false;
+
+    function toggleModal(m, show) {
+        m.style.display = show ? 'flex' : 'none';
         document.body.style.overflow = show ? 'hidden' : '';
     }
 
-    if (openBtn) openBtn.addEventListener('click', () => toggleModal(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => toggleModal(false));
-    if (overlay) overlay.addEventListener('click', () => toggleModal(false));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleModal(false); });
+    function showEventQR() {
+        toggleModal(eventModal, true);
+        if (!eventQrGenerated) {
+            const container = document.getElementById('event-qrcode-container');
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: "{{ route('evento.checkin') }}",
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            eventQrGenerated = true;
+        }
+    }
+
+    if (openBtn) openBtn.addEventListener('click', () => toggleModal(modal, true));
+    if (closeBtn) closeBtn.addEventListener('click', () => toggleModal(modal, false));
+    if (overlay) overlay.addEventListener('click', () => toggleModal(modal, false));
+
+    if (closeEventBtn) closeEventBtn.addEventListener('click', () => toggleModal(eventModal, false));
+    if (eventOverlay) eventOverlay.addEventListener('click', () => toggleModal(eventModal, false));
+
+    document.addEventListener('keydown', e => { 
+        if (e.key === 'Escape') {
+            toggleModal(modal, false);
+            toggleModal(eventModal, false);
+        }
+    });
 </script>
 @endpush

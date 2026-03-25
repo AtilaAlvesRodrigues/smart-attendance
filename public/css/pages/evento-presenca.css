@@ -1,0 +1,70 @@
+/* Event Attendance Management Styles */
+.event-management-header {
+    margin-bottom: 2rem;
+}
+
+.event-qr-container {
+    padding: 10px;
+}
+
+.event-qr-box {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    margin-bottom: 2rem;
+}
+
+.event-actions-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.event-btn-pdf {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.event-btn-pdf:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+}
+
+.event-btn-close {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.event-btn-close:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+.event-visitor-table th {
+    padding-bottom: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.event-visitor-table td {
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}

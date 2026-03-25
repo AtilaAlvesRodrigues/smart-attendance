@@ -12,15 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('professores', function (Blueprint $table) {
-
-            $table->string('cpf')->primary(); // Define o CPF como a chave primária
-            $table->string('nome');
-            $table->string('email')->unique();
+            $table->id(); // PK Interna
+            $table->text('cpf')->nullable(); // CPF Criptografado
+            $table->string('cpf_search')->unique(); // Blind Index para CPF
+            $table->text('nome'); // Nome Criptografado
+            $table->string('nome_search')->index(); // Blind Index para Nome
+            $table->text('email')->nullable(); // Email Criptografado
+            $table->string('email_search')->unique(); // Blind Index para Email
             $table->string('password'); // SENHA para login
             $table->string('role')->default('professor');
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

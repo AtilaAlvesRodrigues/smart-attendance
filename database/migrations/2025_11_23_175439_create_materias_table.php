@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('horario_noturno')->nullable();
             
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

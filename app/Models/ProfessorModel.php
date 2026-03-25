@@ -7,9 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
+use App\Traits\HasBlindIndex;
+
+
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+
 class ProfessorModel extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasBlindIndex, SoftDeletes;
+
+    /**
+     * Define which fields have blind indexes for searching.
+     */
+    public function getBlindIndexFields(): array
+    {
+        return [
+            'email' => 'email_search',
+            'cpf' => 'cpf_search',
+            'nome' => 'nome_search',
+        ];
+    }
 
     /**
      * Define o nome da tabela no banco de dados.
@@ -18,22 +36,11 @@ class ProfessorModel extends Authenticatable
     protected $table = 'professores';
 
     /**
-     * Define a chave primária personalizada.
-     * @var string
+     * Chave Primária Interna (Surrogate)
      */
-    protected $primaryKey = 'cpf';
-
-    /**
-     * Indica se a chave primária é auto-incrementável.
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
-     * Define o tipo da chave primária.
-     * @var string
-     */
-    protected $keyType = 'string';
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'cpf',
@@ -57,12 +64,15 @@ class ProfessorModel extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'password' => 'hashed', // Garante que a senha seja hashed automaticamente
+        'password' => 'hashed',
         'email_verified_at' => 'datetime',
+        'nome' => 'encrypted',
+        'email' => 'encrypted',
+        'cpf' => 'encrypted',
     ];
 
     public function materias()
     {
-        return $this->belongsToMany(Materia::class, 'materia_professor', 'professor_cpf', 'materia_id');
+        return $this->belongsToMany(Materia::class, 'materia_professor', 'professor_id', 'materia_id');
     }
 }

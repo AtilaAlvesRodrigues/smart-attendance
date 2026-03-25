@@ -89,13 +89,13 @@ class DatabaseSeeder extends Seeder
         $todosAlunos = array_merge([$alunoPrincipal], $alunosExtras);
         $todosProfessores = array_merge([$professorPrincipal], $professoresExtras);
 
-        $materiaWeb->professores()->syncWithoutDetaching([$professorPrincipal->cpf]);
-        $materiaWeb->alunos()->syncWithoutDetaching([$alunoPrincipal->ra]);
+        $materiaWeb->professores()->syncWithoutDetaching([$professorPrincipal->id]);
+        $materiaWeb->alunos()->syncWithoutDetaching([$alunoPrincipal->id]);
 
         for ($i = 0; $i < 15; $i++) {
             Presenca::create([
-                'aluno_ra' => $alunoPrincipal->ra,
-                'professor_cpf' => $professorPrincipal->cpf,
+                'aluno_id' => $alunoPrincipal->id,
+                'professor_id' => $professorPrincipal->id,
                 'materia_id' => $materiaWeb->id,
                 'data_aula' => now()->subDays($i * 2)->format('Y-m-d'),
                 'semestre' => '2026/1',
@@ -107,25 +107,25 @@ class DatabaseSeeder extends Seeder
         $materiaOutra = $materiasExtras[0];
         $professorOutro = $professoresExtras[0]; 
         
-        $materiaOutra->professores()->syncWithoutDetaching([$professorOutro->cpf]);
-        $materiaOutra->alunos()->syncWithoutDetaching([$alunoPrincipal->ra]); 
+        $materiaOutra->professores()->syncWithoutDetaching([$professorOutro->id]);
+        $materiaOutra->alunos()->syncWithoutDetaching([$alunoPrincipal->id]); 
 
         array_shift($materiasExtras); 
 
         foreach ($materiasExtras as $materia) {
             $profAleatorio = $todosProfessores[array_rand($todosProfessores)];
-            $materia->professores()->syncWithoutDetaching([$profAleatorio->cpf]);
+            $materia->professores()->syncWithoutDetaching([$profAleatorio->id]);
 
             $alunosAleatoriosChaves = array_rand($todosAlunos, 10);
             foreach ($alunosAleatoriosChaves as $key) {
                 $aluno = $todosAlunos[$key];
-                $materia->alunos()->syncWithoutDetaching([$aluno->ra]);
+                $materia->alunos()->syncWithoutDetaching([$aluno->id]);
 
                 if (rand(0, 1)) {
                     for ($p = 0; $p < 5; $p++) {
                         Presenca::create([
-                            'aluno_ra' => $aluno->ra,
-                            'professor_cpf' => $profAleatorio->cpf,
+                            'aluno_id' => $aluno->id,
+                            'professor_id' => $profAleatorio->id,
                             'materia_id' => $materia->id,
                             'data_aula' => now()->subDays($p * 7)->format('Y-m-d'),
                             'semestre' => '2026/1',

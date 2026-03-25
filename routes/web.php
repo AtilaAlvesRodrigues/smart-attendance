@@ -65,6 +65,14 @@ Route::get('/professor/saiba-mais', function () { return view('pages.professor-i
 Route::get('/aluno/demonstracao', function () { return view('pages.aluno-demo'); })->name('aluno.demo');
 Route::get('/professor/demonstracao', function () { return view('pages.professor-demo'); })->name('professor.demo');
 
+use App\Http\Controllers\EventoController;
+
+Route::get('/evento/checkin', [EventoController::class, 'checkinForm'])->middleware('throttle:10,1')->name('evento.checkin');
+Route::post('/evento/checkin/process', [EventoController::class, 'processCheckin'])->middleware('throttle:5,1')->name('evento.checkin.process');
+
+Route::get('/professor/evento/presenca', [EventoController::class, 'presencaDashboard'])->middleware('auth:professores')->name('professor.evento.presenca');
+Route::post('/professor/evento/encerrar', [EventoController::class, 'encerrarSessao'])->middleware('auth:professores')->name('professor.evento.encerrar');
+
 Route::post('/login', function (Request $request) {
     return redirect()->route('login.aluno');
 })->name('login');
@@ -108,7 +116,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::get('/materias', [DashboardController::class, 'masterMaterias'])->name('master.materias');
         Route::get('/presenca', [DashboardController::class, 'masterPresenca'])->name('master.presenca');
 
-        Route::prefix('search')->group(function () {
+        Route::prefix('search')->middleware('throttle:30,1')->group(function () {
             Route::get('/professores', [MasterSearchController::class, 'searchProfessores'])->name('master.search.professores');
             Route::get('/alunos', [MasterSearchController::class, 'searchAlunos'])->name('master.search.alunos');
             Route::get('/materias', [MasterSearchController::class, 'searchMaterias'])->name('master.search.materias');

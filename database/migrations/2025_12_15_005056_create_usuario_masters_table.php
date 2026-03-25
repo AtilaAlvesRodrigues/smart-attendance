@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('usuario_masters', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
-            $table->string('email')->unique();
+            $table->text('nome');
+            $table->string('nome_search')->index();
+            $table->text('email')->nullable();
+            $table->string('email_search')->unique();
             $table->string('password');
             $table->string('role')->default('master');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

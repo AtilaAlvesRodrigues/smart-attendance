@@ -11,8 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Global security headers for all web responses
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\SecurityHeaders::class,
+        ]);
+
         // Registrar aliases de middleware que o aplicativo espera usar nas rotas
-        // Usa a assinatura que aceita um array de aliases => class
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,

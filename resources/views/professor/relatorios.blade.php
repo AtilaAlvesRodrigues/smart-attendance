@@ -278,7 +278,7 @@
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block font-bold pal-text tracking-tight">{{ $presenca->aluno->nome }}</span>
-                                        <span class="block pal-subtitle font-mono" style="font-size:0.75rem">{{ $presenca->aluno_ra }}</span>
+                                        <span class="block pal-subtitle font-mono" style="font-size:0.75rem">{{ $presenca->aluno->ra }}</span>
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="px-3 py-1 bg-white/10 pal-text rounded-sm text-[10px] font-black border border-white/20 uppercase tracking-widest">

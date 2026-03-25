@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('materia_professor', function (Blueprint $table) {
             $table->id();
             $table->foreignId('materia_id')->constrained('materias')->onDelete('cascade');
-            $table->string('professor_cpf');
-            $table->foreign('professor_cpf')->references('cpf')->on('professores')->onDelete('cascade');
+            $table->foreignId('professor_id')->constrained('professores')->onDelete('cascade');
             $table->timestamps();
         });
     }

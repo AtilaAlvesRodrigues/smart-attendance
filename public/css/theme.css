@@ -131,6 +131,11 @@ body {
 .pal-nav-btn-danger { background: transparent; border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; }
 .pal-nav-btn-danger:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
 
+@media (max-width: 640px) {
+    .pal-nav { padding: 0 1rem; }
+    .pal-nav-logo span { display: none; }
+}
+
 /* NAV ACTIONS & USER INFO */
 .pal-nav-actions {
     display: flex;
@@ -526,6 +531,9 @@ html.light-mode .pal-dashboard-btn-ghost:hover {
     padding: 3rem 2.5rem;
     flex-grow: 1;
     width: 100%;
+}
+@media (max-width: 640px) {
+    .pal-main { padding: 2rem 1.25rem; }
 }
 
 /* INDEX-SPECIFIC PALANTIR COMPONENTS */

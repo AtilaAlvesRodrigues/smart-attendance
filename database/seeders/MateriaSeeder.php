@@ -95,7 +95,7 @@ class MateriaSeeder extends Seeder
             $materiasParaVincular = $todasMaterias->random(rand(2, 3)); 
             // rand(2, 3) garante "2 ou 3" matérias
             foreach ($materiasParaVincular as $mat) {
-                 $mat->professores()->syncWithoutDetaching([$prof->cpf]);
+                 $mat->professores()->syncWithoutDetaching([$prof->id]);
             }
         }
 
@@ -103,7 +103,7 @@ class MateriaSeeder extends Seeder
         foreach ($alunos as $aluno) {
             $materiasParaVincular = $todasMaterias->random(rand(3, 5));
             foreach ($materiasParaVincular as $mat) {
-                $mat->alunos()->syncWithoutDetaching([$aluno->ra]);
+                $mat->alunos()->syncWithoutDetaching([$aluno->id]);
             }
         }
     }

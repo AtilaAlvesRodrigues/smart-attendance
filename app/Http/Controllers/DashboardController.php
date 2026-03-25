@@ -49,7 +49,7 @@ class DashboardController extends BaseController
             
             // Conta as presenças do aluno
             $presencas_aluno = Presenca::where('materia_id', $materia->id)
-                ->where('aluno_ra', $aluno->ra)
+                ->where('aluno_id', $aluno->id)
                 ->count();
             
             // Faltas = Total de sessões que ocorreram - presenças confirmadas
@@ -99,7 +99,10 @@ class DashboardController extends BaseController
 
         if ($request->filled('professor')) {
             $query->whereHas('professor', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->professor . '%');
+                $hash = ProfessorModel::generateBlindIndex($request->professor);
+                $q->where('nome_search', $hash)
+                  ->orWhere('cpf_search', $hash)
+                  ->orWhere('email_search', $hash);
             });
         }
 
@@ -111,7 +114,10 @@ class DashboardController extends BaseController
 
         if ($request->filled('aluno')) {
             $query->whereHas('aluno', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->aluno . '%');
+                $hash = AlunoModel::generateBlindIndex($request->aluno);
+                $q->where('nome_search', $hash)
+                  ->orWhere('ra_search', $hash)
+                  ->orWhere('cpf_search', $hash);
             });
         }
 

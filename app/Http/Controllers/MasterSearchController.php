@@ -21,9 +21,10 @@ class MasterSearchController extends BaseController
 
         if ($query) {
             $professores->where(function($q) use ($query) {
-                $q->where('nome', 'like', '%' . $query . '%')
-                  ->orWhere('email', 'like', '%' . $query . '%')
-                  ->orWhere('cpf', 'like', '%' . $query . '%');
+                $hash = ProfessorModel::generateBlindIndex($query);
+                $q->where('cpf_search', $hash)
+                  ->orWhere('email_search', $hash)
+                  ->orWhere('nome_search', $hash);
             });
         }
 
@@ -41,10 +42,11 @@ class MasterSearchController extends BaseController
 
         if ($query) {
             $alunos->where(function($q) use ($query) {
-                $q->where('nome', 'like', '%' . $query . '%')
-                  ->orWhere('email', 'like', '%' . $query . '%')
-                  ->orWhere('ra', 'like', '%' . $query . '%')
-                  ->orWhere('cpf', 'like', '%' . $query . '%');
+                $hash = AlunoModel::generateBlindIndex($query);
+                $q->where('ra_search', $hash)
+                  ->orWhere('cpf_search', $hash)
+                  ->orWhere('email_search', $hash)
+                  ->orWhere('nome_search', $hash);
             });
         }
 
@@ -79,8 +81,9 @@ class MasterSearchController extends BaseController
 
         if ($request->filled('professor')) {
             $presencas->whereHas('professor', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->professor . '%')
-                  ->orWhere('cpf', 'like', '%' . $request->professor . '%');
+                $hash = ProfessorModel::generateBlindIndex($request->professor);
+                $q->where('cpf_search', $hash)
+                  ->orWhere('nome_search', $hash); // Added nome_search for professor
             });
         }
 
@@ -93,8 +96,9 @@ class MasterSearchController extends BaseController
 
         if ($request->filled('aluno')) {
             $presencas->whereHas('aluno', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->aluno . '%')
-                  ->orWhere('ra', 'like', '%' . $request->aluno . '%');
+                $hash = AlunoModel::generateBlindIndex($request->aluno);
+                $q->where('ra_search', $hash)
+                  ->orWhere('nome_search', $hash);
             });
         }
 
@@ -114,7 +118,7 @@ class MasterSearchController extends BaseController
 
             $totalAulas = $p->materia->total_aulas ?? 0;
             $presencasAluno = Presenca::where('materia_id', $p->materia_id)
-                ->where('aluno_ra', $p->aluno_ra)
+                ->where('aluno_id', $p->aluno_id)
                 ->count();
             $faltas = max(0, $totalAulas - $presencasAluno);
 
@@ -123,11 +127,11 @@ class MasterSearchController extends BaseController
                 'data_aula_formatted' => \Carbon\Carbon::parse($p->data_aula)->format('d/m/Y'),
                 'created_time' => $p->created_at->format('H:i'),
                 'aluno_nome' => $p->aluno->nome ?? 'N/A',
-                'aluno_ra' => $p->aluno_ra,
+                'aluno_ra' => $p->aluno ? $p->aluno->ra : 'N/A',
                 'materia_nome' => $p->materia->nome ?? 'N/A',
                 'materia_sala' => $p->materia->sala ?? '',
                 'professor_nome' => $p->professor->nome ?? 'N/A',
-                'professor_cpf' => $p->professor_cpf,
+                'professor_cpf' => $p->professor ? $p->professor->cpf : 'N/A',
                 'faltas' => $faltas,
                 'total_aulas' => $totalAulas,
                 'media' => $media

@@ -40,9 +40,9 @@ class GerenciarMateriaController extends BaseController
             ->count('data_aula');
 
         $presencasPorAluno = Presenca::where('materia_id', $materia_id)
-            ->select('aluno_ra', DB::raw('COUNT(*) as total_presencas'))
-            ->groupBy('aluno_ra')
-            ->pluck('total_presencas', 'aluno_ra');
+            ->select('aluno_id', DB::raw('COUNT(*) as total_presencas'))
+            ->groupBy('aluno_id')
+            ->pluck('total_presencas', 'aluno_id');
 
         return view('professor.gerenciar.materia', compact(
             'professor', 'materia', 'alunos', 'totalAulas', 'aulasRealizadas', 'presencasPorAluno'
@@ -54,7 +54,7 @@ class GerenciarMateriaController extends BaseController
         $professor = Auth::guard('professores')->user();
         $materias = $professor->materias;
 
-        $query = Presenca::where('professor_cpf', $professor->cpf)
+        $query = Presenca::where('professor_id', $professor->id)
             ->with(['aluno', 'materia']);
 
         if ($request->filled('materia_id')) {
@@ -90,9 +90,16 @@ class GerenciarMateriaController extends BaseController
             'valor' => 'nullable|numeric|min:0|max:10',
         ]);
 
+        // Resolver RA para ID usando Blind Index para segurança
+        $aluno = \App\Models\AlunoModel::where('ra_search', \App\Models\AlunoModel::generateBlindIndex($request->aluno_ra))->first();
+
+        if (!$aluno) {
+            return response()->json(['error' => 'Aluno não encontrado'], 404);
+        }
+
         // Verifica se o aluno está matriculado nesta matéria
         $exists = DB::table('aluno_materia')
-            ->where('aluno_ra', $request->aluno_ra)
+            ->where('aluno_id', $aluno->id)
             ->where('materia_id', $materia_id)
             ->exists();
 
@@ -100,11 +107,18 @@ class GerenciarMateriaController extends BaseController
             return response()->json(['error' => 'Aluno não matriculado nesta matéria'], 404);
         }
 
+        $allowedFields = ['prova1', 'trabalho1', 'trabalho2', 'prova2'];
+        $campo = in_array($request->campo, $allowedFields, true) ? $request->campo : null;
+
+        if (!$campo) {
+            return response()->json(['error' => 'Campo inválido'], 422);
+        }
+
         DB::table('aluno_materia')
-            ->where('aluno_ra', $request->aluno_ra)
+            ->where('aluno_id', $aluno->id)
             ->where('materia_id', $materia_id)
             ->update([
-                $request->campo => $request->valor,
+                $campo => $request->valor,
                 'updated_at' => now(),
             ]);
 

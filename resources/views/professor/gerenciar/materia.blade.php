@@ -147,7 +147,7 @@
                         <tbody class="divide-y divide-white/5">
                             @foreach($alunos as $aluno)
                                 @php
-                                    $presencas = $presencasPorAluno[$aluno->ra] ?? 0;
+                                    $presencas = $presencasPorAluno[$aluno->id] ?? 0;
                                     $faltas = max(0, $totalAulas - $presencas);
                                     $percentPresenca = $totalAulas > 0 ? round(($presencas / $totalAulas) * 100) : 100;
                                     

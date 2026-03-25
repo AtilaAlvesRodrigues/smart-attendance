@@ -14,17 +14,12 @@ return new class extends Migration
         Schema::create('presencas', function (Blueprint $table) {
             $table->id();
             
-            // Relacionamento com Aluno (RA é string)
-            $table->string('aluno_ra');
-            $table->foreign('aluno_ra')->references('ra')->on('alunos')->onDelete('cascade');
-
-            // Relacionamento com Professor (CPF é string)
-            $table->string('professor_cpf');
-            $table->foreign('professor_cpf')->references('cpf')->on('professores')->onDelete('cascade');
+            // Relacionamentos usando ID interno (PK)
+            $table->foreignId('aluno_id')->constrained('alunos')->onDelete('cascade');
+            $table->foreignId('professor_id')->constrained('professores')->onDelete('cascade');
 
             // Relacionamento com Matéria
-            $table->unsignedBigInteger('materia_id');
-            $table->foreign('materia_id')->references('id')->on('materias')->onDelete('cascade');
+            $table->foreignId('materia_id')->constrained('materias')->onDelete('cascade');
 
             // Dados da Aula
             $table->date('data_aula');

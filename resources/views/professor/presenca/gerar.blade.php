@@ -266,7 +266,7 @@
                                         <span class="text-sm font-bold text-white tracking-tight">${presenca.aluno ? presenca.aluno.nome : 'Desconhecido'}</span>
                                     </div>
                                 </td>
-                                <td class="py-4 px-2 text-center text-xs font-medium text-white/70 font-mono tracking-wider">${presenca.aluno_ra}</td>
+                                <td class="py-4 px-2 text-center text-xs font-medium text-white/70 font-mono tracking-wider">${presenca.aluno ? presenca.aluno.ra : 'N/A'}</td>
                                 <td class="py-4 px-2 text-center text-xs font-black text-white/60 tabular-nums tracking-widest">${horaFormatada}</td>
                                 <td class="py-4 px-2 text-right">
                                     <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-400 rounded-sm text-[9px] font-black uppercase tracking-widest">

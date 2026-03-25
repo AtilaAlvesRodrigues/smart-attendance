@@ -70,7 +70,7 @@ class PresencaController extends Controller
             $cacheData = [
                 'codigo' => $codigo_aula,
                 'expira_em' => $expiraEm->timestamp,
-                'professor_cpf' => $professor->cpf,
+                'professor_id' => $professor->id,
             ];
             Cache::put($cacheKey, $cacheData, $expiraEm);
         }
@@ -119,7 +119,7 @@ class PresencaController extends Controller
             return view('aluno.presenca.erro', ['mensagem' => 'Você não está matriculado nesta disciplina.']);
         }
 
-        if (Presenca::where('aluno_ra', $aluno->ra)->where('codigo_aula', $codigo_aula)->exists()) {
+        if (Presenca::where('aluno_id', $aluno->id)->where('codigo_aula', $codigo_aula)->exists()) {
             return view('aluno.presenca.ja_registrado');
         }
 
@@ -128,20 +128,20 @@ class PresencaController extends Controller
         $hora = now()->hour;
         $horario = $hora < 12 ? 'M' : ($hora < 18 ? 'V' : 'N');
 
-        $professor_cpf = $cacheData['professor_cpf'] ?? null;
+        $professor_id = $cacheData['professor_id'] ?? null;
 
-        if (!$professor_cpf) {
+        if (!$professor_id) {
             
             $materia = Materia::with('professores')->find($materia_id);
             if (!$materia || $materia->professores->isEmpty()) {
                 return view('aluno.presenca.erro', ['mensagem' => 'Erro: Matéria sem professor vinculado.']);
             }
-            $professor_cpf = $materia->professores->first()->cpf;
+            $professor_id = $materia->professores->first()->id;
         }
 
         $presenca = Presenca::create([
-            'aluno_ra' => $aluno->ra,
-            'professor_cpf' => $professor_cpf,
+            'aluno_id' => $aluno->id,
+            'professor_id' => $professor_id,
             'materia_id' => $materia_id,
             'data_aula' => $data_aula,
             'semestre' => $semestre,

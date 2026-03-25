@@ -189,7 +189,7 @@
 
                                     $totalAulas = $p->materia->total_aulas ?? 0;
                                     $presencasAluno = \App\Models\Presenca::where('materia_id', $p->materia_id)
-                                        ->where('aluno_ra', $p->aluno_ra)
+                                        ->where('aluno_id', $p->aluno_id)
                                         ->count();
                                     $faltas = max(0, $totalAulas - $presencasAluno);
                                     
@@ -206,7 +206,7 @@
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $p->aluno->nome ?? 'N/A' }}</span>
-                                        <span class="block text-xs text-white/80 font-mono">{{ $p->aluno_ra }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $p->aluno->ra ?? 'N/A' }}</span>
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block font-bold text-white tracking-tight">{{ $p->materia->nome ?? 'N/A' }}</span>
@@ -214,7 +214,7 @@
                                     </td>
                                     <td class="py-4 px-6">
                                         <span class="block text-white/80 font-medium">{{ $p->professor->nome ?? 'N/A' }}</span>
-                                        <span class="block text-xs text-white/80 font-mono">{{ $p->professor_cpf }}</span>
+                                        <span class="block text-xs text-white/80 font-mono">{{ $p->professor->cpf ?? 'N/A' }}</span>
                                     </td>
                                     
                                     <td class="py-4 px-6 text-center">

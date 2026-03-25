@@ -12,8 +12,8 @@ class Presenca extends Model
     protected $table = 'presencas';
 
     protected $fillable = [
-        'aluno_ra',
-        'professor_cpf',
+        'aluno_id',
+        'professor_id',
         'materia_id',
         'data_aula',
         'semestre',
@@ -23,12 +23,12 @@ class Presenca extends Model
 
     public function aluno()
     {
-        return $this->belongsTo(AlunoModel::class, 'aluno_ra', 'ra');
+        return $this->belongsTo(AlunoModel::class, 'aluno_id');
     }
 
     public function professor()
     {
-        return $this->belongsTo(ProfessorModel::class, 'professor_cpf', 'cpf');
+        return $this->belongsTo(ProfessorModel::class, 'professor_id');
     }
 
     public function materia()
