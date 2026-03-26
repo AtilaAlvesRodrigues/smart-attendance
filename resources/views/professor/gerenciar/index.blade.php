@@ -3,11 +3,6 @@
 @section('title', 'Minhas Turmas - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('nav-left')
-    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
-        ← Dashboard
-    </a>
-@endsection
 
 @section('nav-user')
     <div class="pal-nav-user">

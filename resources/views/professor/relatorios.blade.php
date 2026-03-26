@@ -4,9 +4,6 @@
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 @section('nav-left')
-    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
-        ← Dashboard
-    </a>
     <button onclick="window.print()" class="pal-nav-btn pal-nav-btn-solid no-print">
         📄 Gerar PDF
     </button>

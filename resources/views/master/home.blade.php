@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="{{ asset('css/theme_master.css') }}">
 @endpush
 
-@section('nav-left')
-    {{-- Root dashboard --}}
-@endsection
 
 @section('nav-user')
     <div class="pal-nav-actions" style="gap:0.5rem">

@@ -12,9 +12,6 @@
     <a href="{{ route('professor.presenca.index') }}" class="pal-nav-btn pal-nav-btn-ghost hidden sm:inline-flex">
         ⬅ Disciplinas
     </a>
-    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
-        🏠 Home
-    </a>
 @endsection
 
 @section('nav-user')

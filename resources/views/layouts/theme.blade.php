@@ -18,12 +18,20 @@
         if (localStorage.getItem('pal_theme') === 'light') {
             document.documentElement.classList.add('light-mode');
         }
+        // Restore sidebar collapsed state instantly (no layout flash)
+        if (localStorage.getItem('pal_sidebar_collapsed') === '1') {
+            document.documentElement.classList.add('sidebar-collapsed');
+        }
     </script>
     
     @stack('styles')
     @stack('head-scripts')
 </head>
-<body class="@yield('body-class')">
+@php
+    $showSidebar = (auth('professores')->check() || auth('masters')->check()) 
+                   && request()->routeIs('professor.*', 'master.*', 'dashboard.professor', 'dashboard.master');
+@endphp
+<body class="@yield('body-class') {{ $showSidebar ? 'pal-has-sidebar' : '' }}">
 
     {{-- CURSOR GLOW --}}
     <div id="pal-cursor-glow"></div>
@@ -59,6 +67,11 @@
     </nav>
     @endunless
 
+    {{-- ===== SIDEBAR (Professor / Master) ===== --}}
+    @if($showSidebar)
+        <x-ui.sidebar />
+    @endif
+
     {{-- ===== PAGE CONTENT ===== --}}
     <div class="{{ View::hasSection('no-nav') ? '' : 'pal-page' }} flex flex-col flex-grow">
         @yield('content')
@@ -82,6 +95,19 @@
 
     {{-- ===== GLOBAL SCRIPTS ===== --}}
     <script src="{{ asset('js/theme.js') }}"></script>
+    <script>
+        // Set --pal-nav-h so the fixed sidebar starts exactly below the nav
+        (function () {
+            function setNavH() {
+                var nav = document.querySelector('.pal-nav');
+                if (nav) {
+                    document.documentElement.style.setProperty('--pal-nav-h', nav.offsetHeight + 'px');
+                }
+            }
+            setNavH();
+            window.addEventListener('resize', setNavH);
+        })();
+    </script>
 
     {{-- Auto-logout partial (kept for backward compat) --}}
     @include('partials.auto_logout')

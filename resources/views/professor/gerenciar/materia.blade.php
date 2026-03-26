@@ -4,9 +4,6 @@
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 @section('nav-left')
-    <a href="{{ route('dashboard.professor') }}" class="pal-nav-btn pal-nav-btn-ghost">
-        ← Dashboard
-    </a>
     <a href="{{ route('professor.gerenciar.index') }}" class="pal-nav-btn pal-nav-btn-ghost">
         ⬅ Voltar às Turmas
     </a>
