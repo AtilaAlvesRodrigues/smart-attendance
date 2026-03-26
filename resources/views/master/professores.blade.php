@@ -43,8 +43,8 @@
 
                 <div class="flex items-center gap-4">
                     <div class="hidden md:block mr-2">
-                        <input type="text" id="search-professores" placeholder="Pesquisar..." 
-                            class="px-4 py-1.5 bg-black/10 border border-black/10 rounded-sm text-current text-[11px] font-medium focus:outline-none focus:ring-1 focus:ring-black/20 transition-all w-48 pal-filter-input">
+                        <input type="text" id="search-professores" placeholder="Pesquisar..."
+                            class="pal-filter-input w-48 text-[11px]">
                     </div>
                 </div>
             </div>
@@ -182,18 +182,37 @@
             };
 
             const setupSearch = (inputId, url, tbodyId, emptyId, renderRow) => {
-
                 const input = document.getElementById(inputId);
                 const tbody = document.getElementById(tbodyId);
                 const emptyMsg = document.getElementById(emptyId);
+                const originalTbody = tbody.innerHTML;
+                const paginationEl = tbody.closest('.glass, .overflow-hidden')?.querySelector('.px-8.py-6.border-t');
+                const originalPagination = paginationEl ? paginationEl.innerHTML : '';
+                let debounceTimer = null;
 
                 const triggerSearch = async () => {
-                    const query = input.value;
+                    const query = input.value.trim();
+
+                    // Se vazio, restaurar conteudo original do Blade (com paginacao)
+                    if (query === '') {
+                        tbody.innerHTML = originalTbody;
+                        emptyMsg.classList.add('hidden');
+                        if (paginationEl) {
+                            paginationEl.innerHTML = originalPagination;
+                            paginationEl.style.display = '';
+                        }
+                        return;
+                    }
+
                     try {
-                        const response = await fetch(`${url}?q=${query}`);
+                        const params = new URLSearchParams();
+                        params.set('q', query);
+                        const response = await fetch(`${url}?${params.toString()}`);
                         const data = await response.json();
 
                         tbody.innerHTML = '';
+                        if (paginationEl) paginationEl.style.display = 'none';
+
                         if (data.length === 0) {
                             emptyMsg.classList.remove('hidden');
                         } else {
@@ -208,8 +227,10 @@
                     }
                 };
 
-                input.addEventListener('input', triggerSearch);
-                input.addEventListener('focus', triggerSearch);
+                input.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(triggerSearch, 300);
+                });
             };
 
             setupSearch('search-professores', '{{ route("master.search.professores") }}', 'professores-body', 'professores-empty', (prof, jsonItem, esc) => `

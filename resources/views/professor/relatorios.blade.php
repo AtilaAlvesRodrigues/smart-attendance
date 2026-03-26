@@ -217,10 +217,10 @@
 
             <!-- Filtros -->
             <div class="glass p-6 rounded-sm border border-white/10 mb-8 animate-reveal [animation-delay:300ms] no-print">
-                <form action="{{ route('professor.relatorios') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <form id="relatorios-filter-form" action="{{ route('professor.relatorios') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div>
-                        <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Matéria</label>
-                        <select name="materia_id" class="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all">
+                        <label class="pal-eyebrow" style="margin-bottom:0.5rem;">Matéria</label>
+                        <select name="materia_id" class="pal-filter-input w-full">
                             <option value="">Todas as Matérias</option>
                             @foreach($materias as $materia)
                                 <option value="{{ $materia->id }}" {{ request('materia_id') == $materia->id ? 'selected' : '' }}>
@@ -230,14 +230,14 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Data Início</label>
+                        <label class="pal-eyebrow" style="margin-bottom:0.5rem;">Data Início</label>
                         <input type="text" name="data_inicio" value="{{ request('data_inicio') }}" placeholder="DD/MM/AAAA"
-                            class="datepicker w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all cursor-pointer">
+                            class="datepicker pal-filter-input w-full cursor-pointer">
                     </div>
                     <div>
-                        <label class="text-xs font-black text-white/80 uppercase tracking-widest mb-2 block">Data Fim</label>
+                        <label class="pal-eyebrow" style="margin-bottom:0.5rem;">Data Fim</label>
                         <input type="text" name="data_fim" value="{{ request('data_fim') }}" placeholder="DD/MM/AAAA"
-                            class="datepicker w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all cursor-pointer">
+                            class="datepicker pal-filter-input w-full cursor-pointer">
                     </div>
                     <div class="flex gap-2">
                         <button type="submit" class="flex-grow bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-sm transition-all border border-white/10">
@@ -336,6 +336,21 @@
             disableMobile: "true",
             animate: true
         });
+
+        // URLSearchParams para URL limpa sem campos vazios
+        const filterForm = document.getElementById('relatorios-filter-form');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const params = new URLSearchParams();
+                this.querySelectorAll('input[name], select[name]').forEach(el => {
+                    const val = el.value.trim();
+                    if (val !== '') params.set(el.name, val);
+                });
+                const qs = params.toString();
+                window.location.href = qs ? `${this.action}?${qs}` : this.action;
+            });
+        }
     });
 </script>
 @endpush

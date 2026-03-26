@@ -281,36 +281,46 @@
             const emptyMsg = document.getElementById(emptyId);
             const pagination = document.getElementById(paginationId);
             const clearBtn = document.getElementById('btn-clear-filters');
+            const originalTbody = tbody ? tbody.innerHTML : '';
+            const originalPagination = pagination ? pagination.innerHTML : '';
+            let debounceTimer = null;
 
             if (!tbody) return;
 
             const triggerSearch = async () => {
                 const queryParams = new URLSearchParams();
                 let hasQuery = false;
-                
+
                 inputs.forEach(input => {
                     if (input && input.value.trim() !== '') {
                         const paramName = input.id.replace('filter-', '');
-                        queryParams.append(paramName, input.value.trim());
+                        queryParams.set(paramName, input.value.trim());
                         hasQuery = true;
                     }
                 });
+
+                // Se nenhum filtro preenchido, restaurar conteudo original do Blade
+                if (!hasQuery) {
+                    tbody.innerHTML = originalTbody;
+                    emptyMsg.classList.add('hidden');
+                    if (pagination) {
+                        pagination.innerHTML = originalPagination;
+                        pagination.style.display = '';
+                    }
+                    return;
+                }
 
                 try {
                     const response = await fetch(`${url}?${queryParams.toString()}`);
                     const data = await response.json();
 
                     tbody.innerHTML = '';
+                    if (pagination) pagination.style.display = 'none';
+
                     if (data.length === 0) {
                         emptyMsg.classList.remove('hidden');
-                        if (pagination) pagination.style.display = 'none';
                     } else {
                         emptyMsg.classList.add('hidden');
-                        if (pagination && hasQuery) {
-                            pagination.style.display = 'none';
-                        } else if (pagination) {
-                            pagination.style.display = 'block';
-                        }
                         data.forEach(item => {
                             tbody.innerHTML += renderRow(item, escapeHtml);
                         });
@@ -321,12 +331,16 @@
             };
 
             inputs.forEach(input => {
-                if(input) input.addEventListener('input', triggerSearch);
+                if(input) input.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(triggerSearch, 300);
+                });
             });
 
             if(clearBtn) {
                 clearBtn.addEventListener('click', () => {
                     inputs.forEach(input => { if(input) input.value = ''; });
+                    clearTimeout(debounceTimer);
                     triggerSearch();
                 });
             }
