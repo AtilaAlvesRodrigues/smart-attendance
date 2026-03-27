@@ -7,7 +7,6 @@ use App\Models\UsuarioMaster;
 use App\Models\ProfessorModel;
 use App\Models\AlunoModel;
 use App\Models\Materia;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\Presenca; // Importar model Presenca
 
@@ -21,14 +20,14 @@ class DatabaseSeeder extends Seeder
         UsuarioMaster::create([
             'nome' => 'Master Admin',
             'email' => 'master@admin.com',
-            'password' => Hash::make('senha123'),
+            'password' => 'senha123',
         ]);
 
         $professorPrincipal = ProfessorModel::create([
             'nome' => 'Professor Silva',
             'email' => 'professor@teste.com',
             'cpf' => '12345678900', 
-            'password' => Hash::make('senha123'),
+            'password' => 'senha123',
         ]);
 
         $professoresExtras = [];
@@ -37,7 +36,7 @@ class DatabaseSeeder extends Seeder
                 'nome' => "Professor Extra $i",
                 'email' => "prof$i@teste.com",
                 'cpf' => "1000000000$i",
-                'password' => Hash::make('senha123'),
+                'password' => 'senha123',
             ]);
         }
 
@@ -46,7 +45,7 @@ class DatabaseSeeder extends Seeder
             'ra' => '100000000', 
             'cpf' => '00000000000', 
             'email' => 'aluno.teste@site.com',
-            'password' => Hash::make('senha123'),
+            'password' => 'senha123',
         ]);
 
         $alunosExtras = [];
@@ -56,7 +55,7 @@ class DatabaseSeeder extends Seeder
                 'ra' => "20000000$i",
                 'cpf' => "300000000$i", 
                 'email' => "aluno$i@teste.com",
-                'password' => Hash::make('senha123'),
+                'password' => 'senha123',
             ]);
         }
 

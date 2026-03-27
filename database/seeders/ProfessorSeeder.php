@@ -2,68 +2,58 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\ProfessorModel;
 
+/**
+ * ProfessorSeeder — uses ProfessorModel::create() so that
+ * AES-256 encryption, Blind Index generation, and password
+ * hashing (via the 'hashed' cast) are all applied automatically.
+ */
 class ProfessorSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Limpar a tabela antes de inserir (opcional, mas útil para testes)
-        // DB::table('professores')->truncate(); 
+        $professores = [
+            [
+                'cpf'      => '12233344445',
+                'nome'     => 'Professor Teste',
+                'email'    => 'professor@teste.com',
+                'password' => 'professor123',
+                'role'     => 'professor',
+            ],
+            [
+                'cpf'      => '55566677788',
+                'nome'     => 'Profa. Maria',
+                'email'    => 'maria@teste.com',
+                'password' => 'professor123',
+                'role'     => 'professor',
+            ],
+            [
+                'cpf'      => '99988877766',
+                'nome'     => 'Prof. Carlos',
+                'email'    => 'carlos@teste.com',
+                'password' => 'professor123',
+                'role'     => 'professor',
+            ],
+            [
+                'cpf'      => '11122233344',
+                'nome'     => 'Profa. Ana',
+                'email'    => 'ana@teste.com',
+                'password' => 'professor123',
+                'role'     => 'professor',
+            ],
+            [
+                'cpf'      => '55544433322',
+                'nome'     => 'Prof. Pedro',
+                'email'    => 'pedro@teste.com',
+                'password' => 'professor123',
+                'role'     => 'professor',
+            ],
+        ];
 
-        DB::table('professores')->insert([
-            'cpf' => '1223334444', // CPF é a chave primária
-            'nome' => 'Professor Teste',
-            'email' => 'professor@teste.com',
-            'password' => Hash::make('professor123'),
-            'role' => 'professor', // Define a função (role)
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('professores')->insert([
-            'cpf' => '55566677788',
-            'nome' => 'Profa. Maria',
-            'email' => 'maria@teste.com',
-            'password' => Hash::make('professor123'),
-            'role' => 'professor',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('professores')->insert([
-            'cpf' => '99988877766',
-            'nome' => 'Prof. Carlos',
-            'email' => 'carlos@teste.com',
-            'password' => Hash::make('professor123'),
-            'role' => 'professor',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('professores')->insert([
-            'cpf' => '11122233344',
-            'nome' => 'Profa. Ana',
-            'email' => 'ana@teste.com',
-            'password' => Hash::make('professor123'),
-            'role' => 'professor',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('professores')->insert([
-            'cpf' => '55544433322',
-            'nome' => 'Prof. Pedro',
-            'email' => 'pedro@teste.com',
-            'password' => Hash::make('professor123'),
-            'role' => 'professor',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        foreach ($professores as $data) {
+            ProfessorModel::create($data);
+        }
     }
 }

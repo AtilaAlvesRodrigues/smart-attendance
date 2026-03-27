@@ -93,6 +93,34 @@
 .pal-sidebar-label {
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+}
+
+.pal-sidebar-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 2px;
+    background: rgba(168, 85, 247, 0.18);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    color: #a855f7;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.light-mode .pal-sidebar-badge {
+    background: rgba(126, 34, 206, 0.1);
+    border-color: rgba(126, 34, 206, 0.2);
+    color: #7e22ce;
+}
+
+html.sidebar-collapsed .pal-sidebar-badge {
+    display: none;
 }
 
 /* Offset page content on desktop */
@@ -263,7 +291,8 @@ html.sidebar-collapsed .pal-sidebar-group-content {
 
     .pal-sidebar-top-bar,
     .pal-sidebar-section-label,
-    .pal-sidebar-divider {
+    .pal-sidebar-divider,
+    .pal-sidebar-badge {
         display: none;
     }
 
@@ -367,7 +396,8 @@ function palToggleSidebar() {
             <x-ui.sidebar-item
                 href="{{ route('professor.gerenciar.index') }}"
                 label="Minhas Turmas"
-                :active="request()->routeIs('professor.gerenciar.*')">
+                :active="request()->routeIs('professor.gerenciar.*')"
+                :badge="$sidebarCounts['minhas_materias'] ?? null">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13
@@ -428,7 +458,8 @@ function palToggleSidebar() {
                 <x-ui.sidebar-item
                     href="{{ route('master.professores') }}"
                     label="Professores"
-                    :active="request()->routeIs('master.professores')">
+                    :active="request()->routeIs('master.professores')"
+                    :badge="$sidebarCounts['total_professores'] ?? null">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -438,7 +469,8 @@ function palToggleSidebar() {
                 <x-ui.sidebar-item
                     href="{{ route('master.alunos') }}"
                     label="Alunos"
-                    :active="request()->routeIs('master.alunos')">
+                    :active="request()->routeIs('master.alunos')"
+                    :badge="$sidebarCounts['total_alunos'] ?? null">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857
@@ -456,7 +488,8 @@ function palToggleSidebar() {
                 <x-ui.sidebar-item
                     href="{{ route('master.materias') }}"
                     label="Matérias"
-                    :active="request()->routeIs('master.materias')">
+                    :active="request()->routeIs('master.materias')"
+                    :badge="$sidebarCounts['total_materias'] ?? null">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13

@@ -107,7 +107,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         });
     });
 
-    Route::middleware(['auth:masters'])->prefix('dashboard/master')->group(function () {
+    Route::middleware(['auth:masters', 'role:master'])->prefix('dashboard/master')->group(function () {
          
         Route::get('/', [DashboardController::class, 'masterIndex'])->name('dashboard.master');
 

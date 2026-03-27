@@ -44,7 +44,7 @@
         <div class="pal-nav-actions">
             @yield('nav-left')
 
-            @auth
+            @if(auth('professores')->check() || auth('alunos')->check() || auth('masters')->check())
                 @yield('nav-user')
                 <form action="{{ route('logout') }}" method="POST" style="margin:0">
                     @csrf
@@ -62,7 +62,7 @@
                         <a href="{{ route('login.aluno.form') }}" class="pal-nav-btn pal-nav-btn-solid">Entrar</a>
                     @endif
                 @endunless
-            @endauth
+            @endif
         </div>
     </nav>
     @endunless

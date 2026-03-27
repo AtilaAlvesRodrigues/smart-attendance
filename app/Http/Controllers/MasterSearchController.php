@@ -80,11 +80,21 @@ class MasterSearchController extends BaseController
         $presencas = Presenca::with(['aluno', 'aluno.materias', 'materia', 'professor']);
 
         if ($request->filled('professor')) {
-            $presencas->whereHas('professor', function ($q) use ($request) {
-                $hash = ProfessorModel::generateBlindIndex($request->professor);
-                $q->where('cpf_search', $hash)
-                  ->orWhere('nome_search', $hash); // Added nome_search for professor
-            });
+            $term = trim($request->professor);
+            $hash = ProfessorModel::generateBlindIndex($term);
+
+            // First try to find matching professor IDs via all blind index columns
+            $professorIds = ProfessorModel::where('nome_search', $hash)
+                ->orWhere('cpf_search', $hash)
+                ->orWhere('email_search', $hash)
+                ->pluck('id');
+
+            if ($professorIds->isNotEmpty()) {
+                $presencas->whereIn('professor_id', $professorIds);
+            } else {
+                // No match found — return empty result
+                $presencas->whereRaw('1 = 0');
+            }
         }
 
         if ($request->filled('materia')) {
@@ -95,11 +105,21 @@ class MasterSearchController extends BaseController
         }
 
         if ($request->filled('aluno')) {
-            $presencas->whereHas('aluno', function ($q) use ($request) {
-                $hash = AlunoModel::generateBlindIndex($request->aluno);
-                $q->where('ra_search', $hash)
-                  ->orWhere('nome_search', $hash);
-            });
+            $term = trim($request->aluno);
+            $hash = AlunoModel::generateBlindIndex($term);
+
+            // First try to find matching aluno IDs via all blind index columns
+            $alunoIds = AlunoModel::where('nome_search', $hash)
+                ->orWhere('ra_search', $hash)
+                ->orWhere('cpf_search', $hash)
+                ->orWhere('email_search', $hash)
+                ->pluck('id');
+
+            if ($alunoIds->isNotEmpty()) {
+                $presencas->whereIn('aluno_id', $alunoIds);
+            } else {
+                $presencas->whereRaw('1 = 0');
+            }
         }
 
         // Limitamos para evitar sobrecarga no front e mantemos a data
