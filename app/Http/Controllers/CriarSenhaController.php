@@ -65,6 +65,11 @@ class CriarSenhaController extends BaseController
         Auth::guard($guard)->login($user);
         $request->session()->regenerate();
 
+        $pendingCode = session()->pull('pending_attendance_code');
+        if ($pendingCode && $guard === 'alunos') {
+            return redirect()->route('presenca.confirmar', $pendingCode);
+        }
+
         return redirect()->route($redirect);
     }
 }

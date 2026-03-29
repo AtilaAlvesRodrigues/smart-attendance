@@ -85,7 +85,11 @@ class PresencaController extends Controller
         if ($hora < 12) $horario = 'M';
         elseif ($hora < 18) $horario = 'V';
 
-        return view('professor.presenca.gerar', compact('materia', 'codigo_aula', 'semestre', 'horario', 'expiraEmTimestamp'));
+        // Gera URL com o host real da requisição (funciona em rede local via IP)
+        $presencaUrl = $request->getSchemeAndHttpHost()
+            . route('presenca.confirmar', $codigo_aula, false);
+
+        return view('professor.presenca.gerar', compact('materia', 'codigo_aula', 'semestre', 'horario', 'expiraEmTimestamp', 'presencaUrl'));
     }
 
     /**

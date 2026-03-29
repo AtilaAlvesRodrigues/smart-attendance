@@ -23,7 +23,7 @@ class DashboardController extends BaseController
 
         if ($professor) {
             foreach ($professor->materias as $materia) {
-                $cacheKey = 'aula_materia_' . $materia->id . '_' . now()->format('Y-m-d');
+                $cacheKey = "aula_materia_{$materia->id}_" . now()->format('Y-m-d');
                 $cacheData = Cache::get($cacheKey);
 
                 if (is_array($cacheData)) {
@@ -34,7 +34,9 @@ class DashboardController extends BaseController
             }
         }
 
-        return view('professor.home', compact('professor', 'activeMateria', 'activeCode'));
+        $hasActiveEvento = $professor && Cache::has("professor_evento_{$professor->id}");
+
+        return view('professor.home', compact('professor', 'activeMateria', 'activeCode', 'hasActiveEvento'));
     }
 
     public function alunoIndex()
@@ -108,7 +110,7 @@ class DashboardController extends BaseController
 
         if ($request->filled('materia')) {
             $query->whereHas('materia', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->materia . '%');
+                $q->where('nome', 'like', "%{$request->materia}%");
             });
         }
 

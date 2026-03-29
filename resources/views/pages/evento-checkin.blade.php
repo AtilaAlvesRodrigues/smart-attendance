@@ -68,5 +68,6 @@
 @endsection
 
 @push('scripts')
+    <script>window.eventoToken = "{{ $token }}";</script>
     <script src="{{ asset('js/pages/evento-checkin.js') }}"></script>
 @endpush

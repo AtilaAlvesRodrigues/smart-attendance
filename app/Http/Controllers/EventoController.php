@@ -5,76 +5,92 @@ namespace App\Http\Controllers;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class EventoController extends BaseController
 {
-    /**
-     * Show the public check-in page.
-     * Security: Throttled at route level.
-     */
-    public function checkinForm()
+    public function checkinForm(Request $request)
     {
-        return view('pages.evento-checkin');
+        $token = $request->query('token', '');
+        return view('pages.evento-checkin', compact('token'));
     }
 
-    /**
-     * Show the professor management page.
-     * Security: Requires 'professores' authentication.
-     */
     public function presencaDashboard()
     {
-        $professor = Auth::guard('professores')->user();
+        $professor  = Auth::guard('professores')->user();
+        $cacheKey   = "professor_evento_{$professor->id}";
 
-        return view('pages.evento-presenca', compact('professor'));
+        // Reutiliza token ativo do professor (sobrevive a logout/fechamento de aba)
+        $sessionToken = Cache::get($cacheKey) ?: Str::random(16);
+        Cache::put($cacheKey, $sessionToken, now()->addHours(8));
+
+        return view('pages.evento-presenca', compact('professor', 'sessionToken'));
     }
 
-    /**
-     * Process the check-in (Server-side validation example).
-     * This is an example of where we'd add database security.
-     */
     public function processCheckin(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:100|min:3',
-            'email' => 'required|email|max:100',
-            'hp_field' => 'prohibited', // Honeypot field for simple bot protection
+            'name'     => 'required|string|max:100|min:3',
+            'email'    => 'required|email|max:100',
+            'token'    => 'required|string|max:32',
+            'hp_field' => 'prohibited',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => 'Dados inválidos.'], 422);
         }
 
-        // In a real app, we would check the database here:
-        // if (EventCheckin::where('email', $request->email)->exists()) { ... }
+        $token    = $request->input('token');
+        $email    = strtolower($request->input('email'));
+        $cacheKey = "evento_checkin_{$token}";
 
-        return response()->json(['success' => true, 'message' => 'Check-in validado pelo servidor.']);
+        $checkins = Cache::get($cacheKey, []);
+
+        $jaRegistrado = collect($checkins)->contains(
+            fn($c) => strtolower($c['email']) === $email
+        );
+
+        if ($jaRegistrado) {
+            return response()->json(['error' => 'E-mail já registrado nesta palestra.'], 409);
+        }
+
+        $checkins[] = [
+            'name'  => $request->input('name'),
+            'email' => $email,
+            'time'  => now()->toISOString(),
+        ];
+
+        Cache::put($cacheKey, $checkins, now()->addHours(8));
+
+        return response()->json(['success' => true]);
     }
 
-    /**
-     * Terminate the session and send email to professor.
-     */
+    public function getCheckins(string $token)
+    {
+        $checkins = Cache::get("evento_checkin_{$token}", []);
+        return response()->json($checkins);
+    }
+
     public function encerrarSessao(Request $request)
     {
-        $professor = Auth::guard('professores')->user();
-        $emailDestino = $professor ? $professor->email : 'professor@teste.com';
-        $nomeProfessor = $professor ? $professor->nome : 'Professor Silva';
-        
+        $professor     = Auth::guard('professores')->user();
+        $token         = $request->input('token', '');
         $participantes = $request->input('participantes', []);
-        $total = count($participantes);
 
-        // Simulation of sending email using Laravel Mail
-        // In a real environment with SMTP configured:
-        /*
-        \Illuminate\Support\Facades\Mail::raw("Olá $nomeProfessor, a sua palestra foi encerrada com sucesso. Total de participantes: $total", function ($message) use ($emailDestino) {
-            $message->to($emailDestino)->subject('Relatório de Presença - Smart Attendance');
-        });
-        */
+        if ($token) {
+            Cache::forget("evento_checkin_{$token}");
+        }
+
+        if ($professor) {
+            Cache::forget("professor_evento_{$professor->id}");
+        }
 
         return response()->json([
-            'success' => true, 
-            'message' => 'Relatório enviado para ' . $emailDestino,
-            'total' => $total
+            'success' => true,
+            'message' => 'Sessão encerrada.',
+            'total'   => \count($participantes),
         ]);
     }
 }

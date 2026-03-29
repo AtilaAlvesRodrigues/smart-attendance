@@ -76,6 +76,7 @@ Route::post('/evento/checkin/process', [EventoController::class, 'processCheckin
 
 Route::get('/professor/evento/presenca', [EventoController::class, 'presencaDashboard'])->middleware('auth:professores')->name('professor.evento.presenca');
 Route::post('/professor/evento/encerrar', [EventoController::class, 'encerrarSessao'])->middleware('auth:professores')->name('professor.evento.encerrar');
+Route::get('/professor/evento/checkins/{token}', [EventoController::class, 'getCheckins'])->middleware('auth:professores')->name('professor.evento.checkins');
 
 Route::post('/login', function (Request $request) {
     return redirect()->route('login.aluno');

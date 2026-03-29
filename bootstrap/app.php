@@ -11,6 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Confiar no Cloudflare e proxies reversos (necessário para sessões e URLs corretas)
+        $middleware->trustProxies(at: '*');
+
         // Global security headers for all web responses
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\SecurityHeaders::class,

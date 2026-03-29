@@ -65,7 +65,7 @@
                         <p class="text-white/70 text-xs font-bold uppercase tracking-widest leading-relaxed mb-4">
                             Aponte a câmera para o código ou use o link abaixo:
                         </p>
-                        <a href="{{ route('presenca.confirmar', $codigo_aula) }}" target="_blank"
+                        <a href="{{ $presencaUrl }}" target="_blank"
                            class="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white hover:text-white rounded-sm transition-all duration-300 text-xs font-black uppercase tracking-[0.15em] group">
                             <span>Registrar Presença (Link)</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,7 +172,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         // Gerar QR Code
-        const qrContent = "{{ route('presenca.confirmar', $codigo_aula) }}";
+        const qrContent = "{{ $presencaUrl }}";
         new QRCode(document.getElementById("qrcode"), {
             text: qrContent,
             width: 210,

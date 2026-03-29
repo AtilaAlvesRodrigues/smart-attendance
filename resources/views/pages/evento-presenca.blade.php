@@ -37,7 +37,7 @@
                         Link de Acesso Direto (Teste):
                     </p>
                     <div class="flex gap-2">
-                        <input type="text" readonly value="{{ route('evento.checkin') }}" 
+                        <input type="text" readonly value="{{ route('evento.checkin') }}?token={{ $sessionToken }}"
                                class="pal-filter-input flex-grow text-[11px] font-mono" id="copy-link">
                         <button onclick="copyLink()" class="pal-nav-btn pal-nav-btn-solid text-[10px] px-3">Copiar</button>
                     </div>
@@ -151,14 +151,13 @@
 <script src="{{ asset('js/pages/evento-presenca.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Professor info for PDF
         const profInfo = {
             name: "{{ $professor->nome ?? 'Docente' }}",
-            email: "{{ $professor->email ?? 'N/A' }}",
-            cpf: "{{ $professor->cpf ?? 'N/A' }}"
+            email: "{{ $professor->email ?? 'N/A' }}"
         };
-        
-        initEventPresenca("{{ route('evento.checkin') }}", profInfo);
+        const checkinUrl  = "{{ route('evento.checkin') }}" + "?token={{ $sessionToken }}";
+        const checkinsApi = "{{ route('professor.evento.checkins', $sessionToken) }}";
+        initEventPresenca(checkinUrl, profInfo, "{{ $sessionToken }}", checkinsApi);
     });
 </script>
 @endpush

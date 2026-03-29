@@ -108,9 +108,16 @@
                     <p class="pal-subtitle" style="margin:0;">Check-in externo via QR Code para sessões abertas ao público.</p>
                 </div>
             </div>
+            @if($hasActiveEvento)
+            <a href="{{ route('professor.evento.presenca') }}" class="pal-dashboard-btn pal-dashboard-btn-solid" style="background:#22c55e; color:white; display:flex; align-items:center; gap:0.5rem;">
+                <span style="width:6px; height:6px; background:white; border-radius:50%; display:inline-block; animation:ping 1s cubic-bezier(0,0,0.2,1) infinite;"></span>
+                Ver Palestra Aberta
+            </a>
+            @else
             <a href="{{ route('professor.evento.presenca') }}" class="pal-dashboard-btn pal-dashboard-btn-solid" style="background:#3b82f6; color:white;">
                 Gerar QR Evento →
             </a>
+            @endif
         </div>
 
         {{-- Cards --}}
