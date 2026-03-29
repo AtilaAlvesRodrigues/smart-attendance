@@ -21,7 +21,7 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '00011122233',
                 'nome'     => 'Aluno Teste',
                 'email'    => 'aluno.teste@site.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
             [
@@ -29,7 +29,7 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '44455566677',
                 'nome'     => 'Aluna Mariana',
                 'email'    => 'mariana@aluno.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
             [
@@ -37,7 +37,7 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '11111111111',
                 'nome'     => 'Lucas Silva',
                 'email'    => 'lucas@aluno.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
             [
@@ -45,7 +45,7 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '22222222222',
                 'nome'     => 'Beatriz Costa',
                 'email'    => 'beatriz@aluno.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
             [
@@ -53,7 +53,7 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '33333333333',
                 'nome'     => 'Gabriel Santos',
                 'email'    => 'gabriel@aluno.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
             [
@@ -61,7 +61,7 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '44444444444',
                 'nome'     => 'Julia Souza',
                 'email'    => 'julia@aluno.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
             [
@@ -69,13 +69,16 @@ class AlunoSeeder extends Seeder
                 'cpf'      => '55555555555',
                 'nome'     => 'Rafael Lima',
                 'email'    => 'rafael@aluno.com',
-                'password' => 'aluno123',
+                'password' => 'senha123',
                 'role'     => 'aluno',
             ],
         ];
 
         foreach ($alunos as $data) {
-            AlunoModel::create($data);
+            AlunoModel::firstOrCreate(
+                ['cpf_search' => AlunoModel::generateBlindIndex($data['cpf'])],
+                $data
+            );
         }
     }
 }

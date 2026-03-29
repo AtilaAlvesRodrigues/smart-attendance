@@ -40,8 +40,9 @@ class UsuarioMaster extends Authenticatable
     ];
 
     protected $casts = [
-        'password' => 'hashed',
-        'nome' => 'encrypted',
-        'email' => 'encrypted',
+        'password'       => 'hashed',
+        'nome'           => 'encrypted',
+        'email'          => 'encrypted',
+        'remember_token' => 'encrypted',
     ];
 }

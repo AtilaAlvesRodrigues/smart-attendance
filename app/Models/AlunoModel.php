@@ -39,11 +39,12 @@ class AlunoModel extends Authenticatable
 
     protected $fillable = [
         'ra',
-        'cpf', // Você tem CPF na migração, então deve estar no Model.
+        'cpf',
         'nome',
         'email',
         'password',
-        'role', // ⬅️ Essencial para o redirecionamento baseado na role
+        'role',
+        'remember_token',
     ];
 
     /**
@@ -52,7 +53,7 @@ class AlunoModel extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token', // ⬅️ Essencial para a função "Lembrar de Mim"
+        'remember_token', 
     ];
 
     /**
@@ -60,11 +61,11 @@ class AlunoModel extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'password' => 'hashed',
-        'nome' => 'encrypted',
-        'email' => 'encrypted',
-        'ra' => 'encrypted',
-        'cpf' => 'encrypted',
+        'password'       => 'hashed',
+        'email'          => 'encrypted',
+        'ra'             => 'encrypted',
+        'cpf'            => 'encrypted',
+        'remember_token' => 'encrypted',
     ];
 
     public function materias()

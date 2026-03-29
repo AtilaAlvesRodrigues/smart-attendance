@@ -18,8 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Registrar aliases de middleware que o aplicativo espera usar nas rotas
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+            'role'            => \App\Http\Middleware\CheckRole::class,
+            'auth'            => \Illuminate\Auth\Middleware\Authenticate::class,
+            'primeiro-acesso' => \App\Http\Middleware\PrimeiroAcessoMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

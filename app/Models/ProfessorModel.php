@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
@@ -48,6 +47,7 @@ class ProfessorModel extends Authenticatable
         'email',
         'password',
         'role',
+        'remember_token',
     ];
 
     /**
@@ -64,11 +64,11 @@ class ProfessorModel extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'password' => 'hashed',
+        'password'          => 'hashed',
         'email_verified_at' => 'datetime',
-        'nome' => 'encrypted',
-        'email' => 'encrypted',
-        'cpf' => 'encrypted',
+        'email'             => 'encrypted',
+        'cpf'               => 'encrypted',
+        'remember_token'    => 'encrypted',
     ];
 
     public function materias()

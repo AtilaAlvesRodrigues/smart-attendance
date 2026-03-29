@@ -47,6 +47,11 @@
                     </div>
                 </div>
 
+                <p style="display:flex; align-items:flex-start; gap:0.4rem; font-family:'Inter',sans-serif; font-size:0.75rem; color:#888888; line-height:1.5; margin:0;">
+                    <svg style="flex-shrink:0; margin-top:1px; color:#a855f7;" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    Primeiro acesso? Use o token enviado por e-mail no campo de senha.
+                </p>
+
                 <label class="login-checkbox-label">
                     <input type="checkbox" name="remember" class="login-checkbox">
                     Permanecer conectado
@@ -55,6 +60,15 @@
                 <button type="submit" class="login-btn">
                     Entrar no Painel
                 </button>
+
+                <div style="display:flex; justify-content:flex-start; gap:1rem; flex-wrap:wrap;">
+                    <a href="{{ route('esqueci-senha.show', 'professor') }}"
+                        style="font-size:0.75rem; color:var(--pal-gray); text-decoration:none; border-bottom:1px solid transparent; transition:border-color 0.2s;"
+                        onmouseover="this.style.borderColor='var(--pal-gray)'"
+                        onmouseout="this.style.borderColor='transparent'">
+                        Esqueci minha senha
+                    </a>
+                </div>
             </form>
 
         </div>

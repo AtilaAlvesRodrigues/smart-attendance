@@ -7,7 +7,7 @@
 
 # 📋 Smart Attendance
 
-> Sistema web de controle de presença inteligente — rápido, preciso e seguro.  
+> Sistema web de controle de presença inteligente — rápido, preciso e seguro.
 > Desenvolvido como **Projeto Integrador** com PHP/Laravel.
 
 [📖 Documentação](#-documentação) •
@@ -15,8 +15,6 @@
 [🔐 Segurança](#-segurança) •
 [📁 Estrutura](#-estrutura) •
 [🗄️ Banco de Dados](#%EF%B8%8F-banco-de-dados)
-
-O projeto está sendo implementado utilizando [Laravel](https://laravel.com/) e [Filament](https://filamentphp.com/).
 
 </div>
 
@@ -42,13 +40,14 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 
 | Camada | Implementação |
 |---|---|
-| 🔒 Criptografia | AES-256 em todos os dados pessoais (PII) |
-| 👥 Autenticação | Multi-Guard independente por perfil |
-| 🚦 Rate Limiting | Anti-força bruta por IP |
+| 🔒 Criptografia | AES-256 em campos PII (email, CPF, RA, remember_token) |
+| 🔍 Blind Index | SHA-256 nos campos cifrados para buscas seguras |
+| 👥 Autenticação | Multi-Guard independente por perfil (alunos / professores / masters) |
+| 🚦 Rate Limiting | Anti-força bruta por IP em login e envio de e-mail |
 | 🛡️ Headers HTTP | CSP, X-Frame-Options, Permissions-Policy |
-| 🔑 CSRF | Token em todos os formulários |
-| 🤖 Honeypot | Anti-bot no check-in público |
-| 📋 Logging | Registro de tentativas de login falhas |
+| 🔑 CSRF | Token em todos os formulários e requisições AJAX |
+| 🤖 Honeypot | Anti-bot no check-in público de eventos |
+| 📋 Logging | Registro de falhas de autenticação e erros de envio de e-mail |
 
 > 📄 [Ver relatório completo de segurança](docs/Relatorio_Seguranca_SmartAttendance.docx)
 
@@ -58,10 +57,12 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 
 | Módulo | Status |
 |---|---|
-| Autenticação | ✅ Concluído |
-| Controle de Presença | ✅ Concluído |
+| Autenticação Multi-Guard | ✅ Concluído |
+| Controle de Presença (QR Code) | ✅ Concluído |
 | Gerenciamento de Notas | ✅ Concluído |
-| Painel Master | 🚧 Em progresso |
+| Painel Master | ✅ Concluído |
+| Cadastro Direto (Master) | ✅ Concluído |
+| E-mail de Primeiro Acesso | ✅ Concluído |
 | Testes Automatizados | 📋 Pendente |
 | Deploy | 📋 Pendente |
 
@@ -98,17 +99,18 @@ cp .env.example .env
 php artisan key:generate
 
 # 4. Configurar o Banco de Dados no .env
-# Certifique-se de configurar PostgreSQL:
 # DB_CONNECTION=pgsql
 # DB_PORT=5432
 # DB_DATABASE=smart_attendance
 # DB_USERNAME=postgres
 # DB_PASSWORD=sua_senha_aqui
 
-# 5. Rodar migrações e popular o banco (Seeds)
+# 5. Configurar e-mail SMTP no .env (ver seção E-mails abaixo)
+
+# 6. Rodar migrações e popular o banco
 php artisan migrate --seed
 
-# 6. Iniciar o servidor
+# 7. Iniciar o servidor
 php artisan serve
 ```
 
@@ -124,6 +126,98 @@ Acesse: `http://localhost:8000`
 | **Professor** | `professor@teste.com` | `senha123` |
 | **Aluno** | `aluno.teste@site.com` | `senha123` |
 
+> Os seeders usam `firstOrCreate` — rodar `php artisan db:seed` múltiplas vezes não duplica dados.
+
+---
+
+## 🧩 Funcionalidades
+
+### 🎓 Aluno
+- Visualiza presenças e frequência por matéria
+- Acompanha notas (prova1, trabalho1, trabalho2, prova2)
+- Primeiro acesso via token enviado por e-mail
+
+### 👨‍🏫 Professor
+- Gera QR Code por sessão de aula (TTL 30 min no cache)
+- Monitora presença em tempo real
+- Lança e edita notas por turma
+- Gerencia eventos/palestras com check-in público
+
+### 🛠️ Master
+- Cadastra professores, alunos e matérias diretamente (sem fluxo de solicitação)
+- Envia e-mail de primeiro acesso automaticamente ao cadastrar
+- Visualiza contadores de usuários e matérias
+- Acessa central de presenças
+- Gerencia vínculos entre professores e matérias
+
+---
+
+## 📧 Envio de E-mails
+
+O sistema envia e-mails automaticamente no seguinte evento:
+
+| Evento | Destinatário | Descrição |
+|---|---|---|
+| Cadastro pelo Master | Aluno / Professor | Token provisório de primeiro acesso via SMTP |
+| Esqueci minha senha | Aluno / Professor | Novo token de redefinição de senha |
+
+### Configuração SMTP (Gmail)
+
+O envio usa **Gmail SMTP** com **App Password** (não a senha da conta Google).
+
+1. Acesse [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+2. Ative a verificação em duas etapas (obrigatório)
+3. Crie uma senha de app para "Smart Attendance"
+4. No `.env`, configure:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_ENCRYPTION=tls
+MAIL_USERNAME=seu@gmail.com
+MAIL_PASSWORD=xxxxxxxxxxxxxxxx   # App Password sem espaços
+MAIL_FROM_ADDRESS="seu@gmail.com"
+MAIL_FROM_NAME="Smart Attendance"
+```
+
+5. Limpe o cache: `php artisan config:clear`
+
+> **Importante:** nunca commite o `.env` real — use apenas `.env.example` com placeholders.
+
+---
+
+## 🗂️ Arquitetura
+
+### Autenticação Multi-Guard
+
+Três guards independentes, cada um com seu próprio modelo, tabela e sessão:
+
+| Guard | Model | Tabela | Rota base |
+|---|---|---|---|
+| `auth:alunos` | `AlunoModel` | `alunos` | `/aluno/*` |
+| `auth:professores` | `ProfessorModel` | `professores` | `/professor/*` |
+| `auth:masters` | `UsuarioMaster` | `usuario_masters` | `/master/*` |
+
+### Criptografia e Blind Index
+
+Campos PII (email, CPF, RA) são cifrados com AES-256 via cast `encrypted` do Laravel. Para buscas, o trait `HasBlindIndex` gera um hash SHA-256 determinístico armazenado em colunas `*_search`. O campo `nome` é armazenado em texto plano para facilitar exibição e pesquisa direta.
+
+### Fluxo de Presença
+
+1. Professor gera QR Code para uma sessão → cache com chave `aula_materia_{id}_{data}` (TTL 30min)
+2. Aluno escaneia → `PresencaController` valida o cache e cria registro em `presencas`
+3. Rate limiting: 5 tentativas por minuto por usuário
+
+### Fluxo de Primeiro Acesso
+
+1. Master cadastra usuário em `/dashboard/master/cadastrar`
+2. Sistema cria conta com senha temporária aleatória e `remember_token` como token de acesso
+3. E-mail é enviado com o token provisório
+4. Usuário usa o token como senha no primeiro login
+5. Sistema redireciona para `/criar-senha` onde define a senha definitiva
+6. `remember_token` é zerado após a criação da senha
+
 ---
 
 ## 📁 Estrutura
@@ -132,15 +226,59 @@ Acesse: `http://localhost:8000`
 smart-attendance/
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/    # Lógica da aplicação
-│   │   └── Middleware/     # SecurityHeaders, CheckRole
-│   ├── Models/             # AlunoModel, ProfessorModel, UsuarioMaster
-│   └── Traits/             # HasBlindIndex
-├── database/migrations/    # Estrutura das tabelas
-├── resources/views/        # Templates Blade
-├── routes/web.php          # Rotas com guards e throttle
-└── docs/                   # Documentação do projeto
+│   │   ├── Controllers/
+│   │   │   ├── AlunoLoginController.php
+│   │   │   ├── ProfessorLoginController.php
+│   │   │   ├── DashboardController.php
+│   │   │   ├── MasterCadastroController.php   # Cadastro direto pelo master
+│   │   │   ├── PresencaController.php
+│   │   │   ├── GerenciarMateriaController.php
+│   │   │   ├── CriarSenhaController.php
+│   │   │   └── EsqueciSenhaController.php
+│   │   ├── Middleware/
+│   │   │   ├── CheckRole.php
+│   │   │   └── PrimeiroAcessoMiddleware.php
+│   │   └── View/Composers/SidebarComposer.php
+│   ├── Models/
+│   │   ├── AlunoModel.php
+│   │   ├── ProfessorModel.php
+│   │   ├── UsuarioMaster.php
+│   │   └── Materia.php
+│   ├── Mail/
+│   │   └── PrimeiroAcessoMail.php
+│   └── Traits/
+│       └── HasBlindIndex.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── resources/views/
+│   ├── master/
+│   │   ├── home.blade.php
+│   │   └── cadastrar.blade.php
+│   ├── emails/
+│   │   └── primeiro-acesso.blade.php
+│   └── layouts/theme.blade.php
+├── routes/web.php
+└── docs/
 ```
+
+---
+
+## 🗄️ Banco de Dados
+
+As tabelas principais utilizam **Surrogate Keys** (nunca RA/CPF como PK), **criptografia AES-256** nas colunas sensíveis e **Blind Index SHA-256** para buscas seguras.
+
+| Tabela | Descrição |
+|---|---|
+| `alunos` | Dados dos alunos (PII cifrado) |
+| `professores` | Dados dos professores (PII cifrado) |
+| `usuario_masters` | Administradores do sistema |
+| `materias` | Disciplinas cadastradas |
+| `aluno_materia` | Pivot com notas (prova1, trabalho1, trabalho2, prova2) |
+| `materia_professor` | Pivot de vínculo professor ↔ matéria |
+| `presencas` | Registros de check-in via QR Code |
+
+> 📊 [Ver diagrama e descrição completa das tabelas](../../wiki/Banco-de-Dados)
 
 ---
 
@@ -154,14 +292,6 @@ smart-attendance/
 | 📁 Estrutura do Projeto | [Wiki · Estrutura](../../wiki/Estrutura) |
 | 🗄️ Banco de Dados | [Wiki · Banco de Dados](../../wiki/Banco-de-Dados) |
 | 📄 Relatório Word | [Download](docs/Relatorio_Seguranca_SmartAttendance.docx) |
-
----
-
-## 🗄️ Banco de Dados
-
-As tabelas principais utilizam **Surrogate Keys** (nunca RA/CPF como PK), **criptografia AES-256** nas colunas sensíveis e **Blind Index SHA-256** para buscas seguras.
-
-> 📊 [Ver diagrama e descrição completa das tabelas](../../wiki/Banco-de-Dados)
 
 ---
 

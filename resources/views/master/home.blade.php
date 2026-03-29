@@ -11,6 +11,7 @@
 
 @section('nav-user')
     <div class="pal-nav-actions" style="gap:0.5rem">
+        <a href="{{ route('master.cadastrar') }}" class="pal-nav-btn no-underline" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #c084fc; font-weight: 600;">+ Cadastrar</a>
         <div class="pal-nav-user">
             <span class="pal-nav-user-role">Acesso Root</span>
             <span class="pal-nav-user-name">{{ $master->nome ?? 'Administrador' }}</span>
@@ -74,7 +75,7 @@
     </div>
 
     {{-- Stats --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         @foreach([
             [$professoresCount, 'Professores'],
             [$alunosCount, 'Alunos'],
@@ -86,6 +87,7 @@
         </div>
         @endforeach
     </div>
+
 
     {{-- Action Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -118,6 +120,7 @@
     </a>
 
 </main>
+
 @push('scripts')
 <script>
     // Profile Modal Logic

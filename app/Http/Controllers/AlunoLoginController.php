@@ -18,7 +18,7 @@ class AlunoLoginController extends BaseController
 
     public function attemptAuthentication(Request $request)
     {
-        $request->validate([   
+        $request->validate([
             'ra_email_cpf' => 'required|string|max:255',
             'password' => 'required|string|max:255',
         ]);
@@ -28,18 +28,33 @@ class AlunoLoginController extends BaseController
         $remember = $request->has('remember');
 
         // Tentativa como Aluno usando Blind Indexes para busca em dados criptografados
-        $searchFields = ['ra' => 'ra_search', 'cpf' => 'cpf_search', 'email' => 'email_search'];
+        $searchFields = ['ra_search', 'cpf_search', 'email_search'];
         $loginHash = AlunoModel::generateBlindIndex($login);
 
         $aluno = null;
-        foreach ($searchFields as $field => $searchColumn) {  
+        foreach ($searchFields as $searchColumn) {
             $aluno = AlunoModel::where($searchColumn, $loginHash)->first();
             if ($aluno) break;
         }
 
-        if ($aluno && Hash::check($password, $aluno->password)) {   
+        // Verificação de primeiro acesso via remember_token (hash_equals evita timing attack)
+        if ($aluno && !is_null($aluno->remember_token) && hash_equals((string) $aluno->remember_token, $password)) {
+            session([
+                'pending_password_creation' => $aluno->id,
+                'pending_password_role'     => 'aluno',
+            ]);
+            return redirect()->route('criar-senha.show');
+        }
+
+        if ($aluno && Hash::check($password, $aluno->password)) {
             Auth::guard('professores')->logout();
             Auth::guard('masters')->logout();
+
+            // Invalidar token pendente se o usuário logou com senha normal
+            if (!is_null($aluno->remember_token)) {
+                $aluno->remember_token = null;
+                $aluno->save();
+            }
 
             Auth::guard('alunos')->login($aluno, $remember);
             $request->session()->regenerate();
@@ -53,8 +68,7 @@ class AlunoLoginController extends BaseController
         }
 
         Log::warning('Login failed (aluno)', [
-            'ip'    => $request->ip(),
-            'input' => $request->input('ra_email_cpf'),
+            'ip' => $request->ip(),
         ]);
 
         return redirect()->route('login.aluno.form')

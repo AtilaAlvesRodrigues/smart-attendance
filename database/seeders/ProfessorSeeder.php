@@ -19,41 +19,44 @@ class ProfessorSeeder extends Seeder
                 'cpf'      => '12233344445',
                 'nome'     => 'Professor Teste',
                 'email'    => 'professor@teste.com',
-                'password' => 'professor123',
+                'password' => 'senha123',
                 'role'     => 'professor',
             ],
             [
                 'cpf'      => '55566677788',
                 'nome'     => 'Profa. Maria',
                 'email'    => 'maria@teste.com',
-                'password' => 'professor123',
+                'password' => 'senha123',
                 'role'     => 'professor',
             ],
             [
                 'cpf'      => '99988877766',
                 'nome'     => 'Prof. Carlos',
                 'email'    => 'carlos@teste.com',
-                'password' => 'professor123',
+                'password' => 'senha123',
                 'role'     => 'professor',
             ],
             [
                 'cpf'      => '11122233344',
                 'nome'     => 'Profa. Ana',
                 'email'    => 'ana@teste.com',
-                'password' => 'professor123',
+                'password' => 'senha123',
                 'role'     => 'professor',
             ],
             [
                 'cpf'      => '55544433322',
                 'nome'     => 'Prof. Pedro',
                 'email'    => 'pedro@teste.com',
-                'password' => 'professor123',
+                'password' => 'senha123',
                 'role'     => 'professor',
             ],
         ];
 
         foreach ($professores as $data) {
-            ProfessorModel::create($data);
+            ProfessorModel::firstOrCreate(
+                ['cpf_search' => ProfessorModel::generateBlindIndex($data['cpf'])],
+                $data
+            );
         }
     }
 }

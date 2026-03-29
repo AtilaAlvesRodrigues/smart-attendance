@@ -67,8 +67,8 @@ class DashboardController extends BaseController
         $master = Auth::guard('masters')->user();
 
         $professoresCount = ProfessorModel::count();
-        $alunosCount = AlunoModel::count();
-        $materiasCount = Materia::count();
+        $alunosCount      = AlunoModel::count();
+        $materiasCount    = Materia::count();
 
         return view('master.home', compact(
             'master', 'professoresCount', 'alunosCount', 'materiasCount'

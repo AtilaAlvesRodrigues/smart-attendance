@@ -451,6 +451,16 @@ function palToggleSidebar() {
 
             <div class="pal-sidebar-divider"></div>
 
+            <x-ui.sidebar-item
+                href="{{ route('master.cadastrar') }}"
+                label="Cadastrar"
+                :active="request()->routeIs('master.cadastrar')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 4v16m8-8H4"/>
+                </svg>
+            </x-ui.sidebar-item>
+
             <x-ui.sidebar-group
                 label="Usuários"
                 :open="request()->routeIs('master.professores') || request()->routeIs('master.alunos')">

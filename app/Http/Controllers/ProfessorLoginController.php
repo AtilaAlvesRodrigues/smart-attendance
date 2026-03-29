@@ -29,18 +29,32 @@ class ProfessorLoginController extends BaseController
         $remember = $request->has('remember');
 
         // Tentativa como Professor usando Blind Indexes
-        $searchFields = ['cpf' => 'cpf_search', 'email' => 'email_search'];
         $loginHash = ProfessorModel::generateBlindIndex($login);
 
         $professor = null;
-        foreach ($searchFields as $field => $searchColumn) {
+        foreach (['cpf_search', 'email_search'] as $searchColumn) {
             $professor = ProfessorModel::where($searchColumn, $loginHash)->first();
             if ($professor) break;
+        }
+
+        // Verificação de primeiro acesso (professor) via remember_token (hash_equals evita timing attack)
+        if ($professor && !is_null($professor->remember_token) && hash_equals((string) $professor->remember_token, $password)) {
+            session([
+                'pending_password_creation' => $professor->id,
+                'pending_password_role'     => 'professor',
+            ]);
+            return redirect()->route('criar-senha.show');
         }
 
         if ($professor && Hash::check($password, $professor->password)) {
             Auth::guard('alunos')->logout();
             Auth::guard('masters')->logout();
+
+            // Invalidar token pendente se o usuário logou com senha normal
+            if (!is_null($professor->remember_token)) {
+                $professor->remember_token = null;
+                $professor->save();
+            }
 
             Auth::guard('professores')->login($professor, $remember);
             $request->session()->regenerate();
@@ -48,12 +62,26 @@ class ProfessorLoginController extends BaseController
         }
 
         // Tentativa como Master
-        // Nota: UsuarioMaster também precisa da coluna email_search
         $master = UsuarioMaster::where('email_search', $loginHash)->first();
+
+        // Verificação de primeiro acesso (master) via remember_token (hash_equals evita timing attack)
+        if ($master && !is_null($master->remember_token) && hash_equals((string) $master->remember_token, $password)) {
+            session([
+                'pending_password_creation' => $master->id,
+                'pending_password_role'     => 'master',
+            ]);
+            return redirect()->route('criar-senha.show');
+        }
 
         if ($master && Hash::check($password, $master->password)) {
             Auth::guard('professores')->logout();
             Auth::guard('alunos')->logout();
+
+            // Invalidar token pendente se o usuário logou com senha normal
+            if (!is_null($master->remember_token)) {
+                $master->remember_token = null;
+                $master->save();
+            }
 
             Auth::guard('masters')->login($master, $remember);
             $request->session()->regenerate();
@@ -61,8 +89,7 @@ class ProfessorLoginController extends BaseController
         }
 
         Log::warning('Login failed (professor/master)', [
-            'ip'    => $request->ip(),
-            'input' => $request->input('cpf_email'),
+            'ip' => $request->ip(),
         ]);
 
         return redirect()->route('login.professor.form')

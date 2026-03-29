@@ -8,6 +8,10 @@ use App\Http\Controllers\PdfTesteVulnerabilidadeController;
 use App\Http\Controllers\MasterSearchController;
 use App\Http\Controllers\PresencaController;
 use App\Http\Controllers\GerenciarMateriaController;
+use App\Http\Controllers\CriarSenhaController;
+use App\Http\Controllers\SolicitacaoAcessoController;
+use App\Http\Controllers\EsqueciSenhaController;
+use App\Http\Controllers\MasterCadastroController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -55,7 +59,7 @@ Route::post('/login/aluno', [AlunoLoginController::class, 'attemptAuthentication
 Route::get('/login/professor', [ProfessorLoginController::class, 'showLoginForm'])->name('login.professor.form');
 Route::post('/login/professor', [ProfessorLoginController::class, 'attemptAuthentication'])
     ->middleware('throttle:10,3')
-    ->name('login.professor');
+    ->name('login.professor'); 
 
 // Informational "Saiba Mais" Pages
 Route::get('/aluno/saiba-mais', function () { return view('pages.aluno-info'); })->name('aluno.info');
@@ -79,6 +83,17 @@ Route::post('/login', function (Request $request) {
 
 Route::get('/presenca/confirmar/{codigo_aula}', [PresencaController::class, 'confirmarPresenca'])
     ->name('presenca.confirmar');
+
+
+// Esqueci Minha Senha (público)
+Route::get('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'show'])->name('esqueci-senha.show');
+Route::post('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'send'])->middleware('throttle:3,10')->name('esqueci-senha.send');
+
+// Primeiro Acesso — Criação de senha definitiva
+Route::middleware(['primeiro-acesso', 'throttle:10,3'])->group(function () {
+    Route::get('/criar-senha', [CriarSenhaController::class, 'show'])->name('criar-senha.show');
+    Route::post('/criar-senha', [CriarSenhaController::class, 'store'])->name('criar-senha.store');
+});
 
 Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
@@ -115,6 +130,10 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');
         Route::get('/materias', [DashboardController::class, 'masterMaterias'])->name('master.materias');
         Route::get('/presenca', [DashboardController::class, 'masterPresenca'])->name('master.presenca');
+        Route::get('/cadastrar', fn () => view('master.cadastrar'))->name('master.cadastrar');
+        Route::post('/cadastrar/aluno', [MasterCadastroController::class, 'cadastrarAluno'])->name('master.cadastrar.aluno');
+        Route::post('/cadastrar/professor', [MasterCadastroController::class, 'cadastrarProfessor'])->name('master.cadastrar.professor');
+        Route::post('/cadastrar/materia', [MasterCadastroController::class, 'cadastrarMateria'])->name('master.cadastrar.materia');
 
         Route::prefix('search')->middleware('throttle:30,1')->group(function () {
             Route::get('/professores', [MasterSearchController::class, 'searchProfessores'])->name('master.search.professores');

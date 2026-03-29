@@ -13,11 +13,14 @@ class UsuarioMasterSeeder extends Seeder
      */
     public function run(): void
     {
-        UsuarioMaster::create([
-            'nome' => 'Master Admin',
-            'email' => 'master@admin.com',
-            'password' => Hash::make('password'), // Senha padrão
-            'role' => 'master',
-        ]);
+        UsuarioMaster::firstOrCreate(
+            ['email' => 'master@admin.com'],
+            [
+                'nome' => 'Master Admin',
+                'email' => 'master@admin.com',
+                'password' => Hash::make('senha123'),
+                'role' => 'master',
+            ]
+        );
     }
 }

@@ -44,7 +44,7 @@
         <div class="pal-nav-actions">
             @yield('nav-left')
 
-            @if(auth('professores')->check() || auth('alunos')->check() || auth('masters')->check())
+            @if((auth('professores')->check() || auth('alunos')->check() || auth('masters')->check()) && request()->routeIs('aluno.*', 'professor.*', 'master.*', 'dashboard.*', 'home'))
                 @yield('nav-user')
                 <form action="{{ route('logout') }}" method="POST" style="margin:0">
                     @csrf

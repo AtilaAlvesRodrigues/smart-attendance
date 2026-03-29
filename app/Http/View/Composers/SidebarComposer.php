@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\AlunoModel;
 use App\Models\ProfessorModel;
 use App\Models\Materia;
-
 class SidebarComposer
 {
     public function compose(View $view): void
