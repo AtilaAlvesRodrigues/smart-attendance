@@ -397,7 +397,7 @@ As tabelas principais utilizam **Surrogate Keys** (nunca RA/CPF como PK), **crip
 | 🔐 Relatório de Segurança | [Wiki · Segurança](../../wiki/Seguranca) |
 | 📁 Estrutura do Projeto | [Wiki · Estrutura](../../wiki/Estrutura) |
 | 🗄️ Banco de Dados | [Wiki · Banco de Dados](../../wiki/Banco-de-Dados) |
-| 📄 Relatório Word | [Download](docs/Relatorio_Seguranca_SmartAttendance.docx) |
+| 📄 Relatório Word | [Download](docs/Relatorio_Seguranca_SmartAttendance.pdf) |
 
 ---
 
