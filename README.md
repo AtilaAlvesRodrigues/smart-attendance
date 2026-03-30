@@ -50,7 +50,7 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 | 🤖 Honeypot | Anti-bot no check-in público de eventos |
 | 📋 Logging | Registro de falhas de autenticação e erros de envio de e-mail |
 
-> 📄 [Ver relatório completo de segurança](docs/Relatorio_Seguranca_SmartAttendance.docx)
+> 📄 [Ver relatório completo de segurança](docs/Relatorio_Seguranca_SmartAttendance.pdf)
 
 ---
 
