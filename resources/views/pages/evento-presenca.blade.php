@@ -91,22 +91,23 @@
                 </div>
             </div>
         </div>
-    {{-- Toast Notification --}}
-    <div id="copy-toast" class="hidden fixed inset-0 z-[150] flex items-center justify-center pointer-events-none p-6">
-        <div class="glass px-6 py-3 border border-white/10 flex items-center gap-3 animate-reveal shadow-2xl" 
-             style="border-radius:2px; background:rgba(255,255,255,0.05); animation: toastPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">
-            <span class="text-lg">✅</span>
-            <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white">Link Copiado</span>
-        </div>
-    </div>
-</main>
+    </main>
 
-<style>
-@keyframes toastPop {
-    0% { opacity: 0; transform: translateY(-30px) scale(0.9); }
-    100% { opacity: 1; transform: translateY(-80px) scale(1); }
-}
-</style>
+    <style>
+    @keyframes toastPop {
+        0% { opacity: 0; transform: translateY(-30px) scale(0.9); }
+        100% { opacity: 1; transform: translateY(-80px) scale(1); }
+    }
+    </style>
+</div>
+
+{{-- Toast Notification --}}
+<div id="copy-toast" class="hidden fixed inset-0 z-[150] flex items-center justify-center pointer-events-none p-6">
+    <div class="glass px-6 py-3 border border-white/10 flex items-center gap-3 shadow-2xl"
+         style="border-radius:2px; background:rgba(255,255,255,0.05); animation: toastPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">
+        <span class="text-lg">✅</span>
+        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white">Link Copiado</span>
+    </div>
 </div>
 
 {{-- Confirmation Overlay --}}
@@ -126,7 +127,7 @@
         
         <div class="flex gap-4">
             <button onclick="closeConfirmModal()" class="pal-nav-btn pal-nav-btn-ghost flex-grow justify-center py-3" style="border-radius:2px;">Cancelar</button>
-            <button onclick="executeCloseSession()" class="pal-btn-action flex-grow justify-center bg-red-600 border-red-500 py-3" style="border-radius:2px;">Confirmar Encerramento</button>
+            <button onclick="executeCloseSession()" class="pal-btn-action flex-grow justify-center event-btn-confirm-close py-3" style="border-radius:2px;">Confirmar Encerramento</button>
         </div>
     </div>
 </div>

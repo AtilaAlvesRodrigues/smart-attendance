@@ -10,7 +10,7 @@
 .event-qr-box {
     padding: 1.5rem;
     background: white;
-    border-radius: 8px;
+    border-radius: 4px;
     display: inline-block;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     margin-bottom: 2rem;
@@ -23,20 +23,20 @@
 }
 
 .event-btn-pdf {
-    background: #ffffff;
-    color: #000000;
+    background: var(--pal-white);
+    color: var(--pal-black);
     border: none;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 1rem;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: opacity 0.2s ease, transform 0.15s ease;
 }
 
 .event-btn-pdf:hover {
-    background: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+    background: var(--pal-off-white);
+    transform: translateY(-1px);
+    box-shadow: none;
 }
 
 .event-btn-close {
@@ -47,13 +47,26 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     padding: 1rem;
-    transition: all 0.3s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .event-btn-close:hover {
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(239, 68, 68, 0.12);
     border-color: #ef4444;
+}
+
+/* Botão de confirmação de encerramento — ação destrutiva */
+.event-btn-confirm-close {
+    background: #ef4444;
     color: #ffffff;
+    border: 1px solid #ef4444;
+}
+
+.event-btn-confirm-close:hover {
+    background: rgba(239, 68, 68, 0.88);
+    border-color: #ef4444;
+    transform: none;
+    opacity: 1;
 }
 
 .event-visitor-table th {

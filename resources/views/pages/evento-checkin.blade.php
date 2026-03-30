@@ -7,6 +7,7 @@
 @section('hide-nav-defaults', true)
 
 @push('styles')
+    <link rel="stylesheet" href="{{ asset('css/pages/login.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pages/evento-checkin.css') }}">
 @endpush
 
@@ -21,11 +22,11 @@
         </div>
 
         <div id="checkin-card" class="glass event-card" style="margin:0 1rem;">
-            <form id="evento-form" onsubmit="handleCheckin(event)">
-                <div class="mb-6">
-                    <label class="pal-eyebrow">Nome Completo</label>
+            <form id="evento-form" class="login-form" onsubmit="handleCheckin(event)">
+                <div>
+                    <label class="login-label">Nome Completo</label>
                     <input type="text" id="visitor-name" required
-                        class="pal-filter-input" style="width:100%;"
+                        class="login-input"
                         placeholder="Como deseja ser chamado?">
                 </div>
 
@@ -34,18 +35,18 @@
                     <input type="text" id="hp_field" name="hp_field" tabindex="-1" autocomplete="off">
                 </div>
 
-                <div class="mb-6">
-                    <label class="pal-eyebrow">E-mail</label>
+                <div>
+                    <label class="login-label">E-mail</label>
                     <input type="email" id="visitor-email" required
-                        class="pal-filter-input" style="width:100%;"
+                        class="login-input"
                         placeholder="seu@email.com">
                 </div>
 
-                <div id="error-msg" style="display:none; color:#ef4444; font-size:0.8rem; margin-bottom:1rem; font-weight:700;">
-                    ⚠ Erro: Você já realizou check-in neste dispositivo ou com este e-mail.
+                <div id="error-msg" class="login-error" style="display:none;">
+                    Erro: Você já realizou check-in neste dispositivo ou com este e-mail.
                 </div>
 
-                <button type="submit" class="pal-btn-action" style="margin-top:1rem;">
+                <button type="submit" class="pal-btn-action event-btn-submit w-full justify-center">
                     Confirmar Presença
                 </button>
             </form>
