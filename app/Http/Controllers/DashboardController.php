@@ -12,8 +12,25 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * DashboardController
+ *
+ * Responsável por renderizar os painéis de cada perfil de usuário.
+ * Cada método corresponde a uma visão diferente do sistema:
+ *
+ * - professorIndex(): Painel do professor — matérias ativas e chamadas abertas.
+ * - alunoIndex(): Painel do aluno — cálculo de faltas e histórico por matéria.
+ * - masterIndex(): Painel do administrador — contagens gerais do sistema.
+ * - master*(): Sub-painéis do Master para professores, alunos, matérias e presenças.
+ * - index(): Roteador — redireciona para o painel correto conforme o guard ativo.
+ */
 class DashboardController extends BaseController
 {
+    /**
+     * Painel do Professor.
+     * Detecta se há uma sessão de QR Code ativa hoje para alguma das matérias do professor.
+     * Também verifica se há um evento (palestra) ativo em cache.
+     */
     public function professorIndex()
     {
         $professor = Auth::guard('professores')->user();
@@ -39,6 +56,12 @@ class DashboardController extends BaseController
         return view('professor.home', compact('professor', 'activeMateria', 'activeCode', 'hasActiveEvento'));
     }
 
+    /**
+     * Painel do Aluno.
+     * Calcula as faltas de cada matéria:
+     *   faltas = distinct(codigo_aula) da matéria - presenças confirmadas pelo aluno
+     * O limite de faltas é 25% do total_aulas configurado na matéria.
+     */
     public function alunoIndex()
     {
         $aluno = Auth::guard('alunos')->user()->load('materias');
@@ -64,6 +87,10 @@ class DashboardController extends BaseController
         return view('aluno.home', compact('aluno'));
     }
 
+    /**
+     * Painel do Master/Administrador.
+     * Exibe contadores globais: total de professores, alunos e matérias.
+     */
     public function masterIndex()
     {
         $master = Auth::guard('masters')->user();
@@ -95,6 +122,11 @@ class DashboardController extends BaseController
         return view('master.materias', compact('materias'));
     }
 
+    /**
+     * Sub-painel de Presenças do Master.
+     * Suporta filtro por professor, matéria e aluno usando Blind Indexes para busca
+     * em campos criptografados (nome, CPF, RA do aluno/professor).
+     */
     public function masterPresenca(Request $request)
     {
         $query = Presenca::with(['aluno', 'aluno.materias', 'materia', 'professor']);

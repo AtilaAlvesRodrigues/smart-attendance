@@ -63,6 +63,7 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 | Gerenciamento de Notas | ✅ Concluído |
 | Painel Master | ✅ Concluído |
 | Cadastro Direto (Master) | ✅ Concluído |
+| Solicitação de Acesso (fluxo público) | ✅ Concluído |
 | E-mail de Primeiro Acesso | ✅ Concluído |
 | Eventos / Palestras com Check-in | ✅ Concluído |
 | Testes Automatizados | 📋 Pendente |
@@ -326,6 +327,7 @@ smart-attendance/
 │   │   │   ├── PresencaController.php          # QR Code de disciplinas
 │   │   │   ├── GerenciarMateriaController.php
 │   │   │   ├── MasterSearchController.php
+│   │   │   ├── SolicitacaoAcessoController.php # Fluxo público de cadastro
 │   │   │   ├── CriarSenhaController.php
 │   │   │   └── EsqueciSenhaController.php
 │   │   ├── Middleware/
@@ -338,7 +340,8 @@ smart-attendance/
 │   │   ├── ProfessorModel.php
 │   │   ├── UsuarioMaster.php
 │   │   ├── Materia.php
-│   │   └── Presenca.php
+│   │   ├── Presenca.php
+│   │   └── SolicitacaoAcesso.php   # Pedidos públicos de cadastro
 │   ├── Mail/
 │   │   └── PrimeiroAcessoMail.php
 │   └── Traits/
@@ -382,7 +385,8 @@ As tabelas principais utilizam **Surrogate Keys** (nunca RA/CPF como PK), **crip
 | `aluno_materia` | Pivot com notas (prova1, trabalho1, trabalho2, prova2) |
 | `materia_professor` | Pivot de vínculo professor ↔ matéria |
 | `presencas` | Registros de check-in via QR Code de disciplina |
-| `cache` | Cache da aplicação (inclui tokens de sessão de eventos) |
+| `solicitacoes_acesso` | Pedidos públicos de cadastro (status: pendente/aprovado/rejeitado) |
+| `cache` | Cache da aplicação (QR Codes ativos, sessões de eventos — TTL 2h/8h) |
 
 > 📊 [Ver diagrama e descrição completa das tabelas](../../wiki/Banco-de-Dados)
 

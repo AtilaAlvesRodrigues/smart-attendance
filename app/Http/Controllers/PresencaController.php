@@ -64,6 +64,10 @@ class PresencaController extends Controller
             $cacheData = null;
         }
 
+        // Gera um novo código de aula apenas se não houver um ativo hoje.
+        // Formato: {materia_id}-{timestamp}-{random4} — permite identificar
+        // a matéria e data/hora apenas pelo código, sem consultar o banco.
+        // O QR Code fica ativo por 2 horas no cache do servidor.
         if (!$cacheData) {
             $codigo_aula = $materia->id . '-' . now()->timestamp . '-' . Str::random(4);
             $expiraEm = now()->addHours(2);
@@ -104,6 +108,8 @@ class PresencaController extends Controller
 
         $aluno = Auth::guard('alunos')->user();
 
+        // Decodifica o código de aula para extrair materia_id e timestamp.
+        // Isso evita uma consulta ao banco só para descobrir qual matéria é.
         $parts = explode('-', $codigo_aula);
         if (count($parts) < 3 || !is_numeric($parts[0]) || !is_numeric($parts[1])) {
             return view('aluno.presenca.erro', ['mensagem' => 'Código de aula inválido.']);
@@ -143,6 +149,8 @@ class PresencaController extends Controller
             $professor_id = $materia->professores->first()->id;
         }
 
+        // Cria o registro de presença. O campo codigo_aula garante idempotência:
+        // a verificação acima já bloqueou duplicatas para este aluno + código.
         $presenca = Presenca::create([
             'aluno_id' => $aluno->id,
             'professor_id' => $professor_id,

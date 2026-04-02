@@ -5,6 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Model Materia
+ *
+ * Representa uma disciplina do curso no sistema Smart Attendance.
+ *
+ * CAMPOS IMPORTANTES:
+ * - total_aulas: total de aulas previstas no semestre (usado para calcular o limite de faltas = 25%).
+ * - horario_matutino / horario_vespertino / horario_noturno: horários configurados por turno.
+ * - sala: identificador da sala (pode ser usado futuramente para validação de geolocalização).
+ *
+ * SoftDeletes: matérias nunca são apagadas fisicamente.
+ */
 class Materia extends Model
 {
     use SoftDeletes;

@@ -12,6 +12,19 @@ use App\Traits\HasBlindIndex;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
+/**
+ * Model ProfessorModel
+ *
+ * Representa um professor no sistema Smart Attendance.
+ *
+ * SEGURANÇA: Mesma arquitetura do AlunoModel — criptografia AES-256 nos campos PII
+ * e Blind Indexes para busca. Guard isolado 'professores'.
+ *
+ * RESPONSABILIDADES:
+ * - Gerar QR Codes de chamada para suas matérias.
+ * - Visualizar presenças em tempo real no painel.
+ * - Gerenciar notas e relatórios das turmas.
+ */
 class ProfessorModel extends Authenticatable
 {
     use HasFactory, HasBlindIndex, SoftDeletes;
@@ -71,6 +84,10 @@ class ProfessorModel extends Authenticatable
         'remember_token'    => 'encrypted',
     ];
 
+    /**
+     * Matérias ministradas pelo professor.
+     * Relação via tabela pivot 'materia_professor'.
+     */
     public function materias()
     {
         return $this->belongsToMany(Materia::class, 'materia_professor', 'professor_id', 'materia_id');

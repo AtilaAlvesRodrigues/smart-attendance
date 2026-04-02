@@ -9,6 +9,25 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
+/**
+ * EventoController
+ *
+ * Gerencia o sistema de check-in para eventos externos (palestras, workshops, etc.)
+ * que não fazem parte das chamadas regulares de aula.
+ *
+ * DIFERENÇA DO PresencaController:
+ * - Não exige que o participante tenha login no sistema.
+ * - Não vincula a presença a uma matéria ou aluno cadastrado.
+ * - Usa apenas nome e e-mail para identificar o participante.
+ * - Dados ficam em cache por 8 horas (não são persistidos no banco de dados).
+ *
+ * FLUXO:
+ * 1. Professor acessa /professor/evento/presenca → recebe token de sessão (8h).
+ * 2. Token vira URL pública: /evento/checkin?token=...
+ * 3. Participantes acessam a URL e fazem check-in com nome e e-mail.
+ * 4. Honeypot (hp_field) bloqueia bots silenciosamente.
+ * 5. Professor pode encerrar a sessão e exportar a lista.
+ */
 class EventoController extends BaseController
 {
     public function checkinForm(Request $request)
@@ -29,6 +48,11 @@ class EventoController extends BaseController
         return view('pages.evento-presenca', compact('professor', 'sessionToken'));
     }
 
+    /**
+     * Processa o check-in público de um participante.
+     * Valida os dados, bloqueia bots via Honeypot (hp_field: prohibited)
+     * e impede duplicatas pelo e-mail dentro da mesma sessão (token).
+     */
     public function processCheckin(Request $request)
     {
         $validator = Validator::make($request->all(), [
