@@ -48,4 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // BUG-004: Block numbers in name fields (Professor, Aluno, Solicitation)
+    const formsToValidate = ['#form-professor', '#form-aluno', '#form-solicitacao'];
+    formsToValidate.forEach(selector => {
+        const form = document.querySelector(selector);
+        if (form) {
+            const nameInput = form.querySelector('input[name="nome"]');
+            if (nameInput) {
+                nameInput.addEventListener('input', (e) => {
+                    const originalValue = e.target.value;
+                    const cleanValue = originalValue.replace(/[0-9]/g, '');
+                    if (originalValue !== cleanValue) {
+                        e.target.value = cleanValue;
+                    }
+                });
+            }
+        }
+    });
+
 });

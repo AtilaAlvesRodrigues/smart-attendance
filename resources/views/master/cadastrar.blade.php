@@ -106,7 +106,9 @@
                     <div style="display:flex; flex-direction:column; gap:1rem;">
                         <div>
                             <label class="pal-eyebrow" style="display:block; margin-bottom:0.4rem; font-size:0.7rem;">Nome Completo</label>
-                            <input type="text" name="nome" class="login-input" style="width:100%; box-sizing:border-box;" placeholder="Ex: Prof. João Silva" required>
+                            <input type="text" name="nome" class="login-input" style="width:100%; box-sizing:border-box;" 
+                                placeholder="Ex: Prof. João Silva" required
+                                pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+" title="O nome deve conter apenas letras e espaços.">
                             <span class="field-error" data-field="nome" style="display:none; color:#ef4444; font-size:0.75rem; margin-top:0.25rem;"></span>
                         </div>
                         <div>
@@ -152,7 +154,9 @@
                     <div style="display:flex; flex-direction:column; gap:1rem;">
                         <div>
                             <label class="pal-eyebrow" style="display:block; margin-bottom:0.4rem; font-size:0.7rem;">Nome Completo</label>
-                            <input type="text" name="nome" class="login-input" style="width:100%; box-sizing:border-box;" placeholder="Ex: Maria Souza" required>
+                            <input type="text" name="nome" class="login-input" style="width:100%; box-sizing:border-box;" 
+                                placeholder="Ex: Maria Souza" required
+                                pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+" title="O nome deve conter apenas letras e espaços.">
                             <span class="field-error" data-field="nome" style="display:none; color:#ef4444; font-size:0.75rem; margin-top:0.25rem;"></span>
                         </div>
                         <div>
@@ -214,10 +218,12 @@
                             <div>
                                 <label class="pal-eyebrow" style="display:block; margin-bottom:0.4rem; font-size:0.7rem;">Carga Horária (h)</label>
                                 <input type="number" name="carga_horaria" class="login-input" style="width:100%; box-sizing:border-box;" placeholder="Ex: 80" min="1">
+                                <span class="field-error" data-field="carga_horaria" style="display:none; color:#ef4444; font-size:0.75rem; margin-top:0.25rem;"></span>
                             </div>
                             <div>
                                 <label class="pal-eyebrow" style="display:block; margin-bottom:0.4rem; font-size:0.7rem;">Total de Aulas</label>
                                 <input type="number" name="total_aulas" class="login-input" style="width:100%; box-sizing:border-box;" placeholder="Ex: 40" min="1">
+                                <span class="field-error" data-field="total_aulas" style="display:none; color:#ef4444; font-size:0.75rem; margin-top:0.25rem;"></span>
                             </div>
                         </div>
                         <button type="submit" style="width:100%; margin-top:0.5rem; padding:0.75rem 1rem; border-radius:6px; border:1px solid rgba(251,191,36,0.35); background:rgba(251,191,36,0.12); color:#fbbf24; font-weight:700; font-size:0.9rem; cursor:pointer; transition:background 0.2s;"
@@ -325,6 +331,17 @@
                 btn.disabled = false;
                 btn.textContent = defaultLabel;
             }
+        });
+    });
+
+    // ── CPF mask ──────────────────────────────────────────────────────────────
+    document.querySelectorAll('input[name="cpf"]').forEach(function (input) {
+        input.addEventListener('input', function () {
+            var v = this.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 9)      v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/,        '$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/^(\d{3})(\d{1,3})$/,               '$1.$2');
+            this.value = v;
         });
     });
 

@@ -152,7 +152,7 @@
             <div id="printable-content" class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms] relative z-10">
                 <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center no-print bg-white/5">
                     <h3 class="text-xl font-black text-white italic tracking-tighter">Registros de Frequência</h3>
-                    <span class="px-3 py-1 bg-white/10 rounded-sm text-xs font-black text-white/60 uppercase tracking-widest">
+                    <span id="record-count" class="px-3 py-1 bg-white/10 rounded-sm text-xs font-black text-white/60 uppercase tracking-widest">
                         Total: {{ $presencas->total() }} de registros
                     </span>
                 </div>
@@ -275,9 +275,11 @@
             const tbody = document.getElementById(tbodyId);
             const emptyMsg = document.getElementById(emptyId);
             const pagination = document.getElementById(paginationId);
+            const recordCount = document.getElementById('record-count');
             const clearBtn = document.getElementById('btn-clear-filters');
             const originalTbody = tbody ? tbody.innerHTML : '';
             const originalPagination = pagination ? pagination.innerHTML : '';
+            const originalRecordCount = recordCount ? recordCount.textContent : '';
             let debounceTimer = null;
 
             if (!tbody) return;
@@ -302,6 +304,9 @@
                         pagination.innerHTML = originalPagination;
                         pagination.style.display = '';
                     }
+                    if (recordCount) {
+                        recordCount.textContent = originalRecordCount;
+                    }
                     return;
                 }
 
@@ -314,8 +319,10 @@
 
                     if (data.length === 0) {
                         emptyMsg.classList.remove('hidden');
+                        if (recordCount) recordCount.textContent = 'Total: 0 de registros';
                     } else {
                         emptyMsg.classList.add('hidden');
+                        if (recordCount) recordCount.textContent = `Total: ${data.length} de registros`;
                         data.forEach(item => {
                             tbody.innerHTML += renderRow(item, escapeHtml);
                         });

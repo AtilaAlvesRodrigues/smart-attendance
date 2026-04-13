@@ -84,7 +84,22 @@ class MasterCadastroController extends BaseController
             $request->validate([
                 'nome'  => 'required|string|max:255',
                 'email' => 'required|email|max:255',
-                'cpf'   => 'required|string|max:20',
+                'cpf'   => ['required', 'string', 'max:20', function ($attr, $value, $fail) {
+                    $digits = preg_replace('/\D/', '', $value);
+                    if (strlen($digits) !== 11) {
+                        $fail('O CPF deve conter exatamente 11 dígitos.');
+                        return;
+                    }
+                    if (preg_match('/^(.)\1+$/', $digits)) {
+                        $fail('O CPF informado é inválido (dígitos repetidos).');
+                    }
+                }],
+            ], [
+                'nome.required'  => 'O nome é obrigatório.',
+                'nome.max'       => 'O nome deve ter no máximo 255 caracteres.',
+                'email.required' => 'O e-mail é obrigatório.',
+                'email.email'    => 'Informe um e-mail válido.',
+                'cpf.required'   => 'O CPF é obrigatório.',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -140,6 +155,14 @@ class MasterCadastroController extends BaseController
                 'sala'          => 'nullable|string|max:100',
                 'carga_horaria' => 'nullable|integer|min:1',
                 'total_aulas'   => 'nullable|integer|min:1',
+            ], [
+                'nome.required'         => 'O nome da matéria é obrigatório.',
+                'nome.max'              => 'O nome deve ter no máximo 255 caracteres.',
+                'sala.max'              => 'A sala deve ter no máximo 100 caracteres.',
+                'carga_horaria.integer' => 'A carga horária deve ser um número inteiro.',
+                'carga_horaria.min'     => 'A carga horária deve ser de pelo menos 1 hora.',
+                'total_aulas.integer'   => 'O total de aulas deve ser um número inteiro.',
+                'total_aulas.min'       => 'O total de aulas deve ser de pelo menos 1.',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);

@@ -37,7 +37,7 @@
                         </a>
                         <div style="text-align: center;">
                             <span style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; display:block; margin-bottom: 0.5rem;">Sessão Ativa</span>
-                            <strong style="color: white; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em;">{{ $code['materia_nome'] }}</strong>
+                            <strong class="pal-text" style="font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em;">{{ $code['materia_nome'] }}</strong>
                             <span style="color: #888; display: block; font-size: 0.85rem; margin-top: 0.3rem;">Sala: {{ $code['sala'] }}</span>
                         </div>
                     </div>

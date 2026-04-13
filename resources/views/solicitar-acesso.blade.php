@@ -42,7 +42,8 @@
                 <div>
                     <label class="pal-eyebrow">Nome Completo</label>
                     <input type="text" name="nome" value="{{ old('nome') }}" required
-                        class="login-input" placeholder="Seu nome completo">
+                        class="login-input" placeholder="Seu nome completo"
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+" title="O nome deve conter apenas letras e espaços.">
                 </div>
 
                 <div>

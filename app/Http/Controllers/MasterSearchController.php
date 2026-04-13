@@ -22,7 +22,9 @@ class MasterSearchController extends BaseController
         if ($query) {
             $professores->where(function($q) use ($query) {
                 $hash = ProfessorModel::generateBlindIndex($query);
-                $q->where('cpf_search', $hash)
+                // Busca parcial por nome (não criptografado) OU exata por campos sensíveis (Blind Index)
+                $q->where('nome', 'like', '%' . $query . '%')
+                  ->orWhere('cpf_search', $hash)
                   ->orWhere('email_search', $hash)
                   ->orWhere('nome_search', $hash);
             });
@@ -43,7 +45,9 @@ class MasterSearchController extends BaseController
         if ($query) {
             $alunos->where(function($q) use ($query) {
                 $hash = AlunoModel::generateBlindIndex($query);
-                $q->where('ra_search', $hash)
+                // Busca parcial por nome (não criptografado) OU exata por campos sensíveis (Blind Index)
+                $q->where('nome', 'like', '%' . $query . '%')
+                  ->orWhere('ra_search', $hash)
                   ->orWhere('cpf_search', $hash)
                   ->orWhere('email_search', $hash)
                   ->orWhere('nome_search', $hash);
