@@ -22,9 +22,8 @@ jobs:
 
   # ===========================================================================
   # MODULO 1 — CONFIGURACAO
-  # Instala dependencias PHP e Node, compila o front-end e salva os artefatos
-  # vendor/ e public/build/ para reutilizacao nos modulos seguintes.
-  # Cada job recria o proprio .env a partir do .env.example (mais seguro).
+  # Verifica versoes dos componentes, checa pacotes desatualizados,
+  # instala dependencias, compila o front-end e salva artefatos.
   # ===========================================================================
   configuracao:
     name: "1 - Configuracao"
@@ -32,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
@@ -42,7 +41,7 @@ jobs:
           tools: composer:v2
 
       - name: Configurar Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -60,7 +59,7 @@ jobs:
 
       - name: Cache das dependencias do Composer
         id: composer-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: vendor
           key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
@@ -71,8 +70,6 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Verificar pacotes PHP desatualizados (composer outdated)
-        # Mostra quais pacotes tem versoes mais novas disponíveis.
-        # "|| true" garante que a esteira nao quebre — e apenas um aviso informativo.
         run: composer outdated --direct --no-interaction || true
 
       - name: Criar .env e gerar chave da aplicacao
@@ -86,22 +83,20 @@ jobs:
           npm run build
 
       - name: Verificar pacotes NPM desatualizados (npm outdated)
-        # Mostra quais pacotes Node tem versoes mais novas disponíveis.
-        # "|| true" garante que a esteira nao quebre — e apenas um aviso informativo.
         run: npm outdated || true
 
       - name: Ajustar permissoes de diretorios
         run: chmod -R 777 storage bootstrap/cache
 
       - name: Salvar vendor como artefato
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vendor
           path: vendor
           retention-days: 1
 
       - name: Salvar assets compilados como artefato
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: public-build
           path: public/build
@@ -109,8 +104,6 @@ jobs:
 
   # ===========================================================================
   # MODULO 2 — BANCO DE DADOS
-  # Sobe PostgreSQL identico ao de producao, restaura os artefatos do Modulo 1
-  # e executa todas as migrations para validar o schema completo.
   # ===========================================================================
   banco_de_dados:
     name: "2 - Banco de Dados"
@@ -134,7 +127,7 @@ jobs:
 
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
@@ -144,7 +137,7 @@ jobs:
           tools: composer:v2
 
       - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: vendor
           path: vendor
@@ -162,8 +155,6 @@ jobs:
 
   # ===========================================================================
   # MODULO 3 — VERIFICACAO DE SEGURANCA DO CODIGO E DO BANCO DE DADOS
-  # Audita CVEs nos pacotes, valida padrao de codigo com Pint e verifica
-  # se as rotas do sistema nao tem conflitos. Roda em paralelo com Modulo 2.
   # ===========================================================================
   seguranca:
     name: "3 - Seguranca do Codigo e Banco"
@@ -187,7 +178,7 @@ jobs:
 
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
@@ -197,7 +188,7 @@ jobs:
           tools: composer:v2
 
       - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: vendor
           path: vendor
@@ -221,9 +212,6 @@ jobs:
 
   # ===========================================================================
   # MODULO 4 — VERIFICAR ERROS NAS 3 CLASSES (Aluno, Master e Professor)
-  # Valida que as factories e o fluxo de autenticacao funcionam corretamente
-  # para cada um dos 3 guards do sistema.
-  # Depende dos Modulos 2 e 3 (banco OK + seguranca OK).
   # ===========================================================================
   verificar_classes:
     name: "4 - Classes Aluno, Master e Professor"
@@ -247,7 +235,7 @@ jobs:
 
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
@@ -257,13 +245,13 @@ jobs:
           tools: composer:v2
 
       - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: vendor
           path: vendor
 
       - name: Restaurar assets do Modulo 1
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: public-build
           path: public/build
@@ -279,18 +267,14 @@ jobs:
       - name: Executar migrations
         run: php artisan migrate --force
 
-      # Cobre os 3 guards: Aluno, Professor e Master (primeiro acesso e criacao de senha)
       - name: Testar classe Aluno e Professor (PrimeiroAcessoCriarSenhaTest)
         run: php artisan test --filter PrimeiroAcessoCriarSenhaTest
 
-      # Valida que aluno nao acessa painel do professor e vice-versa
       - name: Testar isolamento entre classes (IsolamentoPaineisTest)
         run: php artisan test --filter IsolamentoPaineisTest
 
   # ===========================================================================
   # MODULO 5 — TESTES FINAIS
-  # Executa a suite completa de testes (Unit + Feature).
-  # So roda se todas as classes individuais passaram no Modulo 4.
   # ===========================================================================
   testes_finais:
     name: "5 - Testes Finais"
@@ -314,7 +298,7 @@ jobs:
 
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
@@ -324,13 +308,13 @@ jobs:
           tools: composer:v2
 
       - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: vendor
           path: vendor
 
       - name: Restaurar assets do Modulo 1
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: public-build
           path: public/build
@@ -346,21 +330,14 @@ jobs:
       - name: Executar migrations
         run: php artisan migrate --force
 
-      # Suite completa: ExampleTest + QrCodePresencaTest + IsolamentoPaineisTest
-      #                 + PrimeiroAcessoCriarSenhaTest + Unit/ExampleTest
       - name: Executar suite completa de testes
         run: php artisan test
 
   # ===========================================================================
-  # MODULO 6 — TRABALHO COMPLETO (Deploy)
-  # So executa se TODOS os 5 modulos anteriores passaram E o evento for
-  # um push direto na branch main (nao em Pull Requests).
-  #
-  # Para ativar: configure os Secrets em Settings > Secrets > Actions:
-  #   SSH_HOST        — IP ou hostname do servidor
-  #   SSH_USERNAME    — Usuario SSH (ex: ubuntu, deploy)
-  #   SSH_PRIVATE_KEY — Chave SSH privada (ssh-keygen -t ed25519)
-  #   DEPLOY_PATH     — Caminho no servidor (ex: /var/www/smart-attendance)
+  # MODULO 6 — TRABALHO COMPLETO
+  # Gera um relatorio PDF com as informacoes do pipeline e das modificacoes
+  # do commit. O PDF fica disponivel para download nos artefatos do GitHub.
+  # So executa em push direto na branch main.
   # ===========================================================================
   trabalho_completo:
     name: "6 - Trabalho Completo"
@@ -370,9 +347,117 @@ jobs:
 
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # Necessario para acessar o historico completo do git
 
-      # Descomente o bloco abaixo quando tiver um servidor configurado:
+      - name: Instalar pandoc e wkhtmltopdf para geracao de PDF
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y pandoc wkhtmltopdf
+
+      - name: Coletar informacoes do commit e gerar relatorio Markdown
+        run: |
+          # Informacoes do ambiente
+          DATA_HORA=$(date '+%d/%m/%Y às %H:%M:%S UTC')
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_SHA:0:7}"
+          AUTOR="${{ github.actor }}"
+          BRANCH="${{ github.ref_name }}"
+          RUN_ID="${{ github.run_id }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # Historico de commits recentes (ultimos 5)
+          GIT_LOG=$(git log --oneline -5 --no-color)
+
+          # Arquivos modificados no ultimo commit
+          FILES_CHANGED=$(git diff-tree --no-commit-id -r --name-status HEAD | head -40)
+
+          # Estatisticas do ultimo commit
+          GIT_STAT=$(git diff --stat HEAD~1 HEAD 2>/dev/null || echo "Primeiro commit do repositorio")
+
+          cat > relatorio.md << MARKDOWN
+          # Relatorio de Pipeline — Smart Attendance
+
+          **Data e Hora:** ${DATA_HORA}
+          **Branch:** \`${BRANCH}\`
+          **Commit:** \`${COMMIT_SHORT}\` ([ver no GitHub](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}))
+          **Autor:** ${AUTOR}
+          **Pipeline:** [Execucao #${RUN_ID}](${RUN_URL})
+
+          ---
+
+          ## Resultado dos Modulos
+
+          | Modulo | Descricao | Status |
+          |--------|-----------|--------|
+          | 1 | Configuracao (PHP, Node, Vite) | PASSOU |
+          | 2 | Banco de Dados (Migrations) | PASSOU |
+          | 3 | Seguranca do Codigo e Banco | PASSOU |
+          | 4 | Classes Aluno, Master e Professor | PASSOU |
+          | 5 | Testes Finais (Suite Completa) | PASSOU |
+          | 6 | Trabalho Completo (Deploy) | EM EXECUCAO |
+
+          ---
+
+          ## Arquivos Modificados no Commit
+
+          \`\`\`
+          ${FILES_CHANGED}
+          \`\`\`
+
+          ---
+
+          ## Estatisticas das Alteracoes
+
+          \`\`\`
+          ${GIT_STAT}
+          \`\`\`
+
+          ---
+
+          ## Historico Recente (ultimos 5 commits)
+
+          \`\`\`
+          ${GIT_LOG}
+          \`\`\`
+
+          ---
+
+          ## Informacoes do Ambiente de Testes
+
+          - **Sistema Operacional:** Ubuntu Latest (GitHub Actions)
+          - **PHP:** ${{ env.PHP_VERSION }}
+          - **Node.js:** ${{ env.NODE_VERSION }}
+          - **Banco de Dados (testes):** PostgreSQL 16
+          - **Framework:** Laravel
+
+          ---
+
+          *Relatorio gerado automaticamente pelo pipeline CI/CD do GitHub Actions.*
+          MARKDOWN
+
+      - name: Converter relatorio Markdown para PDF
+        run: |
+          pandoc relatorio.md \
+            -o relatorio-pipeline-${{ github.run_id }}.pdf \
+            --pdf-engine=wkhtmltopdf \
+            --variable papersize=a4 \
+            --variable margin-top=20mm \
+            --variable margin-bottom=20mm \
+            --variable margin-left=25mm \
+            --variable margin-right=25mm \
+            -V title="Smart Attendance — Relatorio de Pipeline" \
+            --standalone
+
+      - name: Publicar relatorio PDF como artefato do GitHub
+        uses: actions/upload-artifact@v5
+        with:
+          name: relatorio-pipeline-${{ github.run_id }}
+          path: relatorio-pipeline-${{ github.run_id }}.pdf
+          retention-days: 30
+
+      # Descomente quando tiver servidor configurado:
       # - name: Deploy via SSH
       #   uses: appleboy/ssh-action@v1.0.3
       #   with:
@@ -384,8 +469,7 @@ jobs:
       #       php artisan down
       #       git pull origin main
       #       composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-      #       npm ci
-      #       npm run build
+      #       npm ci && npm run build
       #       php artisan migrate --force
       #       php artisan optimize:clear
       #       php artisan config:cache
@@ -401,7 +485,6 @@ jobs:
           echo "Modulo 3 - Seguranca:          OK"
           echo "Modulo 4 - Classes (3 guards): OK"
           echo "Modulo 5 - Testes Finais:      OK"
-          echo "Modulo 6 - Trabalho Completo:  Aguardando servidor SSH"
+          echo "Modulo 6 - Relatorio PDF:      Disponivel nos Artefatos da execucao"
           echo ""
-          echo "Para ativar o deploy automatico, configure os Secrets:"
-          echo "  SSH_HOST, SSH_USERNAME, SSH_PRIVATE_KEY, DEPLOY_PATH"
+          echo "Acesse o PDF em: Actions > Execucao atual > Artifacts"
