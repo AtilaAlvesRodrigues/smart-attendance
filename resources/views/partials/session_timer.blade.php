@@ -10,10 +10,10 @@
 
 @if($isAuth && $expiresAtMs)
 <!-- Container do Timer de Sessão -->
-<div id="session-timer-widget" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-mono font-medium shadow-sm backdrop-blur-md transition-all duration-300 bg-purple-950/40 text-purple-300 border border-purple-500/30">
+<div id="session-timer-widget" class="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-medium shadow-sm backdrop-blur-md transition-all duration-300 bg-purple-950/40 text-purple-300 border border-purple-500/30 text-center">
     <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" id="session-timer-dot"></span>
     <span class="text-gray-300 font-sans hidden sm:inline timer-label" id="session-timer-label">Sessão:</span>
-    <span id="session-timer-display" class="font-bold tracking-wider text-white">59:59</span>
+    <span id="session-timer-display" class="font-bold tracking-wider text-white tabular-nums inline-block text-center">59:59</span>
 </div>
 
 <!-- Modal de Timeout de Sessão -->
@@ -37,15 +37,38 @@
 </div>
 
 <style>
+/* Centralização e alinhamento do timer */
+#session-timer-widget {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+#session-timer-display {
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
 /* Estilos para quando o timer é embutido na Sidebar ou no Slot do Aluno */
 #sidebar-timer-slot #session-timer-widget,
 #aluno-timer-slot #session-timer-widget {
     position: static !important;
     box-shadow: none;
+    margin: 0 auto;
 }
+
+#aluno-timer-slot {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100%;
+}
+
 html.sidebar-collapsed #sidebar-timer-slot .timer-label {
     display: none !important;
 }
+
 /* Posicionamento fallback para evitar sobreposição da navbar */
 #session-timer-widget.fallback-fixed {
     position: fixed;
