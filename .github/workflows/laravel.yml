@@ -70,7 +70,12 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Verificar pacotes PHP desatualizados (composer outdated)
-        run: composer outdated --direct --no-interaction || true
+        run: |
+          # Captura o output para arquivo — sera incluido no PDF do Modulo 6
+          composer outdated --direct --no-interaction 2>&1 | tee composer-outdated.txt || true
+          if [ ! -s composer-outdated.txt ]; then
+            echo "Todos os pacotes PHP estao atualizados." > composer-outdated.txt
+          fi
 
       - name: Criar .env e gerar chave da aplicacao
         run: |
@@ -83,7 +88,12 @@ jobs:
           npm run build
 
       - name: Verificar pacotes NPM desatualizados (npm outdated)
-        run: npm outdated || true
+        run: |
+          # Captura o output para arquivo — sera incluido no PDF do Modulo 6
+          npm outdated 2>&1 | tee npm-outdated.txt || true
+          if [ ! -s npm-outdated.txt ]; then
+            echo "Todos os pacotes NPM estao atualizados." > npm-outdated.txt
+          fi
 
       - name: Ajustar permissoes de diretorios
         run: chmod -R 777 storage bootstrap/cache
@@ -100,6 +110,15 @@ jobs:
         with:
           name: public-build
           path: public/build
+          retention-days: 1
+
+      - name: Salvar relatorios de pacotes desatualizados como artefato
+        uses: actions/upload-artifact@v5
+        with:
+          name: outdated-reports
+          path: |
+            composer-outdated.txt
+            npm-outdated.txt
           retention-days: 1
 
   # ===========================================================================
@@ -360,6 +379,11 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y pandoc wkhtmltopdf
 
+      - name: Restaurar relatorios de pacotes desatualizados
+        uses: actions/download-artifact@v5
+        with:
+          name: outdated-reports
+
       - name: Coletar informacoes do commit e gerar relatorio Markdown
         run: |
           # Informacoes do ambiente
@@ -371,7 +395,36 @@ jobs:
           RUN_ID="${{ github.run_id }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          # Historico de commits recentes (ultimos 5)
+          # Pacotes PHP desatualizados e comandos de correcao
+          COMPOSER_OUTDATED_RAW=$(cat composer-outdated.txt 2>/dev/null || echo "Informacao nao disponivel")
+
+          if echo "$COMPOSER_OUTDATED_RAW" | grep -q "atualizados"; then
+            COMPOSER_SECTION="Todos os pacotes PHP estao atualizados."
+            COMPOSER_FIX=""
+          else
+            COMPOSER_SECTION="$COMPOSER_OUTDATED_RAW"
+            # Gera lista de comandos para atualizar cada pacote listado
+            COMPOSER_FIX=$(echo "$COMPOSER_OUTDATED_RAW" | awk 'NF>=2 {print "composer require " $1 ":^" $3}' 2>/dev/null | head -20)
+            if [ -z "$COMPOSER_FIX" ]; then
+              COMPOSER_FIX="composer update"
+            fi
+          fi
+
+          # Pacotes NPM desatualizados e comandos de correcao
+          NPM_OUTDATED_RAW=$(cat npm-outdated.txt 2>/dev/null || echo "Informacao nao disponivel")
+
+          if echo "$NPM_OUTDATED_RAW" | grep -q "atualizados"; then
+            NPM_SECTION="Todos os pacotes NPM estao atualizados."
+            NPM_FIX=""
+          else
+            NPM_SECTION="$NPM_OUTDATED_RAW"
+            # Gera lista de comandos para atualizar cada pacote listado
+            NPM_FIX=$(echo "$NPM_OUTDATED_RAW" | awk 'NR>1 && NF>=4 {print "npm install " $1 "@" $4}' 2>/dev/null | head -20)
+            if [ -z "$NPM_FIX" ]; then
+              NPM_FIX="npm update"
+            fi
+          fi
+
           GIT_LOG=$(git log --oneline -5 --no-color)
 
           # Arquivos modificados no ultimo commit
@@ -401,6 +454,26 @@ jobs:
           | 4 | Classes Aluno, Master e Professor | PASSOU |
           | 5 | Testes Finais (Suite Completa) | PASSOU |
           | 6 | Trabalho Completo (Deploy) | EM EXECUCAO |
+
+          ---
+
+          ## Pacotes PHP Desatualizados
+
+          \`\`\`
+          ${COMPOSER_SECTION}
+          \`\`\`
+
+          $([ -n "$COMPOSER_FIX" ] && echo "**Comandos para atualizar:**" && echo "" && echo "\`\`\`bash" && echo "${COMPOSER_FIX}" && echo "\`\`\`")
+
+          ---
+
+          ## Pacotes NPM Desatualizados
+
+          \`\`\`
+          ${NPM_SECTION}
+          \`\`\`
+
+          $([ -n "$NPM_FIX" ] && echo "**Comandos para atualizar:**" && echo "" && echo "\`\`\`bash" && echo "${NPM_FIX}" && echo "\`\`\`")
 
           ---
 
