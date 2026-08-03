@@ -25,6 +25,9 @@ class ExampleTest extends TestCase
      */
     public function test_login_form_loads_successfully(): void
     {
+        // Ignora o Vite para evitar o erro de manifest not found
+        $this->withoutVite();
+
         $response = $this->get('/login');
 
         // Como essa é a página final, ela sim deve retornar 200
