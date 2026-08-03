@@ -41,8 +41,11 @@ class AlunoModelFactory extends Factory
      */
     public function pendenteDeAtivacao(): static
     {
+        // O estado "pendente" é identificado pelo remember_token preenchido.
+        // O CriarSenhaController verifica: is_null($user->remember_token) para
+        // saber se o token já foi consumido — nunca usa password para essa checagem.
+        // Não passamos password => null pois a coluna tem NOT NULL no banco.
         return $this->state(fn (array $attributes) => [
-            'password'       => null,
             'remember_token' => Str::random(20),
         ]);
     }

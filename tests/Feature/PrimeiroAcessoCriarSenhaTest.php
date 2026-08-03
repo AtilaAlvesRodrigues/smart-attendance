@@ -35,7 +35,6 @@ class PrimeiroAcessoCriarSenhaTest extends TestCase
     private function criarAlunoPendenteDeAtivacao(): AlunoModel
     {
         return AlunoModel::factory()->create([
-            'password'       => null,
             'remember_token' => 'token-ativacao-aleatorio',
         ]);
     }
@@ -46,7 +45,6 @@ class PrimeiroAcessoCriarSenhaTest extends TestCase
     private function criarProfessorPendenteDeAtivacao(): ProfessorModel
     {
         return ProfessorModel::factory()->create([
-            'password'       => null,
             'remember_token' => 'token-ativacao-aleatorio',
         ]);
     }
@@ -144,9 +142,8 @@ class PrimeiroAcessoCriarSenhaTest extends TestCase
      */
     public function test_token_ja_utilizado_e_recusado(): void
     {
-        // Aluno com remember_token = null: token já consumido anteriormente
+        // Aluno com remember_token = null: token ja consumido anteriormente
         $aluno = AlunoModel::factory()->create([
-            'password'       => bcrypt('senhaExistente'),
             'remember_token' => null,
         ]);
 

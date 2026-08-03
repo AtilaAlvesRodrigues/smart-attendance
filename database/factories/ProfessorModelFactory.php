@@ -37,8 +37,9 @@ class ProfessorModelFactory extends Factory
      */
     public function pendenteDeAtivacao(): static
     {
+        // O estado "pendente" é identificado pelo remember_token preenchido.
+        // Não passamos password => null pois a coluna tem NOT NULL no banco.
         return $this->state(fn (array $attributes) => [
-            'password'       => null,
             'remember_token' => Str::random(20),
         ]);
     }

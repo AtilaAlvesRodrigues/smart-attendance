@@ -59,12 +59,7 @@ class IsolamentoPaineisTest extends TestCase
 
     // ─── Testes: Aluno tentando acessar painel do professor ───────────────────
 
-    /**
-     * Um aluno autenticado (guard 'alunos') não consegue acessar
-     * nenhuma rota do painel do professor.
-     *
-     * @dataProvider rotasDoProfessor
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rotasDoProfessor')]
     public function test_aluno_nao_acessa_rotas_do_professor(string $nomeRota): void
     {
         $aluno = $this->criarAluno();
