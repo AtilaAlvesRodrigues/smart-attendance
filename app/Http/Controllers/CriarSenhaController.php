@@ -64,6 +64,7 @@ class CriarSenhaController extends BaseController
         session()->forget(['pending_password_creation', 'pending_password_role']);
         Auth::guard($guard)->login($user);
         $request->session()->regenerate();
+        session(['login_time' => time()]);
 
         $pendingCode = session()->pull('pending_attendance_code');
         if ($pendingCode && $guard === 'alunos') {

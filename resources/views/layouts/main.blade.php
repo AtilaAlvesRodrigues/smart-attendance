@@ -231,8 +231,9 @@
         }
     </script>
 
-    {{-- Script de auto-logout ao fechar aba --}}
+    {{-- Script de auto-logout ao fechar aba e timer de sessao --}}
     @include('partials.auto_logout')
+    @include('partials.session_timer')
 
     @stack('scripts')
 </body>

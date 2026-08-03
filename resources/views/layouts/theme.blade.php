@@ -109,8 +109,9 @@
         })();
     </script>
 
-    {{-- Auto-logout partial (kept for backward compat) --}}
+    {{-- Auto-logout partial e Session timer partial --}}
     @include('partials.auto_logout')
+    @include('partials.session_timer')
 
     @stack('scripts')
 </body>
