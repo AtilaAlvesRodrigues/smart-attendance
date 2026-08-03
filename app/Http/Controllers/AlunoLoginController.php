@@ -58,6 +58,7 @@ class AlunoLoginController extends BaseController
 
             Auth::guard('alunos')->login($aluno, $remember);
             $request->session()->regenerate();
+            session(['login_time' => time()]);
 
             $pendingCode = session()->pull('pending_attendance_code');
             if ($pendingCode) {

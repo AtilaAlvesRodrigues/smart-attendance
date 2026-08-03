@@ -58,6 +58,7 @@ class ProfessorLoginController extends BaseController
 
             Auth::guard('professores')->login($professor, $remember);
             $request->session()->regenerate();
+            session(['login_time' => time()]);
             return redirect()->route('dashboard.professor');
         }
 
@@ -85,6 +86,7 @@ class ProfessorLoginController extends BaseController
 
             Auth::guard('masters')->login($master, $remember);
             $request->session()->regenerate();
+            session(['login_time' => time()]);
             return redirect()->route('dashboard.master');
         }
 

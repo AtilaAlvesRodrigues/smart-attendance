@@ -99,7 +99,8 @@
         @endif
 
         {{-- Hero text --}}
-        <div class="pal-content-container" style="margin-top:4rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:3rem; text-align:center;">
+        <div class="pal-content-container" style="margin-top:3rem; margin-bottom:3rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:2.5rem; text-align:center;">
+            <div id="aluno-timer-slot" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
             <p class="pal-eyebrow" style="margin-bottom:0.75rem;">Guia de Utilização</p>
             <h1 class="pal-title">Como funciona?</h1>
         </div>
