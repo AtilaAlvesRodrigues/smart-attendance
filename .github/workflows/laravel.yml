@@ -47,6 +47,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
+      - name: Verificar versoes dos componentes instalados
+        run: |
+          echo "=== PHP ==="
+          php --version
+          echo "=== Composer ==="
+          composer --version
+          echo "=== Node.js ==="
+          node --version
+          echo "=== NPM ==="
+          npm --version
+
       - name: Cache das dependencias do Composer
         id: composer-cache
         uses: actions/cache@v4
@@ -59,6 +70,11 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
+      - name: Verificar pacotes PHP desatualizados (composer outdated)
+        # Mostra quais pacotes tem versoes mais novas disponíveis.
+        # "|| true" garante que a esteira nao quebre — e apenas um aviso informativo.
+        run: composer outdated --direct --no-interaction || true
+
       - name: Criar .env e gerar chave da aplicacao
         run: |
           cp .env.example .env
@@ -68,6 +84,11 @@ jobs:
         run: |
           npm ci
           npm run build
+
+      - name: Verificar pacotes NPM desatualizados (npm outdated)
+        # Mostra quais pacotes Node tem versoes mais novas disponíveis.
+        # "|| true" garante que a esteira nao quebre — e apenas um aviso informativo.
+        run: npm outdated || true
 
       - name: Ajustar permissoes de diretorios
         run: chmod -R 777 storage bootstrap/cache
