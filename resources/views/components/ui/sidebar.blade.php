@@ -178,9 +178,11 @@ html.sidebar-collapsed .pal-sidebar-badge {
 /* Toggle button */
 .pal-sidebar-top-bar {
     display: flex;
-    justify-content: flex-end;
-    padding: 0.6rem 0.6rem 0.1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.6rem 0.4rem 0.75rem;
     flex-shrink: 0;
+    gap: 0.5rem;
 }
 
 #pal-sidebar-toggle {
@@ -353,6 +355,7 @@ function palToggleSidebar() {
 
     {{-- Toggle button —— visible only on desktop --}}
     <div class="pal-sidebar-top-bar">
+        <div id="sidebar-timer-slot"></div>
         <button id="pal-sidebar-toggle"
                 onclick="palToggleSidebar()"
                 title="Recolher menu"

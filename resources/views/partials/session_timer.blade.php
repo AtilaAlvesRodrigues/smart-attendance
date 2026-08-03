@@ -9,10 +9,10 @@
 @endphp
 
 @if($isAuth && $expiresAtMs)
-<!-- Widget de Timer de Sessão (1 Hora) -->
-<div id="session-timer-widget" class="fixed top-4 right-4 z-[9999] flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono font-medium shadow-lg backdrop-blur-md transition-all duration-300 bg-slate-900/90 text-purple-300 border border-purple-500/30 pointer-events-auto">
-    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="session-timer-dot"></span>
-    <span class="text-gray-300 font-sans hidden sm:inline">Sessão:</span>
+<!-- Container do Timer de Sessão (Renderizado dinamicamente no slot da Sidebar ou no Topo) -->
+<div id="session-timer-widget" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-mono font-medium shadow-sm backdrop-blur-md transition-all duration-300 bg-purple-950/40 text-purple-300 border border-purple-500/30">
+    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" id="session-timer-dot"></span>
+    <span class="text-gray-300 font-sans hidden sm:inline timer-label" id="session-timer-label">Sessão:</span>
     <span id="session-timer-display" class="font-bold tracking-wider text-white">59:59</span>
 </div>
 
@@ -36,6 +36,28 @@
     </div>
 </div>
 
+<style>
+/* Ajuste de estilização quando o timer fica dentro da Sidebar */
+#sidebar-timer-slot #session-timer-widget {
+    position: static !important;
+    box-shadow: none;
+}
+html.sidebar-collapsed #sidebar-timer-slot .timer-label {
+    display: none !important;
+}
+/* Posicionamento fallback caso a página não tenha sidebar */
+body:not(.pal-has-sidebar) #session-timer-widget,
+#session-timer-widget.fallback-fixed {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+</style>
+
 <script>
 (function() {
     const serverExpiresAt = Number("{{ $expiresAtMs }}");
@@ -45,7 +67,26 @@
     const LOGOUT_BEACON_URL = "{{ url('/force-logout-beacon') }}";
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content;
 
-    // Atualiza ou recupera expiração sincronizada no localStorage para todas as abas
+    // Reposiciona o widget para o slot da sidebar (se existir na página)
+    function mountWidgetInSidebar() {
+        const widget = document.getElementById('session-timer-widget');
+        const slot = document.getElementById('sidebar-timer-slot');
+        if (widget && slot) {
+            slot.appendChild(widget);
+            widget.classList.remove('fallback-fixed');
+        } else if (widget) {
+            widget.classList.add('fallback-fixed');
+        }
+    }
+
+    // Tenta encaixar na sidebar no carregamento do DOM
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mountWidgetInSidebar);
+    } else {
+        mountWidgetInSidebar();
+    }
+
+    // Sincronização e expiração no localStorage
     let expiresAt = serverExpiresAt;
     if (serverExpiresAt) {
         localStorage.setItem(LOCAL_STORAGE_KEY, serverExpiresAt.toString());
@@ -93,7 +134,6 @@
             btn.addEventListener('click', executeLogoutAndRedirect);
         }
 
-        // Redireciona automaticamente após 4 segundos se o usuário não clicar
         setTimeout(executeLogoutAndRedirect, 4000);
     }
 
@@ -112,37 +152,34 @@
             display.textContent = formatTime(remainingSec);
         }
 
-        // Atualizações visuais de urgência conforme o tempo diminui
+        // Alertas visuais
         if (remainingSec <= 300 && remainingSec > 60) {
-            // Últimos 5 minutos: Amber / Alerta
-            if (dot) {
-                dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping";
-            }
+            // Últimos 5 minutos: Amber
+            if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
             if (widget) {
-                widget.className = "fixed top-4 right-4 z-[9999] flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono font-medium shadow-lg backdrop-blur-md transition-all duration-300 bg-amber-950/90 text-amber-300 border border-amber-500/50";
+                widget.style.borderColor = "rgba(245, 158, 11, 0.6)";
+                widget.style.backgroundColor = "rgba(120, 53, 15, 0.4)";
+                widget.style.color = "#fcd34d";
             }
         } else if (remainingSec <= 60 && remainingSec > 0) {
-            // Último 1 minuto: Vermelho urgente
-            if (dot) {
-                dot.className = "inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping";
-            }
+            // Último 1 minuto: Vermelho
+            if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping flex-shrink-0";
             if (widget) {
-                widget.className = "fixed top-4 right-4 z-[9999] flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono font-medium shadow-lg backdrop-blur-md transition-all duration-300 bg-rose-950/90 text-rose-300 border border-rose-500/60 animate-pulse";
+                widget.style.borderColor = "rgba(244, 63, 94, 0.7)";
+                widget.style.backgroundColor = "rgba(136, 19, 55, 0.5)";
+                widget.style.color = "#fca5a5";
             }
         }
 
-        // Quando atingir 0 segundos:
         if (remainingSec <= 0) {
             localStorage.setItem(TIMED_OUT_KEY, Date.now().toString());
             showTimeoutModal();
         }
     }
 
-    // Intervalo de 1 segundo (continua correndo e sincroniza a cada tick)
     const interval = setInterval(checkTimer, 1000);
     checkTimer();
 
-    // Sincronização em tempo real entre múltiplas abas via 'storage' event
     window.addEventListener('storage', function(e) {
         if (e.key === TIMED_OUT_KEY && e.newValue) {
             showTimeoutModal();
@@ -153,7 +190,6 @@
         }
     });
 
-    // Garante checagem imediata quando a aba ganha o foco novamente (background tab wake-up)
     window.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
             checkTimer();
@@ -163,7 +199,6 @@
 </script>
 @else
 <script>
-    // Limpa chave se não estiver autenticado
     localStorage.removeItem('smart_session_expires_at');
     localStorage.removeItem('smart_session_timed_out');
 </script>
