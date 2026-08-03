@@ -1,25 +1,111 @@
 name: Smart Attendance — CI/CD
 
+# Gatilhos: roda em push e em Pull Requests para a branch main
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
+# Variáveis de ambiente compartilhadas entre todos os jobs
+env:
+  PHP_VERSION: '8.3'
+  NODE_VERSION: '20'
+  # Credenciais do banco de testes (mesmas usadas pelo serviço postgres abaixo)
+  DB_CONNECTION: pgsql
+  DB_HOST: 127.0.0.1
+  DB_PORT: 5432
+  DB_DATABASE: smart_attendance_test
+  DB_USERNAME: sa_user
+  DB_PASSWORD: sa_secret
+  CACHE_STORE: array
+  SESSION_DRIVER: array
+
 jobs:
-  # ═══════════════════════════════════════════════════════════════════════════
-  # JOB 1 — Auditoria, Padrão de Código e Testes
-  # Objetivo: garantir que o código está seguro, limpo e funcionando antes
-  # de qualquer merge ou deploy.
-  # ═══════════════════════════════════════════════════════════════════════════
-  tests:
-    name: Testes e Qualidade de Codigo
+
+  # ===========================================================================
+  # MODULO 1 — CONFIGURACAO
+  # Instala todas as dependencias (PHP + Node), compila o front-end e
+  # salva os artefatos para que os proximos jobs nao precisem repetir esse trabalho.
+  # ===========================================================================
+  configuracao:
+    name: "1 - Configuracao"
     runs-on: ubuntu-latest
 
-    # ─── Serviço PostgreSQL (espelha o banco de produção) ─────────────────────
-    # Ao usar PostgreSQL aqui, garantimos que consultas específicas da sintaxe
-    # do Postgres (ex: ILIKE, arrays, JSONB) não passem nos testes mas quebrem
-    # em produção — o que aconteceria se usássemos SQLite in-memory.
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, pdo_pgsql, pgsql
+          tools: composer:v2
+
+      - name: Configurar Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache das dependencias do Composer
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-vendor-
+
+      - name: Instalar dependencias do Composer
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Criar arquivo .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Gerar chave da aplicacao
+        run: php artisan key:generate
+
+      - name: Instalar dependencias NPM e compilar Vite
+        run: |
+          npm ci
+          npm run build
+
+      - name: Ajustar permissoes de diretorios
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Salvar dependencias PHP como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+          retention-days: 1
+
+      - name: Salvar assets compilados como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-build
+          path: public/build
+          retention-days: 1
+
+      - name: Salvar arquivo .env como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotenv
+          path: .env
+          retention-days: 1
+
+  # ===========================================================================
+  # MODULO 2 — BANCO DE DADOS
+  # Sobe o PostgreSQL (identico ao de producao), restaura os artefatos
+  # do Modulo 1 e executa todas as migrations para validar o schema.
+  # ===========================================================================
+  banco_de_dados:
+    name: "2 - Banco de Dados"
+    runs-on: ubuntu-latest
+    needs: configuracao
+
     services:
       postgres:
         image: postgres:16
@@ -29,7 +115,6 @@ jobs:
           POSTGRES_PASSWORD: sa_secret
         ports:
           - 5432:5432
-        # Aguarda o PostgreSQL estar pronto para aceitar conexões
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -37,127 +122,251 @@ jobs:
           --health-retries 5
 
     steps:
-      # 1. Checkout do codigo
       - name: Checkout do repositorio
         uses: actions/checkout@v4
 
-      # 2. Configura o PHP 8.3 com extensão pdo_pgsql
-      - name: Configurar PHP 8.3
+      - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
         with:
-          php-version: '8.3'
+          php-version: ${{ env.PHP_VERSION }}
           extensions: pdo, pdo_pgsql, pgsql
           tools: composer:v2
 
-      # 3. Configura o Node.js com cache automático do NPM
-      - name: Configurar Node.js 20
-        uses: actions/setup-node@v4
+      - name: Restaurar vendor do Modulo 1
+        uses: actions/download-artifact@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          name: vendor
+          path: vendor
 
-      # 4. Cache das dependências do Composer (reduz tempo da esteira)
-      - name: Obter diretorio de cache do Composer
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache das dependencias Composer
-        uses: actions/cache@v4
+      - name: Restaurar .env do Modulo 1
+        uses: actions/download-artifact@v4
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          name: dotenv
 
-      # 5. Prepara o .env de testes
-      - name: Criar arquivo .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Executar todas as Migrations
+        run: php artisan migrate --force
 
-      # 6. Instala dependências PHP
-      - name: Instalar dependencias do Composer
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Verificar status das Migrations
+        run: php artisan migrate:status
 
-      # 7. Auditoria de Segurança (CVEs em pacotes)
-      - name: Auditoria de Seguranca PHP (composer audit)
+  # ===========================================================================
+  # MODULO 3 — VERIFICACAO DE SEGURANCA DO CODIGO E DO BANCO DE DADOS
+  # Audita vulnerabilidades nos pacotes PHP e verifica o padrao de codigo
+  # com Laravel Pint. Roda em paralelo com o Modulo 2.
+  # ===========================================================================
+  seguranca:
+    name: "3 - Seguranca do Codigo e Banco"
+    runs-on: ubuntu-latest
+    needs: configuracao
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: smart_attendance_test
+          POSTGRES_USER: sa_user
+          POSTGRES_PASSWORD: sa_secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, pdo_pgsql, pgsql
+          tools: composer:v2
+
+      - name: Restaurar vendor do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Restaurar .env do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: dotenv
+
+      - name: Auditoria de vulnerabilidades PHP (composer audit)
         run: composer audit
 
-      # 8. Padrão de Código (Laravel Pint)
-      # O "--test" retorna exit code 1 se houver código fora do padrão.
-      # Remova o "|| true" quando quiser que a esteira QUEBRE em estilo incorreto.
-      - name: Verificar Padrao de Codigo (Laravel Pint)
+      - name: Verificar padrao de codigo (Laravel Pint)
+        # O "--test" falha se houver estilo fora do padrao.
+        # Troque "|| true" por nada quando quiser bloquear merges com codigo mal formatado.
         run: ./vendor/bin/pint --test || true
 
-      # 9. Instala dependências NPM e compila o Vite
-      - name: Build do Front-end (Vite)
-        run: |
-          npm ci
-          npm run build
+      - name: Verificar integridade das migrations no banco
+        run: php artisan migrate --force
 
-      # 10. Gera a chave da aplicação e ajusta permissões
-      - name: Gerar chave da aplicacao
-        run: php artisan key:generate
+      - name: Listar rotas do sistema (detecta conflitos de rota)
+        run: php artisan route:list
+
+  # ===========================================================================
+  # MODULO 4 — VERIFICAR ERROS NAS 3 CLASSES (Aluno, Master e Professor)
+  # Valida que as factories criam registros corretamente para cada tipo de
+  # usuario e que o fluxo de primeiro acesso funciona para os 3 guards.
+  # Depende dos Modulos 2 e 3 (banco OK + seguranca OK).
+  # ===========================================================================
+  verificar_classes:
+    name: "4 - Classes Aluno, Master e Professor"
+    runs-on: ubuntu-latest
+    needs: [ banco_de_dados, seguranca ]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: smart_attendance_test
+          POSTGRES_USER: sa_user
+          POSTGRES_PASSWORD: sa_secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, pdo_pgsql, pgsql
+          tools: composer:v2
+
+      - name: Restaurar vendor do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Restaurar assets do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: public-build
+          path: public/build
+
+      - name: Restaurar .env do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: dotenv
 
       - name: Ajustar permissoes de diretorios
         run: chmod -R 777 storage bootstrap/cache
 
-      # 11. Executa as migrations no PostgreSQL de testes
-      - name: Executar Migrations no PostgreSQL
-        env:
-          DB_CONNECTION: pgsql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 5432
-          DB_DATABASE: smart_attendance_test
-          DB_USERNAME: sa_user
-          DB_PASSWORD: sa_secret
+      - name: Executar migrations
         run: php artisan migrate --force
 
-      # 12. Executa a Suite Completa de Testes
-      # Os testes cobrem:
-      #   • QrCodePresencaTest    — Geração e leitura dos QR Codes de presença
-      #   • IsolamentoPaineisTest — Isolamento dos painéis por guard de autenticação
-      #   • PrimeiroAcessoCriarSenhaTest — Fluxo de criação de senha no primeiro acesso
-      #   • ExampleTest           — Smoke tests de rotas básicas
-      - name: Executar Testes (PHPUnit/Pest)
+      # Roda somente o PrimeiroAcessoCriarSenhaTest, que cobre os 3 guards:
+      # Aluno  → redireciona para dashboard.aluno
+      # Professor → redireciona para dashboard.professor
+      # Master → redireciona para dashboard.master
+      - name: Testar classe Aluno (primeiro acesso e criacao de senha)
+        run: php artisan test --filter PrimeiroAcessoCriarSenhaTest
+
+      # Roda o IsolamentoPaineisTest que valida os guards Aluno e Professor
+      - name: Testar isolamento entre classes (Aluno vs Professor)
+        run: php artisan test --filter IsolamentoPaineisTest
+
+  # ===========================================================================
+  # MODULO 5 — TESTES FINAIS
+  # Executa a suite completa de testes de feature e unit.
+  # So roda se as classes individuais passaram no Modulo 4.
+  # ===========================================================================
+  testes_finais:
+    name: "5 - Testes Finais"
+    runs-on: ubuntu-latest
+    needs: verificar_classes
+
+    services:
+      postgres:
+        image: postgres:16
         env:
-          DB_CONNECTION: pgsql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 5432
-          DB_DATABASE: smart_attendance_test
-          DB_USERNAME: sa_user
-          DB_PASSWORD: sa_secret
-          # Usa o cache em array durante os testes para isolar o estado entre os testes
-          CACHE_STORE: array
-          SESSION_DRIVER: array
+          POSTGRES_DB: smart_attendance_test
+          POSTGRES_USER: sa_user
+          POSTGRES_PASSWORD: sa_secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, pdo_pgsql, pgsql
+          tools: composer:v2
+
+      - name: Restaurar vendor do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Restaurar assets do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: public-build
+          path: public/build
+
+      - name: Restaurar .env do Modulo 1
+        uses: actions/download-artifact@v4
+        with:
+          name: dotenv
+
+      - name: Ajustar permissoes de diretorios
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Executar migrations
+        run: php artisan migrate --force
+
+      # Suite completa: ExampleTest + QrCodePresencaTest + IsolamentoPaineisTest
+      #                 + PrimeiroAcessoCriarSenhaTest + Unit/ExampleTest
+      - name: Executar suite completa de testes
         run: php artisan test
 
-  # ═══════════════════════════════════════════════════════════════════════════
-  # JOB 2 — Deploy Contínuo (CD)
-  # Objetivo: se TODOS os testes passarem em um push na branch 'main',
-  # fazer o deploy automaticamente no servidor de produção/homologação.
+  # ===========================================================================
+  # MODULO 6 — TRABALHO COMPLETO (Deploy)
+  # So executa se TODOS os 5 modulos anteriores passaram E o evento for
+  # um push direto na branch main (nao em Pull Requests).
   #
-  # PRÉ-REQUISITOS (configurar em Settings > Secrets and variables > Actions):
-  #   SSH_HOST         → IP ou hostname do servidor (ex: 192.168.1.100)
-  #   SSH_USERNAME     → Usuário SSH (ex: deploy, ubuntu, root)
-  #   SSH_PRIVATE_KEY  → Chave SSH privada gerada para o deploy (ssh-keygen -t ed25519)
-  #   DEPLOY_PATH      → Caminho absoluto no servidor (ex: /var/www/smart-attendance)
-  #
-  # COMO GERAR A CHAVE SSH:
-  #   ssh-keygen -t ed25519 -C "github-actions-deploy"
-  #   → Copie a PRIVADA para o Secret SSH_PRIVATE_KEY
-  #   → Adicione a PÚBLICA ao ~/.ssh/authorized_keys no servidor
-  # ═══════════════════════════════════════════════════════════════════════════
-  deploy:
-    name: Deploy em Producao
+  # Para ativar: configure os Secrets abaixo em Settings > Secrets > Actions:
+  #   SSH_HOST        — IP ou hostname do servidor
+  #   SSH_USERNAME    — Usuario SSH (ex: ubuntu, deploy)
+  #   SSH_PRIVATE_KEY — Chave SSH privada (ssh-keygen -t ed25519)
+  #   DEPLOY_PATH     — Caminho no servidor (ex: /var/www/smart-attendance)
+  # ===========================================================================
+  trabalho_completo:
+    name: "6 - Trabalho Completo"
     runs-on: ubuntu-latest
-    needs: tests  # Só executa se o job 'tests' PASSAR completamente
-
-    # Deploy só ocorre em push direto na branch 'main' (não em Pull Requests)
+    needs: testes_finais
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout do repositorio
         uses: actions/checkout@v4
 
-      # Descomente e configure este step quando tiver um servidor
+      # Descomente o bloco abaixo quando tiver um servidor configurado:
       # - name: Deploy via SSH
       #   uses: appleboy/ssh-action@v1.0.3
       #   with:
@@ -166,43 +375,27 @@ jobs:
       #     key: ${{ secrets.SSH_PRIVATE_KEY }}
       #     script: |
       #       cd ${{ secrets.DEPLOY_PATH }}
-      #
-      #       # Ativa o modo de manutenção enquanto o deploy ocorre
       #       php artisan down
-      #
-      #       # Puxa as últimas alterações da branch main
       #       git pull origin main
-      #
-      #       # Atualiza dependências PHP (sem dev em produção)
       #       composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-      #
-      #       # Atualiza dependências Node e reconstrói o front-end
       #       npm ci
       #       npm run build
-      #
-      #       # Executa novas migrations com segurança
       #       php artisan migrate --force
-      #
-      #       # Limpa e re-cacheia configurações para máxima performance
       #       php artisan optimize:clear
       #       php artisan config:cache
       #       php artisan route:cache
       #       php artisan view:cache
-      #
-      #       # Ajusta permissões necessárias
       #       chmod -R 775 storage bootstrap/cache
-      #
-      #       # Desativa o modo de manutenção — sistema volta ao ar
       #       php artisan up
 
-      # Step temporário de aviso (remova ao ativar o deploy SSH acima)
-      - name: Deploy SSH ainda nao configurado
+      - name: Pipeline concluido com sucesso
         run: |
-          echo "✅ Todos os testes passaram com sucesso!"
+          echo "Modulo 1 - Configuracao:       OK"
+          echo "Modulo 2 - Banco de Dados:     OK"
+          echo "Modulo 3 - Seguranca:          OK"
+          echo "Modulo 4 - Classes (3 guards): OK"
+          echo "Modulo 5 - Testes Finais:      OK"
+          echo "Modulo 6 - Trabalho Completo:  Aguardando servidor SSH"
           echo ""
-          echo "Para ativar o deploy automático:"
-          echo "1. Configure os Secrets no GitHub:"
-          echo "   - SSH_HOST, SSH_USERNAME, SSH_PRIVATE_KEY, DEPLOY_PATH"
-          echo "2. Descomente o step 'Deploy via SSH' neste arquivo."
-          echo ""
-          echo "Consulte o README.md para instruções detalhadas."
+          echo "Para ativar o deploy automatico, configure os Secrets:"
+          echo "  SSH_HOST, SSH_USERNAME, SSH_PRIVATE_KEY, DEPLOY_PATH"
