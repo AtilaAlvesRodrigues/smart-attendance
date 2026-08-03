@@ -344,12 +344,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: testes_finais
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Permissao de escrita necessaria para commitar o PDF de volta ao repositorio
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout do repositorio
         uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Necessario para acessar o historico completo do git
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Instalar pandoc e wkhtmltopdf para geracao de PDF
         run: |
@@ -457,6 +461,59 @@ jobs:
           path: relatorio-pipeline-${{ github.run_id }}.pdf
           retention-days: 30
 
+      - name: Salvar PDF na pasta tests/PDF do repositorio
+        run: |
+          # Mensagem do ultimo commit (sanitizada para nome de pasta)
+          COMMIT_MSG=$(git log -1 --format="%s" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9 _-]//g' \
+            | sed 's/ \+/_/g' \
+            | sed 's/_\+/_/g' \
+            | cut -c1-60 \
+            | sed 's/_$//')
+
+          DATA=$(date '+%Y-%m-%d')
+
+          # Nome da pasta: DATA_mensagem-do-commit
+          NOME_PASTA="${DATA}_${COMMIT_MSG}"
+          PASTA_DESTINO="tests/PDF/${NOME_PASTA}"
+
+          echo "Criando pasta: ${PASTA_DESTINO}"
+          mkdir -p "${PASTA_DESTINO}"
+
+          # Copia o PDF gerado para a pasta do repositorio
+          cp relatorio-pipeline-${{ github.run_id }}.pdf \
+            "${PASTA_DESTINO}/relatorio-pipeline.pdf"
+
+          echo "PDF salvo em: ${PASTA_DESTINO}/relatorio-pipeline.pdf"
+
+      - name: Configurar Git para commit automatico
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commitar e publicar PDF no repositorio
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATA=$(date '+%Y-%m-%d')
+          COMMIT_MSG=$(git log -1 --format="%s" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9 _-]//g' \
+            | sed 's/ \+/_/g' \
+            | cut -c1-60)
+
+          NOME_PASTA="${DATA}_${COMMIT_MSG}"
+
+          git add "tests/PDF/${NOME_PASTA}/"
+
+          # [skip ci] evita que este commit dispare uma nova execucao do pipeline
+          git commit -m "docs(pdf): relatorio pipeline ${DATA} [skip ci]" \
+            || echo "Nenhuma alteracao para commitar"
+
+          git push origin main \
+            || echo "Push falhou — pode ja estar atualizado"
+
       # Descomente quando tiver servidor configurado:
       # - name: Deploy via SSH
       #   uses: appleboy/ssh-action@v1.0.3
@@ -485,6 +542,7 @@ jobs:
           echo "Modulo 3 - Seguranca:          OK"
           echo "Modulo 4 - Classes (3 guards): OK"
           echo "Modulo 5 - Testes Finais:      OK"
-          echo "Modulo 6 - Relatorio PDF:      Disponivel nos Artefatos da execucao"
+          echo "Modulo 6 - Relatorio PDF:      Salvo em tests/PDF/"
           echo ""
-          echo "Acesse o PDF em: Actions > Execucao atual > Artifacts"
+          echo "O PDF foi comitado automaticamente em tests/PDF/"
+          echo "E tambem esta disponivel em: Actions > Execucao atual > Artifacts"

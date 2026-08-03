@@ -1,0 +1,3 @@
+# Esta pasta armazena os relatorios PDF gerados automaticamente pelo pipeline CI/CD.
+# Cada subpasta tem o nome da mensagem do commit + data de execucao.
+# Os PDFs sao comitados automaticamente pelo GitHub Actions no Modulo 6.
