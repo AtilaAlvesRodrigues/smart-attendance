@@ -95,6 +95,19 @@ jobs:
             echo "Todos os pacotes NPM estao atualizados." > npm-outdated.txt
           fi
 
+      - name: Auditar vulnerabilidades NPM (npm audit)
+        run: |
+          # Reporta vulnerabilidades encontradas nos pacotes instalados
+          # "|| true" garante que a esteira nao quebre — o resultado vai para o PDF
+          npm audit 2>&1 | tee npm-audit.txt || true
+
+      - name: Corrigir vulnerabilidades NPM automaticamente (npm audit fix)
+        run: |
+          # Aplica correcoes automaticas que nao quebram compatibilidade de versoes.
+          # Usa --legacy-peer-deps para evitar conflitos de peer dependencies
+          # (ex: laravel-vite-plugin exige vite@^7, que pode conflitar com atualizacoes automaticas).
+          npm audit fix --legacy-peer-deps 2>&1 | tee npm-audit-fix.txt || true
+
       - name: Ajustar permissoes de diretorios
         run: chmod -R 777 storage bootstrap/cache
 
