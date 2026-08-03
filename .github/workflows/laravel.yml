@@ -127,7 +127,7 @@ jobs:
           # Usa o cache em array durante os testes para isolar o estado entre os testes
           CACHE_STORE: array
           SESSION_DRIVER: array
-        run: php artisan test --parallel
+        run: php artisan test
 
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 2 — Deploy Contínuo (CD)
