@@ -9,8 +9,8 @@
 @endphp
 
 @if($isAuth && $expiresAtMs)
-<!-- Container do Timer de Sessão (Renderizado dinamicamente no slot da Sidebar ou no Topo) -->
-<div id="session-timer-widget" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-mono font-medium shadow-sm backdrop-blur-md transition-all duration-300 bg-purple-950/40 text-purple-300 border border-purple-500/30">
+<!-- Container do Timer de Sessão -->
+<div id="session-timer-widget" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-mono font-medium shadow-sm backdrop-blur-md transition-all duration-300 bg-purple-950/40 text-purple-300 border border-purple-500/30">
     <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" id="session-timer-dot"></span>
     <span class="text-gray-300 font-sans hidden sm:inline timer-label" id="session-timer-label">Sessão:</span>
     <span id="session-timer-display" class="font-bold tracking-wider text-white">59:59</span>
@@ -37,22 +37,22 @@
 </div>
 
 <style>
-/* Ajuste de estilização quando o timer fica dentro da Sidebar */
-#sidebar-timer-slot #session-timer-widget {
+/* Estilos para quando o timer é embutido na Sidebar ou no Slot do Aluno */
+#sidebar-timer-slot #session-timer-widget,
+#aluno-timer-slot #session-timer-widget {
     position: static !important;
     box-shadow: none;
 }
 html.sidebar-collapsed #sidebar-timer-slot .timer-label {
     display: none !important;
 }
-/* Posicionamento fallback caso a página não tenha sidebar */
-body:not(.pal-has-sidebar) #session-timer-widget,
+/* Posicionamento fallback para evitar sobreposição da navbar */
 #session-timer-widget.fallback-fixed {
     position: fixed;
-    top: 1rem;
-    right: 1rem;
+    top: 4.5rem;
+    right: 1.5rem;
     z-index: 9999;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.92);
     border: 1px solid rgba(168, 85, 247, 0.3);
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
@@ -67,26 +67,29 @@ body:not(.pal-has-sidebar) #session-timer-widget,
     const LOGOUT_BEACON_URL = "{{ url('/force-logout-beacon') }}";
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content;
 
-    // Reposiciona o widget para o slot da sidebar (se existir na página)
-    function mountWidgetInSidebar() {
+    // Tenta encaixar no slot da sidebar ou no slot dedicado da página do aluno
+    function mountWidgetInPage() {
         const widget = document.getElementById('session-timer-widget');
-        const slot = document.getElementById('sidebar-timer-slot');
-        if (widget && slot) {
-            slot.appendChild(widget);
+        const sidebarSlot = document.getElementById('sidebar-timer-slot');
+        const alunoSlot = document.getElementById('aluno-timer-slot');
+
+        if (widget && sidebarSlot) {
+            sidebarSlot.appendChild(widget);
+            widget.classList.remove('fallback-fixed');
+        } else if (widget && alunoSlot) {
+            alunoSlot.appendChild(widget);
             widget.classList.remove('fallback-fixed');
         } else if (widget) {
             widget.classList.add('fallback-fixed');
         }
     }
 
-    // Tenta encaixar na sidebar no carregamento do DOM
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', mountWidgetInSidebar);
+        document.addEventListener('DOMContentLoaded', mountWidgetInPage);
     } else {
-        mountWidgetInSidebar();
+        mountWidgetInPage();
     }
 
-    // Sincronização e expiração no localStorage
     let expiresAt = serverExpiresAt;
     if (serverExpiresAt) {
         localStorage.setItem(LOCAL_STORAGE_KEY, serverExpiresAt.toString());
@@ -154,7 +157,6 @@ body:not(.pal-has-sidebar) #session-timer-widget,
 
         // Alertas visuais
         if (remainingSec <= 300 && remainingSec > 60) {
-            // Últimos 5 minutos: Amber
             if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
             if (widget) {
                 widget.style.borderColor = "rgba(245, 158, 11, 0.6)";
@@ -162,7 +164,6 @@ body:not(.pal-has-sidebar) #session-timer-widget,
                 widget.style.color = "#fcd34d";
             }
         } else if (remainingSec <= 60 && remainingSec > 0) {
-            // Último 1 minuto: Vermelho
             if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping flex-shrink-0";
             if (widget) {
                 widget.style.borderColor = "rgba(244, 63, 94, 0.7)";
