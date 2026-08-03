@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase; // <-- Importação necessária
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    use RefreshDatabase; // <-- Trait que roda as migrations automaticamente
+
     /**
      * Testa se a rota raiz redireciona para o formulário de login.
      */
