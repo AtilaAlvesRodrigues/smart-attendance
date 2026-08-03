@@ -9,11 +9,10 @@
 @endphp
 
 @if($isAuth && $expiresAtMs)
-<!-- Container do Timer de Sessão -->
-<div id="session-timer-widget" class="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-medium shadow-sm backdrop-blur-md transition-all duration-300 bg-purple-950/40 text-purple-300 border border-purple-500/30 text-center">
-    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" id="session-timer-dot"></span>
-    <span class="text-gray-300 font-sans hidden sm:inline timer-label" id="session-timer-label">Sessão:</span>
-    <span id="session-timer-display" class="font-bold tracking-wider text-white tabular-nums inline-block text-center">59:59</span>
+<!-- Container do Timer de Sessão (Pílula perfeitamente centralizada) -->
+<div id="session-timer-widget" class="inline-flex items-center justify-center text-center rounded-full text-xs font-mono font-bold transition-all duration-300 bg-purple-950/60 text-purple-300 border border-purple-500/40 shadow-md">
+    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" id="session-timer-dot" style="margin-right: 8px;"></span>
+    <span id="session-timer-display" class="text-white text-sm font-bold tracking-widest text-center tabular-nums" style="line-height: 1; display: inline-block; text-align: center;">59:59</span>
 </div>
 
 <!-- Modal de Timeout de Sessão -->
@@ -37,39 +36,48 @@
 </div>
 
 <style>
-/* Centralização e alinhamento do timer */
+/* Força a caixa do timer a ficar perfeitamente alinhada e centralizada */
 #session-timer-widget {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
+    min-width: 105px !important;
+    height: 34px !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
 }
 
 #session-timer-display {
-    font-variant-numeric: tabular-nums;
-    text-align: center;
+    font-variant-numeric: tabular-nums !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+    text-align: center !important;
+    line-height: 1 !important;
 }
 
-/* Estilos para quando o timer é embutido na Sidebar ou no Slot do Aluno */
+/* Slots de montagem */
 #sidebar-timer-slot #session-timer-widget,
 #aluno-timer-slot #session-timer-widget {
     position: static !important;
     box-shadow: none;
-    margin: 0 auto;
+    margin: 0 auto !important;
 }
 
 #aluno-timer-slot {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    width: 100%;
+    width: 100% !important;
+    text-align: center !important;
 }
 
-html.sidebar-collapsed #sidebar-timer-slot .timer-label {
-    display: none !important;
+#sidebar-timer-slot {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
-/* Posicionamento fallback para evitar sobreposição da navbar */
+/* Fallback fixo caso a página não possua slot */
 #session-timer-widget.fallback-fixed {
     position: fixed;
     top: 4.5rem;
@@ -90,7 +98,6 @@ html.sidebar-collapsed #sidebar-timer-slot .timer-label {
     const LOGOUT_BEACON_URL = "{{ url('/force-logout-beacon') }}";
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content;
 
-    // Tenta encaixar no slot da sidebar ou no slot dedicado da página do aluno
     function mountWidgetInPage() {
         const widget = document.getElementById('session-timer-widget');
         const sidebarSlot = document.getElementById('sidebar-timer-slot');
