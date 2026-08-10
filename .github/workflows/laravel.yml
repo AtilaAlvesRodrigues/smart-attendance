@@ -9,12 +9,21 @@ on:
 env:
   PHP_VERSION: '8.3'
   NODE_VERSION: '20'
+  APP_ENV: testing
+  APP_KEY: ${{ secrets.APP_KEY }}
   DB_CONNECTION: pgsql
   DB_HOST: 127.0.0.1
   DB_PORT: 5432
   DB_DATABASE: smart_attendance_test
-  DB_USERNAME: sa_user
-  DB_PASSWORD: sa_secret
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  MAIL_MAILER: smtp
+  MAIL_HOST: ${{ secrets.MAIL_HOST }}
+  MAIL_PORT: ${{ secrets.MAIL_PORT }}
+  MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+  MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+  MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
+  MAIL_FROM_NAME: ${{ vars.MAIL_FROM_NAME }}
   CACHE_STORE: array
   SESSION_DRIVER: array
 
@@ -147,8 +156,8 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: sa_user
-          POSTGRES_PASSWORD: sa_secret
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -198,8 +207,8 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: sa_user
-          POSTGRES_PASSWORD: sa_secret
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -255,8 +264,8 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: sa_user
-          POSTGRES_PASSWORD: sa_secret
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -318,8 +327,8 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: sa_user
-          POSTGRES_PASSWORD: sa_secret
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
