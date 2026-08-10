@@ -168,7 +168,8 @@ html.sidebar-collapsed .pal-sidebar-badge {
 
 /* ===== Collapse transition ===== */
 #pal-sidebar {
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease;
 }
 
 .pal-has-sidebar .pal-page {
@@ -221,13 +222,17 @@ html.sidebar-collapsed .pal-sidebar-badge {
     color: rgba(30, 41, 59, 0.8);
 }
 
-/* ===== Collapsed state ===== */
+/* ===== Collapsed state — sidebar totalmente oculta ===== */
 html.sidebar-collapsed #pal-sidebar {
-    width: 52px;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-right: none;
 }
 
 html.sidebar-collapsed .pal-has-sidebar .pal-page {
-    padding-left: 52px;
+    /* Mantém espaço para o botão flutuante de reabrir (32px + 8px + folga = 52px) */
+    padding-left: 52px !important;
 }
 
 html.sidebar-collapsed .pal-sidebar-label,
@@ -258,6 +263,64 @@ html.sidebar-collapsed .pal-sidebar-group-trigger {
 html.sidebar-collapsed .pal-sidebar-group-content {
     max-height: 400px !important;
     overflow: visible;
+}
+
+/* Oculta o timer quando a sidebar estiver fechada */
+html.sidebar-collapsed #sidebar-timer-slot {
+    display: none !important;
+}
+
+/* ===== Botão flutuante para reabrir a sidebar ===== */
+#pal-sidebar-reopen {
+    position: fixed;
+    top: calc(var(--pal-nav-h, 60px) + 12px);
+    left: 8px;
+    z-index: 95;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(168, 85, 247, 0.18);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: rgba(168, 85, 247, 0.9);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    animation: palReopenPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#pal-sidebar-reopen:hover {
+    background: rgba(168, 85, 247, 0.35);
+    color: #fff;
+    transform: scale(1.12);
+}
+
+html.sidebar-collapsed #pal-sidebar-reopen {
+    display: flex;
+}
+
+.light-mode #pal-sidebar-reopen {
+    background: rgba(126, 34, 206, 0.1);
+    border-color: rgba(126, 34, 206, 0.25);
+    color: #7e22ce;
+}
+
+.light-mode #pal-sidebar-reopen:hover {
+    background: rgba(126, 34, 206, 0.22);
+    color: #5b21b6;
+}
+
+@keyframes palReopenPop {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 767px) {
+    #pal-sidebar-reopen {
+        display: none !important;
+    }
 }
 
 /* ===== Mobile — bottom bar ===== */
@@ -339,6 +402,13 @@ html.sidebar-collapsed .pal-sidebar-group-content {
 }
 </style>
 <script>
+(function() {
+    // Restaura estado colapsado antes do primeiro render
+    if (localStorage.getItem('pal_sidebar_collapsed') === '1') {
+        document.documentElement.classList.add('sidebar-collapsed');
+    }
+})();
+
 function palToggleSidebar() {
     var isCollapsed = document.documentElement.classList.toggle('sidebar-collapsed');
     localStorage.setItem('pal_sidebar_collapsed', isCollapsed ? '1' : '0');
@@ -350,6 +420,16 @@ function palToggleSidebar() {
 }
 </script>
 @endonce
+
+{{-- Botão flutuante para reabrir a sidebar quando fechada --}}
+<button id="pal-sidebar-reopen"
+        onclick="palToggleSidebar()"
+        title="Abrir menu"
+        aria-label="Abrir menu">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+    </svg>
+</button>
 
 <aside id="pal-sidebar" aria-label="Navegação principal">
 
