@@ -47,11 +47,11 @@ The `CheckRole` middleware (`app/Http/Middleware/CheckRole.php`) enforces role s
 
 ### PII Encryption
 
-All personally identifiable fields (nome, email, cpf, ra) on `AlunoModel` and `ProfessorModel` are encrypted at rest with AES-256 via Laravel's `Crypt` facade. To allow searching on encrypted fields, `HasBlindIndex` trait (`app/Traits/HasBlindIndex.php`) generates deterministic SHA-256 hashes stored in `*_hash` columns. Always use the blind index columns when querying by name, email, CPF, or RA.
+PII fields (email, cpf, ra) on `AlunoModel` and `ProfessorModel` are encrypted at rest with AES-256 via the `encrypted` cast; `nome` is plain text by design. `UsuarioMaster` encrypts both `nome` and `email`. To allow searching, the `HasBlindIndex` trait (`app/Traits/HasBlindIndex.php`) fills deterministic SHA-256 hashes (peppered with `APP_KEY`) in `*_search` columns. Never query encrypted columns directly (`where('email', ...)` never matches) — use `where('email_search', Model::generateBlindIndex($value))`.
 
 ### Attendance Flow
 
-1. Professor generates a QR code for a class session → stored in Laravel cache with key `aula_materia_{materia_id}_{date}` (30-minute TTL).
+1. Professor generates a QR code for a class session → stored in Laravel cache with key `aula_materia_{materia_id}_{date}` (2-hour TTL).
 2. Student scans the QR → `PresencaController` validates the cache key and creates a `Presenca` record.
 3. Rate limiting: 5 check-in attempts per minute per user.
 
@@ -86,6 +86,10 @@ Before making any UI changes, consult `.cursorrules` — it documents known bugs
 | Master | `master@admin.com` | `senha123` |
 | Professor | `professor@teste.com` | `senha123` |
 | Aluno | `aluno.teste@site.com` | `senha123` |
+
+## Deploy
+
+Production runs on Vercel (`vercel.json`, `api/index.php`, runtime `vercel-php`) with PostgreSQL on Supabase in a dedicated `laravel` schema (`DB_SEARCH_PATH=laravel`). The function filesystem is read-only except `/tmp`, so cache/compiled paths are redirected there via env vars, and sessions/cache use the `database` driver. See the Deploy section of `README.md`.
 
 ## Environment
 
