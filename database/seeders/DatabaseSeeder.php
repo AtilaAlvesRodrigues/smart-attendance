@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Evita duplicar dados (e violar os índices únicos) ao rodar o seed mais de uma vez.
+        if (UsuarioMaster::where('email_search', UsuarioMaster::generateBlindIndex('master@admin.com'))->exists()) {
+            return;
+        }
+
         UsuarioMaster::create([
             'nome' => 'Master Admin',
             'email' => 'master@admin.com',
