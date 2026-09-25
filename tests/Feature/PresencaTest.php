@@ -260,4 +260,56 @@ class PresencaTest extends TestCase
             'codigo_aula' => $codigo,
         ]);
     }
+
+    public function test_get_presencas_expoe_apenas_nome_e_ra_do_aluno(): void
+    {
+        $professor = ProfessorModel::factory()->create();
+        $aluno = AlunoModel::factory()->create(['nome' => 'Ana Lima', 'ra' => '555111']);
+        $materia = Materia::factory()->create();
+
+        \App\Models\Presenca::create([
+            'aluno_id' => $aluno->id,
+            'professor_id' => $professor->id,
+            'materia_id' => $materia->id,
+            'data_aula' => now()->toDateString(),
+            'semestre' => '2/2026',
+            'horario' => 'N',
+            'codigo_aula' => 'AULA-X',
+        ]);
+
+        $response = $this->actingAs($professor, 'professores')
+            ->getJson('/professor/presenca/check/AULA-X');
+
+        $response->assertOk()
+            ->assertJsonPath('0.aluno.nome', 'Ana Lima')
+            ->assertJsonPath('0.aluno.ra', '555111');
+
+        $json = $response->getContent();
+        $this->assertStringNotContainsString($aluno->email, $json);
+        $this->assertStringNotContainsString($aluno->cpf, $json);
+        $this->assertStringNotContainsString('_search', $json);
+    }
+
+    public function test_get_presencas_nao_mostra_aula_de_outro_professor(): void
+    {
+        $dono = ProfessorModel::factory()->create();
+        $outro = ProfessorModel::factory()->create();
+        $aluno = AlunoModel::factory()->create();
+        $materia = Materia::factory()->create();
+
+        \App\Models\Presenca::create([
+            'aluno_id' => $aluno->id,
+            'professor_id' => $dono->id,
+            'materia_id' => $materia->id,
+            'data_aula' => now()->toDateString(),
+            'semestre' => '2/2026',
+            'horario' => 'N',
+            'codigo_aula' => 'AULA-Y',
+        ]);
+
+        $this->actingAs($outro, 'professores')
+            ->getJson('/professor/presenca/check/AULA-Y')
+            ->assertOk()
+            ->assertExactJson([]);
+    }
 }

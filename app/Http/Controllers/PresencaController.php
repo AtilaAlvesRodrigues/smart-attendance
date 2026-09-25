@@ -175,11 +175,18 @@ class PresencaController extends Controller
      */
     public function getPresencas(Request $request, $codigo_aula)
     {
-        $presencas = Presenca::with('aluno')
+        // Só as presenças das aulas do professor logado, e só os campos que a
+        // tela usa — CPF, e-mail e blind indexes não devem chegar ao navegador.
+        $presencas = Presenca::with('aluno:id,nome,ra')
             ->where('codigo_aula', $codigo_aula)
+            ->where('professor_id', Auth::guard('professores')->id())
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get(['id', 'aluno_id', 'codigo_aula', 'created_at']);
 
-        return response()->json($presencas);
+        return response()->json($presencas->map(fn ($p) => [
+            'id'         => $p->id,
+            'created_at' => $p->created_at,
+            'aluno'      => $p->aluno ? ['nome' => $p->aluno->nome, 'ra' => $p->aluno->ra] : null,
+        ]));
     }
 }
