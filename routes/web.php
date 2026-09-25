@@ -90,6 +90,11 @@ Route::get('/presenca/confirmar/{codigo_aula}', [PresencaController::class, 'con
 Route::get('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'show'])->name('esqueci-senha.show');
 Route::post('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'send'])->middleware('throttle:3,10')->name('esqueci-senha.send');
 
+// Solicitação de Acesso (público) — pedido de cadastro analisado pelo Master
+Route::get('/solicitar-acesso/{tipo}', [SolicitacaoAcessoController::class, 'show'])->name('solicitar-acesso.show');
+Route::post('/solicitar-acesso/{tipo}', [SolicitacaoAcessoController::class, 'store'])->middleware('throttle:5,10')->name('solicitar-acesso.store');
+Route::post('/solicitar-acesso/{tipo}/verificar-email', [SolicitacaoAcessoController::class, 'verificarEmail'])->middleware('throttle:20,1')->name('solicitar-acesso.verificar-email');
+
 // Primeiro Acesso — Criação de senha definitiva
 Route::middleware(['primeiro-acesso', 'throttle:10,3'])->group(function () {
     Route::get('/criar-senha', [CriarSenhaController::class, 'show'])->name('criar-senha.show');
@@ -135,6 +140,10 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::post('/cadastrar/aluno', [MasterCadastroController::class, 'cadastrarAluno'])->name('master.cadastrar.aluno');
         Route::post('/cadastrar/professor', [MasterCadastroController::class, 'cadastrarProfessor'])->name('master.cadastrar.professor');
         Route::post('/cadastrar/materia', [MasterCadastroController::class, 'cadastrarMateria'])->name('master.cadastrar.materia');
+
+        Route::get('/solicitacoes', [SolicitacaoAcessoController::class, 'index'])->name('master.solicitacoes');
+        Route::post('/solicitacoes/{solicitacao}/aprovar', [SolicitacaoAcessoController::class, 'aprovar'])->name('master.solicitacoes.aprovar');
+        Route::post('/solicitacoes/{solicitacao}/rejeitar', [SolicitacaoAcessoController::class, 'rejeitar'])->name('master.solicitacoes.rejeitar');
 
         Route::prefix('search')->middleware('throttle:30,1')->group(function () {
             Route::get('/professores', [MasterSearchController::class, 'searchProfessores'])->name('master.search.professores');
