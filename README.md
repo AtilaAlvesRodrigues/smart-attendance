@@ -3,15 +3,19 @@
 <img src="https://img.shields.io/badge/PHP-8.2+-7A86C8?style=for-the-badge&logo=php&logoColor=white"/>
 <img src="https://img.shields.io/badge/Laravel-12+-FF2D20?style=for-the-badge&logo=laravel&logoColor=white"/>
 <img src="https://img.shields.io/badge/PostgreSQL-17+-336791?style=for-the-badge&logo=postgresql&logoColor=white"/>
-<img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-F59E0B?style=for-the-badge"/>
+<a href="https://github.com/AtilaAlvesRodrigues/smart-attendance/actions/workflows/laravel.yml"><img src="https://img.shields.io/github/actions/workflow/status/AtilaAlvesRodrigues/smart-attendance/laravel.yml?branch=main&style=for-the-badge&label=CI"/></a>
+<a href="https://smart-attendance-nine-alpha.vercel.app"><img src="https://img.shields.io/badge/Demo-Online-22C55E?style=for-the-badge&logo=vercel&logoColor=white"/></a>
 
 # 📋 Smart Attendance
 
 > Sistema web de controle de presença inteligente — rápido, preciso e seguro.
 > Desenvolvido como **Projeto Integrador** com PHP/Laravel.
 
-[📖 Documentação](#-documentação) •
+**[🌐 Acessar a demo online](https://smart-attendance-nine-alpha.vercel.app)**
+
 [⚙️ Instalação](#%EF%B8%8F-instalação) •
+[🧪 Testes](#-testes) •
+[🚀 Deploy](#-deploy) •
 [📱 Teste pelo Celular](#-teste-pelo-celular) •
 [🔐 Segurança](#-segurança) •
 [📁 Estrutura](#-estrutura) •
@@ -50,7 +54,7 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 | 🤖 Honeypot | Anti-bot no check-in público de eventos |
 | 📋 Logging | Registro de falhas de autenticação e erros de envio de e-mail |
 
-> 📄 [Ver relatório completo de segurança](docs/Relatorio_Seguranca_SmartAttendance.pdf)
+> 🧪 Cada camada tem testes automatizados em `tests/Feature` (CSRF, XSS, SQL/Column Injection, headers, rate limit, honeypot, criptografia, blind index e isolamento entre painéis).
 
 ---
 
@@ -66,8 +70,9 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 | Solicitação de Acesso (fluxo público) | ✅ Concluído |
 | E-mail de Primeiro Acesso | ✅ Concluído |
 | Eventos / Palestras com Check-in | ✅ Concluído |
-| Testes Automatizados | 📋 Pendente |
-| Deploy | 📋 Pendente |
+| Testes Automatizados (180 testes) | ✅ Concluído |
+| CI/CD (GitHub Actions) | ✅ Concluído |
+| Deploy (Vercel + Supabase) | ✅ Concluído |
 
 ---
 
@@ -88,10 +93,9 @@ O **Smart Attendance** substitui listas de chamada manuais por um processo digit
 ## ⚙️ Instalação
 
 ```bash
-# 1. Clonar o repositório e entrar no branch PHP
+# 1. Clonar o repositório
 git clone https://github.com/AtilaAlvesRodrigues/smart-attendance.git
 cd smart-attendance
-git checkout PHP
 
 # 2. Instalar dependências (PHP e Node)
 composer install
@@ -205,7 +209,72 @@ php artisan config:clear
 | **Professor** | `professor@teste.com` | `senha123` |
 | **Aluno** | `aluno.teste@site.com` | `senha123` |
 
-> Os seeders usam `firstOrCreate` — rodar `php artisan db:seed` múltiplas vezes não duplica dados.
+> Rodar `php artisan db:seed` múltiplas vezes não duplica dados.
+>
+> Na demo online esses mesmos usuários estão disponíveis. Os dados são de teste e podem ser reiniciados a qualquer momento.
+
+---
+
+## 🧪 Testes
+
+```bash
+composer test                              # suíte completa (SQLite em memória)
+php artisan test --filter=PresencaTest     # um arquivo específico
+```
+
+O pipeline do GitHub Actions ([`.github/workflows/laravel.yml`](.github/workflows/laravel.yml)) roda em todo push e Pull Request para a `main`, contra um PostgreSQL 17 real:
+
+| Módulo | O que verifica |
+|---|---|
+| 1 · Configuração | Instala dependências, compila o Vite, gera relatórios de pacotes desatualizados e `npm audit` |
+| 2 · Banco de Dados | Migrations, rollback e seed idempotente |
+| 3 · Segurança | `composer audit`, testes de segurança e `route:list` |
+| 4 · Classes | Primeiro acesso, isolamento entre painéis, papéis, cadastro e solicitações |
+| 5 · Testes Finais | Suíte completa |
+| 6 · Trabalho Completo | Gera o relatório PDF do pipeline (disponível em *Actions → execução → Artifacts*) |
+
+---
+
+## 🚀 Deploy
+
+A demo roda na **Vercel** com o runtime [`vercel-php`](https://github.com/vercel-community/php) e banco **PostgreSQL no Supabase**.
+
+| Arquivo | Função |
+|---|---|
+| [`vercel.json`](vercel.json) | Build do Vite, arquivos estáticos de `public/` e demais rotas para o PHP |
+| [`api/index.php`](api/index.php) | Entrada da função serverless → `public/index.php` |
+| [`.vercelignore`](.vercelignore) | Impede o upload de `.env`, `vendor` e caches locais |
+
+Variáveis de ambiente necessárias na Vercel (além de `APP_KEY` e `DB_*`):
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+LOG_CHANNEL=stderr
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+CACHE_STORE=database          # QR Codes e check-ins precisam de cache compartilhado
+DB_SEARCH_PATH=laravel        # schema próprio, fora da API REST pública do Supabase
+DB_SSLMODE=require
+# O sistema de arquivos da função é somente leitura, exceto /tmp:
+APP_CONFIG_CACHE=/tmp/config.php
+APP_EVENTS_CACHE=/tmp/events.php
+APP_PACKAGES_CACHE=/tmp/packages.php
+APP_ROUTES_CACHE=/tmp/routes.php
+APP_SERVICES_CACHE=/tmp/services.php
+VIEW_COMPILED_PATH=/tmp
+```
+
+Use o **Session pooler** do Supabase (`aws-0-<região>.pooler.supabase.com:5432`), pois a Vercel não tem IPv6.
+As migrations são aplicadas a partir de uma máquina local apontando para o banco de produção:
+
+```bash
+php artisan migrate --force --seed
+```
+
+> ⚠️ A `APP_KEY` também é o *pepper* do Blind Index: o seed precisa usar a mesma chave da produção, e trocar a chave exige `php artisan secure:data`.
+>
+> 📧 Na demo o e-mail está com `MAIL_MAILER=log` — os e-mails de primeiro acesso não são enviados. Configure SMTP (seção abaixo) para ativá-los.
 
 ---
 
@@ -225,6 +294,7 @@ php artisan config:clear
 
 ### 🛠️ Master
 - Cadastra professores, alunos e matérias diretamente (sem fluxo de solicitação)
+- Aprova ou rejeita solicitações públicas de acesso (`/solicitar-acesso/{aluno|professor}`)
 - Envia e-mail de primeiro acesso automaticamente ao cadastrar
 - Visualiza contadores de usuários e matérias
 - Acessa central de presenças
@@ -367,7 +437,8 @@ smart-attendance/
 │   │   └── primeiro-acesso.blade.php
 │   └── layouts/theme.blade.php
 ├── routes/web.php
-└── docs/                       # Relatórios e documentação
+├── api/index.php               # Entrada serverless (Vercel)
+└── vercel.json                 # Configuração do deploy
 ```
 
 ---
@@ -386,24 +457,12 @@ As tabelas principais utilizam **Surrogate Keys** (nunca RA/CPF como PK), **crip
 | `materia_professor` | Pivot de vínculo professor ↔ matéria |
 | `presencas` | Registros de check-in via QR Code de disciplina |
 | `solicitacoes_acesso` | Pedidos públicos de cadastro (status: pendente/aprovado/rejeitado) |
+| `sessions` | Sessões dos usuários (driver `database`) |
 | `cache` | Cache da aplicação (QR Codes ativos, sessões de eventos — TTL 2h/8h) |
 
-> 📊 [Ver diagrama e descrição completa das tabelas](../../wiki/Banco-de-Dados)
 
 ---
 
-## 📖 Documentação
-
-| Documento | Link |
-|---|---|
-| 🏠 Wiki completa | [GitHub Wiki](../../wiki) |
-| ⚙️ Instalação detalhada | [Wiki · Instalação](../../wiki/Instalacao) |
-| 🔐 Relatório de Segurança | [Wiki · Segurança](../../wiki/Seguranca) |
-| 📁 Estrutura do Projeto | [Wiki · Estrutura](../../wiki/Estrutura) |
-| 🗄️ Banco de Dados | [Wiki · Banco de Dados](../../wiki/Banco-de-Dados) |
-| 📄 Relatório Word | [Download](docs/Relatorio_Seguranca_SmartAttendance.pdf) |
-
----
 
 <div align="center">
 

@@ -5,42 +5,45 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Banco de testes descartável (container do próprio job) — não precisa de secrets,
+# assim o pipeline também roda em Pull Requests vindos de forks.
 env:
   PHP_VERSION: '8.3'
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
   APP_ENV: testing
-  APP_KEY: ${{ secrets.APP_KEY }}
   DB_CONNECTION: pgsql
   DB_HOST: 127.0.0.1
   DB_PORT: 5432
   DB_DATABASE: smart_attendance_test
-  DB_USERNAME: ${{ secrets.DB_USERNAME }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  MAIL_MAILER: smtp
-  MAIL_HOST: ${{ secrets.MAIL_HOST }}
-  MAIL_PORT: ${{ secrets.MAIL_PORT }}
-  MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-  MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-  MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
-  MAIL_FROM_NAME: ${{ vars.MAIL_FROM_NAME }}
+  DB_USERNAME: postgres
+  DB_PASSWORD: postgres
+  MAIL_MAILER: array
   CACHE_STORE: array
   SESSION_DRIVER: array
+  QUEUE_CONNECTION: sync
 
 jobs:
 
   # ===========================================================================
   # MODULO 1 — CONFIGURACAO
-  # Verifica versoes dos componentes, checa pacotes desatualizados,
-  # instala dependencias, compila o front-end e salva artefatos.
+  # Verifica versoes, instala dependencias, compila o front-end e gera
+  # os relatorios de pacotes desatualizados/vulneraveis usados no Modulo 6.
   # ===========================================================================
   configuracao:
     name: "1 - Configuracao"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do repositorio
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
       - name: Configurar PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
@@ -48,116 +51,77 @@ jobs:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo, pdo_pgsql, pgsql
           tools: composer:v2
+          coverage: none
 
       - name: Configurar Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
 
-      - name: Verificar versoes dos componentes instalados
-        run: |
-          echo "=== PHP ==="
-          php --version
-          echo "=== Composer ==="
-          composer --version
-          echo "=== Node.js ==="
-          node --version
-          echo "=== NPM ==="
-          npm --version
+      - name: Versoes dos componentes
+        run: php --version && composer --version && node --version && npm --version
 
-      - name: Cache das dependencias do Composer
-        id: composer-cache
+      - name: Cache do Composer
         uses: actions/cache@v5
         with:
-          path: vendor
-          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-vendor-
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
 
-      - name: Instalar dependencias do Composer
-        if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-      - name: Verificar pacotes PHP desatualizados (composer outdated)
+      - name: Instalar dependencias
         run: |
-          # Captura o output para arquivo — sera incluido no PDF do Modulo 6
-          composer outdated --direct --no-interaction 2>&1 | tee composer-outdated.txt || true
-          if [ ! -s composer-outdated.txt ]; then
-            echo "Todos os pacotes PHP estao atualizados." > composer-outdated.txt
-          fi
-
-      - name: Criar .env e gerar chave da aplicacao
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Instalar dependencias NPM e compilar Vite
-        run: |
+          composer install --no-interaction --no-progress --prefer-dist
           npm ci
-          npm run build
 
-      - name: Verificar pacotes NPM desatualizados (npm outdated)
+      - name: Compilar assets (Vite)
+        run: npm run build
+
+      - name: Relatorios de pacotes desatualizados e auditoria
         run: |
-          # Captura o output para arquivo — sera incluido no PDF do Modulo 6
-          npm outdated 2>&1 | tee npm-outdated.txt || true
-          if [ ! -s npm-outdated.txt ]; then
-            echo "Todos os pacotes NPM estao atualizados." > npm-outdated.txt
-          fi
+          composer outdated --direct --no-interaction > composer-outdated.txt 2>&1 || true
+          [ -s composer-outdated.txt ] || echo "Todos os pacotes PHP estao atualizados." > composer-outdated.txt
+          npm outdated > npm-outdated.txt 2>&1 || true
+          [ -s npm-outdated.txt ] || echo "Todos os pacotes NPM estao atualizados." > npm-outdated.txt
+          npm audit > npm-audit.txt 2>&1 || true
 
-      - name: Auditar vulnerabilidades NPM (npm audit)
-        run: |
-          # Reporta vulnerabilidades encontradas nos pacotes instalados
-          # "|| true" garante que a esteira nao quebre — o resultado vai para o PDF
-          npm audit 2>&1 | tee npm-audit.txt || true
-
-      - name: Corrigir vulnerabilidades NPM automaticamente (npm audit fix)
-        run: |
-          # Aplica correcoes automaticas que nao quebram compatibilidade de versoes.
-          # Usa --legacy-peer-deps para evitar conflitos de peer dependencies
-          # (ex: laravel-vite-plugin exige vite@^7, que pode conflitar com atualizacoes automaticas).
-          npm audit fix --legacy-peer-deps 2>&1 | tee npm-audit-fix.txt || true
-
-      - name: Ajustar permissoes de diretorios
-        run: chmod -R 777 storage bootstrap/cache
-
-      - name: Salvar vendor como artefato
+      - name: Salvar relatorios
         uses: actions/upload-artifact@v5
         with:
-          name: vendor
-          path: vendor
-          retention-days: 1
-
-      - name: Salvar assets compilados como artefato
-        uses: actions/upload-artifact@v5
-        with:
-          name: public-build
-          path: public/build
-          retention-days: 1
-
-      - name: Salvar relatorios de pacotes desatualizados como artefato
-        uses: actions/upload-artifact@v5
-        with:
-          name: outdated-reports
+          name: relatorios-pacotes
           path: |
             composer-outdated.txt
             npm-outdated.txt
-          retention-days: 1
+            npm-audit.txt
+          retention-days: 7
 
   # ===========================================================================
-  # MODULO 2 — BANCO DE DADOS
+  # MODULOS 2 a 5 — BANCO, SEGURANCA, CLASSES E TESTES
+  # Cada modulo sobe seu proprio PostgreSQL e instala dependencias via cache.
   # ===========================================================================
-  banco_de_dados:
-    name: "2 - Banco de Dados"
+  modulos:
+    name: ${{ matrix.nome }}
     runs-on: ubuntu-latest
     needs: configuracao
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nome: "2 - Banco de Dados"
+            modulo: banco
+          - nome: "3 - Seguranca do Codigo e Banco"
+            modulo: seguranca
+          - nome: "4 - Classes Aluno, Master e Professor"
+            modulo: classes
+          - nome: "5 - Testes Finais"
+            modulo: testes
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
@@ -167,477 +131,140 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout do repositorio
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-      - name: Configurar PHP ${{ env.PHP_VERSION }}
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo, pdo_pgsql, pgsql
           tools: composer:v2
+          coverage: none
 
-      - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v5
+      - uses: actions/setup-node@v5
         with:
-          name: vendor
-          path: vendor
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: Criar .env e gerar chave da aplicacao
+      - uses: actions/cache@v5
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Instalar dependencias e preparar ambiente
         run: |
+          composer install --no-interaction --no-progress --prefer-dist
+          npm ci && npm run build
           cp .env.example .env
           php artisan key:generate
 
-      - name: Executar todas as Migrations
+      - name: Executar migrations
         run: php artisan migrate --force
 
-      - name: Verificar status das Migrations
-        run: php artisan migrate:status
-
-  # ===========================================================================
-  # MODULO 3 — VERIFICACAO DE SEGURANCA DO CODIGO E DO BANCO DE DADOS
-  # ===========================================================================
-  seguranca:
-    name: "3 - Seguranca do Codigo e Banco"
-    runs-on: ubuntu-latest
-    needs: configuracao
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout do repositorio
-        uses: actions/checkout@v5
-
-      - name: Configurar PHP ${{ env.PHP_VERSION }}
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: pdo, pdo_pgsql, pgsql
-          tools: composer:v2
-
-      - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v5
-        with:
-          name: vendor
-          path: vendor
-
-      - name: Criar .env e gerar chave da aplicacao
+      # --- Modulo 2 ---------------------------------------------------------
+      - name: Status das migrations e seed idempotente
+        if: matrix.modulo == 'banco'
         run: |
-          cp .env.example .env
-          php artisan key:generate
+          php artisan migrate:status
+          php artisan db:seed --force
+          php artisan db:seed --force
+          php artisan migrate:rollback --force
+          php artisan migrate --force
 
+      # --- Modulo 3 ---------------------------------------------------------
       - name: Auditoria de vulnerabilidades PHP (composer audit)
+        if: matrix.modulo == 'seguranca'
         run: composer audit
 
-      - name: Verificar padrao de codigo (Laravel Pint)
-        run: ./vendor/bin/pint --test || true
+      - name: Testes das camadas de seguranca
+        if: matrix.modulo == 'seguranca'
+        run: php artisan test --filter '(Csrf|Xss|SqlInjection|ColumnInjection|SecurityHeaders|RateLimit|Honeypot|Encryption|BlindIndex|UnauthorizedAccess)Test'
 
-      - name: Verificar integridade das migrations no banco
-        run: php artisan migrate --force
-
-      - name: Listar rotas do sistema (detecta conflitos de rota)
+      - name: Listar rotas (detecta conflitos de rota)
+        if: matrix.modulo == 'seguranca'
         run: php artisan route:list
 
-  # ===========================================================================
-  # MODULO 4 — VERIFICAR ERROS NAS 3 CLASSES (Aluno, Master e Professor)
-  # ===========================================================================
-  verificar_classes:
-    name: "4 - Classes Aluno, Master e Professor"
-    runs-on: ubuntu-latest
-    needs: [ banco_de_dados, seguranca ]
+      # --- Modulo 4 ---------------------------------------------------------
+      - name: Testar classes e isolamento entre paineis
+        if: matrix.modulo == 'classes'
+        run: php artisan test --filter '(PrimeiroAcessoCriarSenha|IsolamentoPaineis|RoleMiddleware|MasterCadastro|SolicitacaoAcesso)Test'
 
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout do repositorio
-        uses: actions/checkout@v5
-
-      - name: Configurar PHP ${{ env.PHP_VERSION }}
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: pdo, pdo_pgsql, pgsql
-          tools: composer:v2
-
-      - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v5
-        with:
-          name: vendor
-          path: vendor
-
-      - name: Restaurar assets do Modulo 1
-        uses: actions/download-artifact@v5
-        with:
-          name: public-build
-          path: public/build
-
-      - name: Criar .env e gerar chave da aplicacao
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Ajustar permissoes de diretorios
-        run: chmod -R 777 storage bootstrap/cache
-
-      - name: Executar migrations
-        run: php artisan migrate --force
-
-      - name: Testar classe Aluno e Professor (PrimeiroAcessoCriarSenhaTest)
-        run: php artisan test --filter PrimeiroAcessoCriarSenhaTest
-
-      - name: Testar isolamento entre classes (IsolamentoPaineisTest)
-        run: php artisan test --filter IsolamentoPaineisTest
-
-  # ===========================================================================
-  # MODULO 5 — TESTES FINAIS
-  # ===========================================================================
-  testes_finais:
-    name: "5 - Testes Finais"
-    runs-on: ubuntu-latest
-    needs: verificar_classes
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: smart_attendance_test
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout do repositorio
-        uses: actions/checkout@v5
-
-      - name: Configurar PHP ${{ env.PHP_VERSION }}
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: pdo, pdo_pgsql, pgsql
-          tools: composer:v2
-
-      - name: Restaurar vendor do Modulo 1
-        uses: actions/download-artifact@v5
-        with:
-          name: vendor
-          path: vendor
-
-      - name: Restaurar assets do Modulo 1
-        uses: actions/download-artifact@v5
-        with:
-          name: public-build
-          path: public/build
-
-      - name: Criar .env e gerar chave da aplicacao
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Ajustar permissoes de diretorios
-        run: chmod -R 777 storage bootstrap/cache
-
-      - name: Executar migrations
-        run: php artisan migrate --force
-
+      # --- Modulo 5 ---------------------------------------------------------
       - name: Executar suite completa de testes
+        if: matrix.modulo == 'testes'
         run: php artisan test
 
   # ===========================================================================
   # MODULO 6 — TRABALHO COMPLETO
-  # Gera um relatorio PDF com as informacoes do pipeline e das modificacoes
-  # do commit. O PDF fica disponivel para download nos artefatos do GitHub.
-  # So executa em push direto na branch main.
+  # Gera o relatorio PDF do pipeline e publica como artefato da execucao
+  # (Actions > execucao > Artifacts). Nao commita nada no repositorio.
   # ===========================================================================
   trabalho_completo:
     name: "6 - Trabalho Completo"
     runs-on: ubuntu-latest
-    needs: testes_finais
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    # Permissao de escrita necessaria para commitar o PDF de volta ao repositorio
-    permissions:
-      contents: write
+    needs: modulos
+    if: github.event_name != 'pull_request'
 
     steps:
-      - name: Checkout do repositorio
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
         with:
-          fetch-depth: 0  # Necessario para acessar o historico completo do git
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 10
 
-      - name: Instalar pandoc e wkhtmltopdf para geracao de PDF
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y pandoc wkhtmltopdf
-
-      - name: Restaurar relatorios de pacotes desatualizados
-        uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v5
         with:
-          name: outdated-reports
+          name: relatorios-pacotes
 
-      - name: Coletar informacoes do commit e gerar relatorio Markdown
+      - name: Instalar pandoc e wkhtmltopdf
+        run: sudo apt-get update -q && sudo apt-get install -y -q pandoc wkhtmltopdf
+
+      - name: Gerar relatorio Markdown
         run: |
-          # Informacoes do ambiente
-          DATA_HORA=$(date '+%d/%m/%Y às %H:%M:%S UTC')
-          COMMIT_SHA="${{ github.sha }}"
-          COMMIT_SHORT="${COMMIT_SHA:0:7}"
-          AUTOR="${{ github.actor }}"
-          BRANCH="${{ github.ref_name }}"
-          RUN_ID="${{ github.run_id }}"
-          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          {
+            echo "# Relatorio de Pipeline — Smart Attendance"
+            echo
+            echo "**Data e Hora:** $(date '+%d/%m/%Y às %H:%M:%S UTC')  "
+            echo "**Branch:** \`${{ github.ref_name }}\`  "
+            echo "**Commit:** [\`${GITHUB_SHA:0:7}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})  "
+            echo "**Autor:** ${{ github.actor }}  "
+            echo "**Pipeline:** [Execucao #${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo
+            echo "## Resultado dos Modulos"
+            echo
+            echo "| Modulo | Descricao | Status |"
+            echo "|---|---|---|"
+            echo "| 1 | Configuracao (PHP, Node, Vite) | PASSOU |"
+            echo "| 2 | Banco de Dados (Migrations e Seed) | PASSOU |"
+            echo "| 3 | Seguranca do Codigo e Banco | PASSOU |"
+            echo "| 4 | Classes Aluno, Master e Professor | PASSOU |"
+            echo "| 5 | Testes Finais (Suite Completa) | PASSOU |"
+            echo
+            echo "## Pacotes PHP desatualizados"
+            echo '```'; cat composer-outdated.txt; echo '```'
+            echo
+            echo "## Pacotes NPM desatualizados"
+            echo '```'; cat npm-outdated.txt; echo '```'
+            echo
+            echo "## Auditoria NPM"
+            echo '```'; cat npm-audit.txt; echo '```'
+            echo
+            echo "## Arquivos modificados no commit"
+            echo '```'; git diff-tree --no-commit-id -r --name-status HEAD | head -40; echo '```'
+            echo
+            echo "## Historico recente"
+            echo '```'; git log --oneline -5 --no-color; echo '```'
+            echo
+            echo "*Relatorio gerado automaticamente pelo GitHub Actions.*"
+          } > relatorio.md
 
-          # Pacotes PHP desatualizados e comandos de correcao
-          COMPOSER_OUTDATED_RAW=$(cat composer-outdated.txt 2>/dev/null || echo "Informacao nao disponivel")
-
-          if echo "$COMPOSER_OUTDATED_RAW" | grep -q "atualizados"; then
-            COMPOSER_SECTION="Todos os pacotes PHP estao atualizados."
-            COMPOSER_FIX=""
-          else
-            COMPOSER_SECTION="$COMPOSER_OUTDATED_RAW"
-            # Gera lista de comandos para atualizar cada pacote listado
-            COMPOSER_FIX=$(echo "$COMPOSER_OUTDATED_RAW" | awk 'NF>=2 {print "composer require " $1 ":^" $3}' 2>/dev/null | head -20)
-            if [ -z "$COMPOSER_FIX" ]; then
-              COMPOSER_FIX="composer update"
-            fi
-          fi
-
-          # Pacotes NPM desatualizados e comandos de correcao
-          NPM_OUTDATED_RAW=$(cat npm-outdated.txt 2>/dev/null || echo "Informacao nao disponivel")
-
-          if echo "$NPM_OUTDATED_RAW" | grep -q "atualizados"; then
-            NPM_SECTION="Todos os pacotes NPM estao atualizados."
-            NPM_FIX=""
-          else
-            NPM_SECTION="$NPM_OUTDATED_RAW"
-            # Gera lista de comandos para atualizar cada pacote listado
-            NPM_FIX=$(echo "$NPM_OUTDATED_RAW" | awk 'NR>1 && NF>=4 {print "npm install " $1 "@" $4}' 2>/dev/null | head -20)
-            if [ -z "$NPM_FIX" ]; then
-              NPM_FIX="npm update"
-            fi
-          fi
-
-          GIT_LOG=$(git log --oneline -5 --no-color)
-
-          # Arquivos modificados no ultimo commit
-          FILES_CHANGED=$(git diff-tree --no-commit-id -r --name-status HEAD | head -40)
-
-          # Estatisticas do ultimo commit
-          GIT_STAT=$(git diff --stat HEAD~1 HEAD 2>/dev/null || echo "Primeiro commit do repositorio")
-
-          cat > relatorio.md << MARKDOWN
-          # Relatorio de Pipeline — Smart Attendance
-
-          **Data e Hora:** ${DATA_HORA}
-          **Branch:** \`${BRANCH}\`
-          **Commit:** \`${COMMIT_SHORT}\` ([ver no GitHub](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}))
-          **Autor:** ${AUTOR}
-          **Pipeline:** [Execucao #${RUN_ID}](${RUN_URL})
-
-          ---
-
-          ## Resultado dos Modulos
-
-          | Modulo | Descricao | Status |
-          |--------|-----------|--------|
-          | 1 | Configuracao (PHP, Node, Vite) | PASSOU |
-          | 2 | Banco de Dados (Migrations) | PASSOU |
-          | 3 | Seguranca do Codigo e Banco | PASSOU |
-          | 4 | Classes Aluno, Master e Professor | PASSOU |
-          | 5 | Testes Finais (Suite Completa) | PASSOU |
-          | 6 | Trabalho Completo (Deploy) | EM EXECUCAO |
-
-          ---
-
-          ## Pacotes PHP Desatualizados
-
-          \`\`\`
-          ${COMPOSER_SECTION}
-          \`\`\`
-
-          $([ -n "$COMPOSER_FIX" ] && echo "**Comandos para atualizar:**" && echo "" && echo "\`\`\`bash" && echo "${COMPOSER_FIX}" && echo "\`\`\`")
-
-          ---
-
-          ## Pacotes NPM Desatualizados
-
-          \`\`\`
-          ${NPM_SECTION}
-          \`\`\`
-
-          $([ -n "$NPM_FIX" ] && echo "**Comandos para atualizar:**" && echo "" && echo "\`\`\`bash" && echo "${NPM_FIX}" && echo "\`\`\`")
-
-          ---
-
-          ## Arquivos Modificados no Commit
-
-          \`\`\`
-          ${FILES_CHANGED}
-          \`\`\`
-
-          ---
-
-          ## Estatisticas das Alteracoes
-
-          \`\`\`
-          ${GIT_STAT}
-          \`\`\`
-
-          ---
-
-          ## Historico Recente (ultimos 5 commits)
-
-          \`\`\`
-          ${GIT_LOG}
-          \`\`\`
-
-          ---
-
-          ## Informacoes do Ambiente de Testes
-
-          - **Sistema Operacional:** Ubuntu Latest (GitHub Actions)
-          - **PHP:** ${{ env.PHP_VERSION }}
-          - **Node.js:** ${{ env.NODE_VERSION }}
-          - **Banco de Dados (testes):** PostgreSQL 16
-          - **Framework:** Laravel
-
-          ---
-
-          *Relatorio gerado automaticamente pelo pipeline CI/CD do GitHub Actions.*
-          MARKDOWN
-
-      - name: Converter relatorio Markdown para PDF
+      - name: Converter para PDF
         run: |
-          pandoc relatorio.md \
-            -o relatorio-pipeline-${{ github.run_id }}.pdf \
-            --pdf-engine=wkhtmltopdf \
-            --variable papersize=a4 \
-            --variable margin-top=20mm \
-            --variable margin-bottom=20mm \
-            --variable margin-left=25mm \
-            --variable margin-right=25mm \
-            -V title="Smart Attendance — Relatorio de Pipeline" \
-            --standalone
+          pandoc relatorio.md -o relatorio-pipeline.pdf --pdf-engine=wkhtmltopdf \
+            -V papersize=a4 -V margin-top=20mm -V margin-bottom=20mm \
+            -V margin-left=25mm -V margin-right=25mm \
+            -V title="Smart Attendance — Relatorio de Pipeline" --standalone
 
-      - name: Publicar relatorio PDF como artefato do GitHub
+      - name: Publicar relatorio PDF
         uses: actions/upload-artifact@v5
         with:
           name: relatorio-pipeline-${{ github.run_id }}
-          path: relatorio-pipeline-${{ github.run_id }}.pdf
-          retention-days: 30
-
-      - name: Salvar PDF na pasta tests/PDF do repositorio
-        run: |
-          # Mensagem do ultimo commit (sanitizada para nome de pasta)
-          COMMIT_MSG=$(git log -1 --format="%s" \
-            | tr '[:upper:]' '[:lower:]' \
-            | sed 's/[^a-z0-9 _-]//g' \
-            | sed 's/ \+/_/g' \
-            | sed 's/_\+/_/g' \
-            | cut -c1-60 \
-            | sed 's/_$//')
-
-          DATA=$(date '+%Y-%m-%d')
-
-          # Nome da pasta: DATA_mensagem-do-commit
-          NOME_PASTA="${DATA}_${COMMIT_MSG}"
-          PASTA_DESTINO="tests/PDF/${NOME_PASTA}"
-
-          echo "Criando pasta: ${PASTA_DESTINO}"
-          mkdir -p "${PASTA_DESTINO}"
-
-          # Copia o PDF gerado para a pasta do repositorio
-          cp relatorio-pipeline-${{ github.run_id }}.pdf \
-            "${PASTA_DESTINO}/relatorio-pipeline.pdf"
-
-          echo "PDF salvo em: ${PASTA_DESTINO}/relatorio-pipeline.pdf"
-
-      - name: Configurar Git para commit automatico
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commitar e publicar PDF no repositorio
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          DATA=$(date '+%Y-%m-%d')
-          COMMIT_MSG=$(git log -1 --format="%s" \
-            | tr '[:upper:]' '[:lower:]' \
-            | sed 's/[^a-z0-9 _-]//g' \
-            | sed 's/ \+/_/g' \
-            | cut -c1-60)
-
-          NOME_PASTA="${DATA}_${COMMIT_MSG}"
-
-          git add "tests/PDF/${NOME_PASTA}/"
-
-          # [skip ci] evita que este commit dispare uma nova execucao do pipeline
-          git commit -m "docs(pdf): relatorio pipeline ${DATA} [skip ci]" \
-            || echo "Nenhuma alteracao para commitar"
-
-          git push origin main \
-            || echo "Push falhou — pode ja estar atualizado"
-
-      # Descomente quando tiver servidor configurado:
-      # - name: Deploy via SSH
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USERNAME }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       cd ${{ secrets.DEPLOY_PATH }}
-      #       php artisan down
-      #       git pull origin main
-      #       composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-      #       npm ci && npm run build
-      #       php artisan migrate --force
-      #       php artisan optimize:clear
-      #       php artisan config:cache
-      #       php artisan route:cache
-      #       php artisan view:cache
-      #       chmod -R 775 storage bootstrap/cache
-      #       php artisan up
-
-      - name: Pipeline concluido com sucesso
-        run: |
-          echo "Modulo 1 - Configuracao:       OK"
-          echo "Modulo 2 - Banco de Dados:     OK"
-          echo "Modulo 3 - Seguranca:          OK"
-          echo "Modulo 4 - Classes (3 guards): OK"
-          echo "Modulo 5 - Testes Finais:      OK"
-          echo "Modulo 6 - Relatorio PDF:      Salvo em tests/PDF/"
-          echo ""
-          echo "O PDF foi comitado automaticamente em tests/PDF/"
-          echo "E tambem esta disponivel em: Actions > Execucao atual > Artifacts"
+          path: relatorio-pipeline.pdf
+          retention-days: 90

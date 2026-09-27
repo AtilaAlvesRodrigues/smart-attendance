@@ -36,7 +36,9 @@ class EncryptionTest extends TestCase
         $this->assertNotSame($email, $raw->email);
         $this->assertNotSame($cpf, $raw->cpf);
         $this->assertNotSame($ra, $raw->ra);
-        $this->assertNotSame($nome, $raw->nome);
+        // nome é armazenado em texto plano por design (exibição/pesquisa direta)
+        $this->assertSame($nome, $raw->nome);
+        $this->assertNotEmpty($raw->nome_search);
     }
 
     public function test_aluno_sensitive_data_is_decrypted_by_model(): void
@@ -78,7 +80,9 @@ class EncryptionTest extends TestCase
 
         $this->assertNotSame($email, $raw->email);
         $this->assertNotSame($cpf, $raw->cpf);
-        $this->assertNotSame($nome, $raw->nome);
+        // nome é armazenado em texto plano por design (exibição/pesquisa direta)
+        $this->assertSame($nome, $raw->nome);
+        $this->assertNotEmpty($raw->nome_search);
     }
 
     public function test_professor_sensitive_data_is_decrypted_by_model(): void

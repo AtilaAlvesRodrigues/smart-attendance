@@ -3,7 +3,7 @@
 @section('title', 'Sessão Expirada (419) - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col justify-center items-center')
-@section('no-nav')
+@section('no-nav', true)
 
 @section('content')
     <div class="flex-grow flex flex-col items-center justify-center p-6 relative">

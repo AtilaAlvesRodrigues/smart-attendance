@@ -14,7 +14,7 @@ class UsuarioMasterSeeder extends Seeder
     public function run(): void
     {
         UsuarioMaster::firstOrCreate(
-            ['email' => 'master@admin.com'],
+            ['email_search' => UsuarioMaster::generateBlindIndex('master@admin.com')],
             [
                 'nome' => 'Master Admin',
                 'email' => 'master@admin.com',

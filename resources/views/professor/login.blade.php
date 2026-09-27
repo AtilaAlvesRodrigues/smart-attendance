@@ -68,6 +68,12 @@
                         onmouseout="this.style.borderColor='transparent'">
                         Esqueci minha senha
                     </a>
+                    <a href="{{ route('solicitar-acesso.show', 'professor') }}"
+                        style="font-size:0.75rem; color:var(--pal-gray); text-decoration:none; border-bottom:1px solid transparent; transition:border-color 0.2s;"
+                        onmouseover="this.style.borderColor='var(--pal-gray)'"
+                        onmouseout="this.style.borderColor='transparent'">
+                        Solicitar acesso
+                    </a>
                 </div>
             </form>
 
