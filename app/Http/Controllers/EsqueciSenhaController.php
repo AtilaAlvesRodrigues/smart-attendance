@@ -48,12 +48,18 @@ class EsqueciSenhaController extends BaseController
                 ? route('login.aluno.form')
                 : route('login.professor.form');
 
-            Mail::to($user->email)->send(new PrimeiroAcessoMail(
-                nomeUsuario: $user->nome,
-                emailUsuario: $user->email,
-                token: $token,
-                loginUrl: $loginRoute,
-            ));
+            // Uma falha de envio não pode mudar a resposta: um erro só para
+            // e-mails cadastrados revelaria quem existe no sistema (RN-ESQ-03).
+            try {
+                Mail::to($user->email)->send(new PrimeiroAcessoMail(
+                    nomeUsuario: $user->nome,
+                    emailUsuario: $user->email,
+                    token: $token,
+                    loginUrl: $loginRoute,
+                ));
+            } catch (\Throwable $e) {
+                \Log::error('Falha ao enviar e-mail de redefinição para ' . $tipo . ' ID ' . $user->id . ' [' . get_class($e) . ']');
+            }
         }
 
         return redirect()->back()->with('success', $successMessage);

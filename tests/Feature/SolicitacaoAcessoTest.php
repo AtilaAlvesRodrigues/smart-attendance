@@ -107,4 +107,20 @@ class SolicitacaoAcessoTest extends TestCase
 
         $this->get('/dashboard/master/solicitacoes')->assertStatus(302);
     }
+
+    public function test_aprovacao_com_falha_no_smtp_cria_conta_e_avisa_o_master(): void
+    {
+        $this->post('/solicitar-acesso/aluno', $this->dadosAluno());
+        $solicitacao = SolicitacaoAcesso::first();
+
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('SMTP indisponível'));
+        $this->actingAs(UsuarioMaster::factory()->create(), 'masters');
+
+        $this->post("/dashboard/master/solicitacoes/{$solicitacao->id}/aprovar")
+            ->assertRedirect()
+            ->assertSessionHasErrors('erro');
+
+        $this->assertSame('aprovado', $solicitacao->fresh()->status);
+        $this->assertSame(1, AlunoModel::count());
+    }
 }

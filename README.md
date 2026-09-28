@@ -324,7 +324,7 @@ O envio usa **Gmail SMTP** com **App Password** (não a senha da conta Google).
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_ENCRYPTION=tls
+MAIL_SCHEME=smtp   # porta 587 negocia TLS (STARTTLS); use smtps com a porta 465
 MAIL_USERNAME=seu@gmail.com
 MAIL_PASSWORD=xxxxxxxxxxxxxxxx   # App Password sem espaços
 MAIL_FROM_ADDRESS="seu@gmail.com"

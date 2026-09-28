@@ -79,4 +79,15 @@ class PasswordRecoveryTest extends TestCase
 
         Mail::assertSentCount(1);
     }
+
+    public function test_falha_no_smtp_nao_revela_que_o_email_existe(): void
+    {
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('SMTP indisponível'));
+
+        AlunoModel::factory()->create(['email' => 'aluno@teste.com']);
+
+        $this->post('/esqueci-senha/aluno', ['email' => 'aluno@teste.com'])
+            ->assertRedirect()
+            ->assertSessionHas('success', 'Se este e-mail estiver cadastrado, você receberá as instruções em breve.');
+    }
 }

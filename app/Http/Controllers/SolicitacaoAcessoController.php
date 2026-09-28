@@ -198,12 +198,21 @@ class SolicitacaoAcessoController extends BaseController
         $masterId = Auth::guard('masters')->id();
         $solicitacao->update(['status' => 'aprovado', 'aprovado_por' => $masterId]);
 
-        Mail::to($user->email)->send(new PrimeiroAcessoMail(
-            nomeUsuario: $user->nome,
-            emailUsuario: $user->email,
-            token: $token,
-            loginUrl: $loginUrl,
-        ));
+        try {
+            Mail::to($user->email)->send(new PrimeiroAcessoMail(
+                nomeUsuario: $user->nome,
+                emailUsuario: $user->email,
+                token: $token,
+                loginUrl: $loginUrl,
+            ));
+        } catch (\Throwable $e) {
+            \Log::error('Falha ao enviar e-mail de primeiro acesso para ' . $solicitacao->tipo . ' ID ' . $user->id . ' [' . get_class($e) . ']');
+
+            return redirect()->back()->withErrors([
+                'erro' => "Conta criada, mas o e-mail de acesso não pôde ser enviado para {$solicitacao->email}. "
+                    . 'O usuário pode usar "Esqueci minha senha" para receber um novo token.',
+            ]);
+        }
 
         return redirect()->back()->with('success', "Conta criada e e-mail de acesso enviado para {$solicitacao->email}.");
     }
