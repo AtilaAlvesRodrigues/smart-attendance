@@ -22,12 +22,20 @@ class MasterTurmaController extends Controller
     {
         $materia->load(['professores:id', 'alunos:id']);
 
+        $professoresIds = $materia->professores->pluck('id')->all();
+        $alunosIds = $materia->alunos->pluck('id')->all();
+
+        // Já vinculados primeiro, depois em ordem alfabética (natural: "Aluno 2" antes de "Aluno 10")
+        $ordenar = fn ($lista, array $marcados) => $lista
+            ->sortBy(fn ($p) => (in_array($p->id, $marcados) ? '0|' : '1|') . mb_strtolower($p->nome), SORT_NATURAL)
+            ->values();
+
         return view('master.turma', [
             'materia'        => $materia,
-            'professores'    => ProfessorModel::orderBy('nome')->get(['id', 'nome']),
-            'alunos'         => AlunoModel::orderBy('nome')->get(['id', 'nome', 'ra']),
-            'professoresIds' => $materia->professores->pluck('id')->all(),
-            'alunosIds'      => $materia->alunos->pluck('id')->all(),
+            'professores'    => $ordenar(ProfessorModel::get(['id', 'nome']), $professoresIds),
+            'alunos'         => $ordenar(AlunoModel::get(['id', 'nome', 'ra']), $alunosIds),
+            'professoresIds' => $professoresIds,
+            'alunosIds'      => $alunosIds,
         ]);
     }
 
