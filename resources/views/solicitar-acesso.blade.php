@@ -130,10 +130,13 @@
         async function verificarEmail(email) {
             setFeedback('checking', 'Verificando disponibilidade...');
             try {
-                const url = verificarUrl + '?email=' + encodeURIComponent(email);
-                const res = await fetch(url, {
-                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                // POST com o e-mail no corpo: a rota é POST e o endereço não vai para a URL (nem para logs)
+                const res = await fetch(verificarUrl, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
                 });
+                if (!res.ok) { hideFeedback(); return; }
                 const data = await res.json();
 
                 if (data.status === 'ok') {
