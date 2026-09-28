@@ -10,7 +10,7 @@
         <span class="pal-nav-user-role">Professor</span>
         <span class="pal-nav-user-name">{{ $professor->nome ?? 'Docente' }}</span>
     </div>
-    <button id="open-profile" class="pal-profile-btn" type="button">
+    <button id="open-profile" class="pal-profile-btn" type="button" aria-label="Abrir meu perfil" title="Meu perfil" type="button">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
     </button>
 </div>
@@ -27,7 +27,7 @@
                     <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Painel Docente</p>
                     <h2 class="pal-always-white" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Meu Perfil</h2>
                 </div>
-                <button id="close-profile" class="pal-profile-btn" style="border-color:rgba(255,255,255,0.1); color:#888;">
+                <button id="close-profile" class="pal-profile-btn" type="button" aria-label="Fechar perfil" style="border-color:rgba(255,255,255,0.1); color:#888;">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>

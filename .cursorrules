@@ -329,4 +329,15 @@ Sempre que uma nova funcionalidade for adicionada, os ambientes de demonstraçã
 
 ---
 
-**Última Atualização**: 24/03/2026 - Implementada a arquitetura de demonstração interativa (Mock Dashboards) de alta fidelidade e normas de Viewport Safety via gatilho "anote".
+## 20. USABILIDADE E ACESSIBILIDADE (camada final)
+- **`public/css/usability.css`** é carregado por último no layout e corrige contraste (mínimo 4.5:1), tamanho mínimo de rótulos, foco visível no teclado, alvos de toque de 44px no celular e `prefers-reduced-motion` (desliga tilt, brilho do cursor e animações). Novas correções globais de legibilidade vão nesse arquivo, não espalhadas nos CSS de perfil.
+- **Cinzas de texto**: não use `#555`–`#888` sobre fundo escuro. Use `var(--pal-gray)` (#a3a3a3) ou `var(--pal-light-gray)`.
+- **Linguagem**: escreva ações e estados em português simples ("Iniciar chamada", "Presença confirmada!", "Em dia", "Atenção"). Evite jargão técnico ("Sistema em Espera", "Acesso Root", "Transmissão Ativa").
+- **Status nunca só por cor**: todo selo de situação tem texto (e ícone quando couber).
+- **Regra acadêmica única**: frequência, faltas, limite (25% das aulas previstas), média e situação vêm de `App\Support\SituacaoAcademica`. Não recalcule em views ou JS com critérios próprios; o JS de notas espelha essa classe.
+- **Dados vindos do usuário em JS**: nunca monte HTML com `innerHTML` a partir de nomes/textos do banco. Use `textContent` (ver `professor/presenca/gerar.blade.php`).
+- **QR Code da aula** nunca aparece em página pública; só nome e sala da aula em andamento.
+
+---
+
+**Última Atualização**: 27/09/2026 - Seção 20 (usabilidade/acessibilidade): usability.css, regra acadêmica única em SituacaoAcademica, linguagem simples e proibição de innerHTML com dados do usuário.

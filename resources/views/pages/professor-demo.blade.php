@@ -21,7 +21,7 @@
         <span class="pal-nav-user-role">Professor (Demo)</span>
         <span class="pal-nav-user-name">Dra. Maria Oliveira</span>
     </div>
-    <button id="open-profile" class="pal-profile-btn pal-info-tooltip pal-info-tooltip-down" data-tooltip="Acesse seus dados de registro docente e a lista de disciplinas sob sua responsabilidade.">
+    <button id="open-profile" type="button" aria-label="Abrir meu perfil" class="pal-profile-btn pal-info-tooltip pal-info-tooltip-down" data-tooltip="Acesse seus dados de registro docente e a lista de disciplinas sob sua responsabilidade.">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
     </button>
     <a href="{{ route('professor.info') }}" class="pal-nav-btn pal-nav-btn-danger pal-info-tooltip pal-info-tooltip-down" data-tooltip="Encerrar a demonstração docente e voltar para a página de informações.">Sair</a>
@@ -35,10 +35,10 @@
         <div class="pal-modal-content">
             <div class="pal-modal-header">
                 <div class="pal-info-tooltip pal-info-tooltip-down" data-tooltip="Suas credenciais docentes são usadas para assinar digitalmente os registros de presença.">
-                    <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Credenciais Docentes</p>
+                    <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Seus dados</p>
                     <h2 class="pal-text" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Meu Perfil (Demo)</h2>
                 </div>
-                <button id="close-profile" class="pal-profile-btn">
+                <button id="close-profile" class="pal-profile-btn" type="button" aria-label="Fechar perfil">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>

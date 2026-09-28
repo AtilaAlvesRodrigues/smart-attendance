@@ -9,13 +9,13 @@
     <div style="width:100%; max-width:460px; text-align:center;">
 
         {{-- Icon --}}
-        <div style="display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border:1px solid rgba(255,255,255,0.12); border-radius:4px; margin-bottom:2rem;">
-            <svg width="28" height="28" fill="none" stroke="#efefef" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <div style="display:inline-flex; align-items:center; justify-content:center; width:72px; height:72px; background:rgba(34,197,94,0.15); border:2px solid #22c55e; border-radius:50%; margin-bottom:2rem;" aria-hidden="true">
+            <svg width="34" height="34" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
         </div>
 
         <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin-bottom:0.75rem;">Presença Registrada</p>
-        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Confirmado.</h1>
-        <p style="font-size:0.9rem; color:#bbb; margin-bottom:2.5rem;">{{ $mensagem ?? 'Sua presença foi registrada com sucesso no sistema.' }}</p>
+        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Presença confirmada!</h1>
+        <p style="font-size:0.9rem; color:#bbb; margin-bottom:2.5rem;">Tudo certo. O professor já vê seu nome na lista da chamada e sua frequência foi atualizada.</p>
 
         @if(isset($materia) && isset($presenca))
         <div style="background:rgba(18,18,18,0.98); border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:1.5rem; margin-bottom:2.5rem; text-align:left;">

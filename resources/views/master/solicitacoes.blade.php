@@ -9,8 +9,8 @@
 @section('nav-user')
     <div class="pal-nav-actions" style="gap:0.5rem">
         <div class="pal-nav-user">
-            <span class="pal-nav-user-role">Acesso Root</span>
-            <span class="pal-nav-user-name">Administrador</span>
+            <span class="pal-nav-user-role">Administrador</span>
+            <span class="pal-nav-user-name">{{ auth()->guard('masters')->user()->nome ?? 'Administrador' }}</span>
         </div>
     </div>
 @endsection

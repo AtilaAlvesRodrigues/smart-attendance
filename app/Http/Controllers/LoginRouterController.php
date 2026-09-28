@@ -16,10 +16,11 @@ class LoginRouterController extends BaseController
             $cacheKey = 'aula_materia_' . $materia->id . '_' . now()->format('Y-m-d');
             $cacheData = \Illuminate\Support\Facades\Cache::get($cacheKey);
 
+            // Só nome e sala: o código da aula nunca vai para a página pública,
+            // senão qualquer pessoa marcaria presença sem estar em sala.
             if (is_array($cacheData) && isset($cacheData['codigo'])) {
                 $activeCodes[] = [
                     'materia_nome' => $materia->nome,
-                    'codigo' => $cacheData['codigo'],
                     'sala' => $materia->sala
                 ];
             }

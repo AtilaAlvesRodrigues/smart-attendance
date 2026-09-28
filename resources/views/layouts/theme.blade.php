@@ -25,6 +25,8 @@
     </script>
     
     @stack('styles')
+    {{-- Camada de usabilidade/acessibilidade: sempre por último --}}
+    <link rel="stylesheet" href="{{ asset('css/usability.css') }}?v={{ filemtime(public_path('css/usability.css')) }}">
     @stack('head-scripts')
 </head>
 @php
@@ -48,7 +50,7 @@
                 @yield('nav-user')
                 <form action="{{ route('logout') }}" method="POST" style="margin:0">
                     @csrf
-                    <button type="submit" class="pal-nav-btn pal-nav-btn-danger">Sair</button>
+                    <button type="submit" class="pal-nav-btn pal-nav-btn-danger" aria-label="Sair do sistema">Sair</button>
                 </form>
             @else
                 @yield('nav-right')
@@ -86,7 +88,7 @@
     @endunless
 
     {{-- ===== THEME TOGGLE BUTTON ===== --}}
-    <button id="theme-toggle" class="pal-theme-toggle" style="position:fixed; bottom:2rem; right:2rem; z-index:9999; width:48px; height:48px; border-radius:50%; background:var(--pal-near-black); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#efefef; cursor:pointer; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden;">
+    <button id="theme-toggle" class="pal-theme-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema claro/escuro" style="position:fixed; bottom:2rem; right:2rem; z-index:9999; width:48px; height:48px; border-radius:50%; background:var(--pal-near-black); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#efefef; cursor:pointer; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden;">
         <div id="theme-icon-container" style="position:relative; width:20px; height:20px; transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);">
             <svg id="theme-icon-moon" style="position:absolute; top:0; left:0; width:100%; height:100%; transition: opacity 0.3s ease; opacity:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             <svg id="theme-icon-sun" style="position:absolute; top:0; left:0; width:100%; height:100%; transition: opacity 0.3s ease; opacity:1;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>

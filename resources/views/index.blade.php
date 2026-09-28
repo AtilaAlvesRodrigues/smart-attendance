@@ -26,24 +26,6 @@
 
         <!-- QR Code Visual -->
         <div class="pal-hero-visual">
-            @if(isset($activeCodes) && count($activeCodes) > 0)
-                <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
-                @foreach($activeCodes as $index => $code)
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
-                        <a href="{{ route('presenca.confirmar', $code['codigo']) }}" 
-                           style="width:240px; height:240px; background:white; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; text-decoration:none; padding: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);"
-                           id="qrcode-{{$index}}" data-code="{{ route('presenca.confirmar', $code['codigo']) }}"
-                           aria-label="Escritar QR Code para confirmar presença em {{ $code['materia_nome'] }}">
-                        </a>
-                        <div style="text-align: center;">
-                            <span style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#22c55e; display:block; margin-bottom: 0.5rem;">Sessão Ativa</span>
-                            <strong class="pal-text" style="font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em;">{{ $code['materia_nome'] }}</strong>
-                            <span style="color: #888; display: block; font-size: 0.85rem; margin-top: 0.3rem;">Sala: {{ $code['sala'] }}</span>
-                        </div>
-                    </div>
-                @endforeach
-                </div>
-            @else
             <div class="pal-qr-mock">
                 <!-- Data dots inner visual -->
                 <div class="pal-qr-inner">
@@ -62,6 +44,14 @@
                     <p class="pal-qr-label">QR CODE DINÂMICO</p>
                     <p class="pal-qr-sub">Escaneie para confirmar presença</p>
                 </div>
+            </div>
+            @if(isset($activeCodes) && count($activeCodes) > 0)
+            <div class="pal-live-classes" role="status">
+                <p class="pal-live-classes-label"><span class="pal-live-dot" aria-hidden="true"></span> Chamada aberta agora</p>
+                @foreach($activeCodes as $code)
+                <p class="pal-live-classes-item"><strong>{{ $code['materia_nome'] }}</strong> · Sala {{ $code['sala'] }}</p>
+                @endforeach
+                <p class="pal-live-classes-hint">Escaneie o QR Code projetado em sala para registrar sua presença.</p>
             </div>
             @endif
         </div>
@@ -229,9 +219,5 @@
     </div>
 </section>
 
-@push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="{{ asset('js/pages/index.js') }}?v={{ filemtime(public_path('js/pages/index.js')) }}"></script>
-@endpush
 
 @endsection
