@@ -14,8 +14,8 @@
         </div>
 
         <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin-bottom:0.75rem;">Presença Duplicada</p>
-        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Tudo Certo.</h1>
-        <p style="font-size:0.9rem; color:#bbb; margin-bottom:2.5rem;">Você já registrou sua presença nesta sessão anteriormente. Não é necessário realizar o procedimento novamente.</p>
+        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Presença já registrada</h1>
+        <p style="font-size:0.9rem; color:#bbb; margin-bottom:2.5rem;">Você já confirmou presença nesta aula. Não precisa fazer mais nada.</p>
 
         <div style="background:rgba(18,18,18,0.98); border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:1.25rem; margin-bottom:2.5rem;">
             <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin:0 0 0.4rem;">Status do Registro</p>
@@ -29,7 +29,7 @@
             Voltar ao Início
         </a>
 
-        <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#222; margin-top:1.5rem;">
+        <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#a3a3a3; margin-top:1.5rem;">
             Sincronizado com o sistema docente
         </p>
 

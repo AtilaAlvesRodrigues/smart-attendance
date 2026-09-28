@@ -11,6 +11,8 @@ use App\Models\Presenca;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use App\Support\SituacaoAcademica;
 
 /**
  * DashboardController
@@ -65,23 +67,30 @@ class DashboardController extends BaseController
     public function alunoIndex()
     {
         $aluno = Auth::guard('alunos')->user()->load('materias');
-        
+        $materiaIds = $aluno->materias->pluck('id');
+
+        // Aulas realizadas = chamadas (códigos únicos) feitas em cada matéria
+        $aulasRealizadas = Presenca::whereIn('materia_id', $materiaIds)
+            ->select('materia_id', DB::raw('COUNT(DISTINCT codigo_aula) as total'))
+            ->groupBy('materia_id')
+            ->pluck('total', 'materia_id');
+
+        $presencasAluno = Presenca::whereIn('materia_id', $materiaIds)
+            ->where('aluno_id', $aluno->id)
+            ->select('materia_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('materia_id')
+            ->pluck('total', 'materia_id');
+
         foreach ($aluno->materias as $materia) {
-            // Conta quantas aulas (códigos únicos) existiram para essa matéria até agora
-            $total_sessoes = Presenca::where('materia_id', $materia->id)
-                ->distinct('codigo_aula')
-                ->count('codigo_aula');
-            
-            // Conta as presenças do aluno
-            $presencas_aluno = Presenca::where('materia_id', $materia->id)
-                ->where('aluno_id', $aluno->id)
-                ->count();
-            
-            // Faltas = Total de sessões que ocorreram - presenças confirmadas
-            $materia->faltas = max(0, $total_sessoes - $presencas_aluno);
-            
-            // Limite de faltas (25% da carga horária total de aulas)
-            $materia->limite_faltas = floor(($materia->total_aulas ?? 0) * 0.25);
+            $materia->situacao = new SituacaoAcademica(
+                aulasRealizadas: (int) ($aulasRealizadas[$materia->id] ?? 0),
+                presencas: (int) ($presencasAluno[$materia->id] ?? 0),
+                aulasPrevistas: (int) ($materia->total_aulas ?? 0),
+                notas: [$materia->pivot->prova1, $materia->pivot->trabalho1, $materia->pivot->trabalho2, $materia->pivot->prova2],
+            );
+            // Mantidos para o modal de perfil
+            $materia->faltas = $materia->situacao->faltas;
+            $materia->limite_faltas = $materia->situacao->limiteFaltas;
         }
 
         return view('aluno.home', compact('aluno'));
@@ -98,9 +107,10 @@ class DashboardController extends BaseController
         $professoresCount = ProfessorModel::count();
         $alunosCount      = AlunoModel::count();
         $materiasCount    = Materia::count();
+        $solicitacoesPendentes = \App\Models\SolicitacaoAcesso::where('status', 'pendente')->count();
 
         return view('master.home', compact(
-            'master', 'professoresCount', 'alunosCount', 'materiasCount'
+            'master', 'professoresCount', 'alunosCount', 'materiasCount', 'solicitacoesPendentes'
         ));
     }
 

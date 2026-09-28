@@ -14,8 +14,9 @@
         </div>
 
         <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#999; margin-bottom:0.75rem;">Erro de Registro</p>
-        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Ops.</h1>
-        <p style="font-size:0.9rem; color:#f87171; font-weight:500; margin-bottom:2.5rem;">{{ $mensagem ?? 'Ocorreu um erro ao confirmar sua presença. Tente novamente ou procure o professor.' }}</p>
+        <h1 style="font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-0.04em; color:#efefef; margin:0 0 0.75rem;">Não foi possível registrar</h1>
+        <p style="font-size:0.9rem; color:#f87171; font-weight:500; margin-bottom:1rem;">{{ $mensagem ?? 'Ocorreu um erro ao confirmar sua presença. Tente novamente ou procure o professor.' }}</p>
+        <p style="font-size:0.9rem; color:#bbb; margin-bottom:2.5rem;">Escaneie de novo o QR Code projetado em sala. Se não funcionar, avise o professor: ele pode enviar o link da chamada.</p>
 
         <div style="display:flex; flex-direction:column; gap:0.75rem;">
             <a href="{{ route('dashboard.aluno') }}"
@@ -25,7 +26,7 @@
                 Voltar ao Início
             </a>
 
-            <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#222; margin:0.5rem 0 0;">
+            <p style="font-family:'Space Grotesk',monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#a3a3a3; margin:0.5rem 0 0;">
                 Código: SEC-PRES-01
             </p>
         </div>

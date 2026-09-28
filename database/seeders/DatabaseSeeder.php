@@ -114,6 +114,34 @@ class DatabaseSeeder extends Seeder
         $materiaOutra->professores()->syncWithoutDetaching([$professorOutro->id]);
         $materiaOutra->alunos()->syncWithoutDetaching([$alunoPrincipal->id]); 
 
+        // --- Dados de demonstração do aluno principal ---------------------
+        // Notas lançadas em Desenvolvimento Web (aluno em dia)...
+        $materiaWeb->alunos()->updateExistingPivot($alunoPrincipal->id, [
+            'prova1' => 8.5, 'trabalho1' => 9.0, 'trabalho2' => 7.5,
+        ]);
+
+        // ...e em Banco de Dados um caso de atenção: 12 aulas dadas, 6 faltas
+        // (limite de 7), para a demonstração mostrar o alerta de faltas.
+        $colega = $alunosExtras[0];
+        $materiaOutra->alunos()->syncWithoutDetaching([$colega->id]);
+        $materiaOutra->alunos()->updateExistingPivot($alunoPrincipal->id, [
+            'prova1' => 4.5, 'trabalho1' => 6.0,
+        ]);
+        for ($aula = 1; $aula <= 12; $aula++) {
+            $registro = [
+                'professor_id' => $professorOutro->id,
+                'materia_id'   => $materiaOutra->id,
+                'data_aula'    => now()->subDays(($aula - 1) * 7)->format('Y-m-d'),
+                'semestre'     => '2/' . now()->year,
+                'horario'      => 'N',
+                'codigo_aula'  => 'BD' . $aula,
+            ];
+            Presenca::create($registro + ['aluno_id' => $colega->id]);
+            if ($aula % 2 === 0) {
+                Presenca::create($registro + ['aluno_id' => $alunoPrincipal->id]);
+            }
+        }
+
         array_shift($materiasExtras); 
 
         foreach ($materiasExtras as $materia) {

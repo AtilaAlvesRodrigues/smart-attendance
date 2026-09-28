@@ -10,7 +10,7 @@
 
 @if($isAuth && $expiresAtMs)
 <!-- Container do Timer de Sessão (Pílula perfeitamente centralizada) -->
-<div id="session-timer-widget" class="inline-flex items-center justify-center text-center rounded-full text-xs font-mono font-bold transition-all duration-300 bg-purple-950/60 text-purple-300 border border-purple-500/40 shadow-md">
+<div id="session-timer-widget" role="timer" aria-label="Tempo restante até a sessão expirar por segurança" title="Tempo restante até a sessão expirar por segurança" class="inline-flex items-center justify-center text-center rounded-full text-xs font-mono font-bold transition-all duration-300 bg-purple-950/60 text-purple-300 border border-purple-500/40 shadow-md">
     <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" id="session-timer-dot" style="margin-right: 8px;"></span>
     <span id="session-timer-display" class="text-white text-sm font-bold tracking-widest text-center tabular-nums" style="line-height: 1; display: inline-block; text-align: center;">59:59</span>
 </div>

@@ -1,0 +1,118 @@
+/* ==========================================================================
+   USABILIDADE E ACESSIBILIDADE — camada final
+   Carregado por último no layout (depois dos CSS de cada perfil), para
+   corrigir legibilidade em todas as telas sem mexer na identidade visual.
+   Referência: WCAG 2.2 AA (contraste 4.5:1 em texto, alvos de toque 44px).
+   ========================================================================== */
+
+/* --- 1. Contraste ---------------------------------------------------------
+   Os cinzas #555-#888 sobre o fundo #050505-#111 ficavam abaixo de 4.5:1.
+   #a3a3a3 sobre #0d0d0d ≈ 7.8:1; #c4c4c4 ≈ 11:1.                              */
+:root {
+    --pal-gray:       #a3a3a3;
+    --pal-light-gray: #c4c4c4;
+}
+html.light-mode {
+    --pal-gray:       #525252;   /* 7.4:1 sobre #f5f5f7 */
+    --pal-light-gray: #333333;
+}
+
+html:not(.light-mode) [style*="color:#444"],
+html:not(.light-mode) [style*="color:#555"],
+html:not(.light-mode) [style*="color:#666"],
+html:not(.light-mode) [style*="color:#777"],
+html:not(.light-mode) [style*="color: #777"],
+html:not(.light-mode) [style*="color:#888"],
+html:not(.light-mode) [style*="color: #888"] { color: #a3a3a3 !important; }
+
+html:not(.light-mode) .text-white\/20,
+html:not(.light-mode) .text-white\/30,
+html:not(.light-mode) .text-white\/40,
+html:not(.light-mode) .text-white\/50 { color: rgba(255,255,255,0.72) !important; }
+
+html.light-mode .pal-eyebrow,
+html.light-mode .pal-subtitle { color: #525252 !important; }
+
+/* --- 2. Tamanho mínimo e rótulos ------------------------------------------
+   Rótulos em caixa alta muito espaçada são lidos letra a letra. Mantemos o
+   estilo, mas com espaçamento menor e tamanho mínimo de ~12.5px.             */
+.pal-eyebrow,
+.pal-overline,
+.login-label,
+.pal-nav-user-role,
+.pal-sidebar-section-label {
+    font-size: 0.78rem !important;
+    letter-spacing: 0.08em !important;
+}
+.pal-eyebrow, .pal-overline, .login-label { color: var(--pal-gray); opacity: 1 !important; }
+html:not(.light-mode) .pal-nav-user-role { color: #a3a3a3 !important; }
+
+[style*="font-size:0.55rem"], [style*="font-size:0.58rem"], [style*="font-size:0.6rem"],
+[style*="font-size:0.62rem"], [style*="font-size:0.65rem"], [style*="font-size:0.68rem"],
+[style*="font-size:0.7rem"], [style*="font-size:0.72rem"],
+.text-\[10px\], .text-\[11px\] { font-size: 0.8rem !important; }
+
+[style*="letter-spacing:0.2em"], [style*="letter-spacing:0.25em"], [style*="letter-spacing:0.3em"],
+.tracking-\[0\.2em\], .tracking-\[0\.3em\], .tracking-widest { letter-spacing: 0.1em !important; }
+
+.pal-subtitle, .pal-page-sub { font-size: 0.95rem; line-height: 1.55; }
+
+/* --- 3. Foco visível para teclado -------------------------------------- */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid #a78bfa !important;
+    outline-offset: 2px !important;
+    border-radius: 4px;
+}
+html.light-mode a:focus-visible, html.light-mode button:focus-visible,
+html.light-mode input:focus-visible { outline-color: #6d28d9 !important; }
+
+/* --- 4. Menos movimento para quem pede ---------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .tilt-card { transform: none !important; }
+    #pal-cursor-glow { display: none !important; }
+}
+/* O brilho que segue o cursor não existe em telas de toque */
+@media (hover: none) { #pal-cursor-glow { display: none !important; } }
+
+/* --- 5. Celular ---------------------------------------------------------- */
+@media (max-width: 640px) {
+    /* Botões do menu não podem ser cortados nem ficar menores que 44px */
+    .pal-nav { gap: 0.5rem; }
+    .pal-nav-actions { gap: 0.4rem !important; min-width: 0; }
+    .pal-nav-btn { padding: 0.55rem 0.7rem !important; letter-spacing: 0.04em !important; min-height: 40px; display: inline-flex; align-items: center; }
+    .pal-nav-user { display: none !important; }            /* nome já aparece no painel */
+    .pal-profile-btn { min-width: 40px; min-height: 40px; }
+
+    /* Botão de tema menor e sem cobrir o conteúdo */
+    #theme-toggle { width: 40px !important; height: 40px !important; bottom: 1rem !important; right: 1rem !important; }
+    .pal-site-footer { padding-bottom: 4.5rem; }
+
+    /* Campos com 16px evitam o zoom automático do iPhone ao tocar */
+    input, select, textarea, .login-input { font-size: 16px !important; }
+}
+
+/* Alvos de toque confortáveis em qualquer tela */
+.login-btn, .pal-btn-primary, .pal-btn-outline, .pal-dashboard-btn { min-height: 44px; }
+
+/* --- 6. Componentes novos (painéis) ------------------------------------ */
+
+/* Aula em andamento na página inicial (sem expor o QR) */
+.pal-live-classes { margin-top: 1.5rem; text-align: center; }
+.pal-live-classes-label { font-size: 0.85rem; font-weight: 700; color: #22c55e; margin: 0 0 0.35rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+.pal-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,0.2); }
+.pal-live-classes-item { color: var(--pal-white); font-size: 1rem; margin: 0.15rem 0; }
+.pal-live-classes-hint { color: var(--pal-gray); font-size: 0.9rem; margin: 0.5rem 0 0; }
+
+/* Cronômetro da sessão com legenda */
+.pal-timer-caption { display: block; font-size: 0.72rem; color: var(--pal-gray); text-align: center; margin-top: 0.3rem; }
+.pal-hero-visual { flex-direction: column; align-items: center; }
+/* Modo projeção da chamada: nada por cima do QR Code */
+body:has(#modo-projecao.flex) #theme-toggle,
+body:has(#modo-projecao.flex) #session-timer-widget { display: none !important; }

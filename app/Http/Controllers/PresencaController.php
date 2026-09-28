@@ -93,7 +93,7 @@ class PresencaController extends Controller
         $presencaUrl = $request->getSchemeAndHttpHost()
             . route('presenca.confirmar', $codigo_aula, false);
 
-        return view('professor.presenca.gerar', compact('materia', 'codigo_aula', 'semestre', 'horario', 'expiraEmTimestamp', 'presencaUrl'));
+        return view('professor.presenca.gerar', compact('professor', 'materia', 'codigo_aula', 'semestre', 'horario', 'expiraEmTimestamp', 'presencaUrl'));
     }
 
     /**

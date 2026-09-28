@@ -13,10 +13,10 @@
     <div class="pal-nav-actions" style="gap:0.5rem">
         <a href="{{ route('master.cadastrar') }}" class="pal-nav-btn no-underline" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #c084fc; font-weight: 600;">+ Cadastrar</a>
         <div class="pal-nav-user">
-            <span class="pal-nav-user-role">Acesso Root</span>
+            <span class="pal-nav-user-role">Administrador</span>
             <span class="pal-nav-user-name">{{ $master->nome ?? 'Administrador' }}</span>
         </div>
-        <button id="open-profile" class="pal-profile-btn">
+        <button id="open-profile" class="pal-profile-btn" type="button" aria-label="Abrir meu perfil" title="Meu perfil">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         </button>
     </div>
@@ -32,7 +32,7 @@
                 <p class="pal-eyebrow" style="margin-bottom:0.3rem;">Painel de Controle</p>
                 <h2 class="pal-always-white" style="font-size:1.4rem; font-weight:900; letter-spacing:-0.03em; margin:0;">Perfil Master</h2>
             </div>
-            <button id="close-profile" class="pal-profile-btn" style="border-color:rgba(255,255,255,0.1); color:#888;">
+            <button id="close-profile" class="pal-profile-btn" type="button" aria-label="Fechar perfil" style="border-color:rgba(255,255,255,0.1); color:#888;">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -68,54 +68,50 @@
 <main class="pal-main animate-reveal">
 
     {{-- Header --}}
-    <div class="border-b border-white/5 pb-8 mb-10">
-        <p class="pal-eyebrow mb-2">Admin Master</p>
-        <h1 class="pal-title">Visão Geral do Sistema</h1>
-        <p class="pal-subtitle">Controle total de usuários, turmas e registros de presença.</p>
+    <div class="border-b border-white/5 pb-8 mb-8">
+        <p class="pal-eyebrow mb-2">Administração</p>
+        <h1 class="pal-title">Visão geral</h1>
+        <p class="pal-subtitle">Cadastre pessoas e matérias, aprove pedidos de acesso e acompanhe as presenças da instituição.</p>
     </div>
 
-    {{-- Stats --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        @foreach([
-            [$professoresCount, 'Professores'],
-            [$alunosCount, 'Alunos'],
-            [$materiasCount, 'Matérias'],
-        ] as [$count, $label])
-        <div class="pal-stat-card shadow-xl transition-all animate-fade-in">
-            <p class="number mb-3">{{ $count }}</p>
-            <p class="label m-0">{{ $label }}</p>
+    {{-- Pendências --}}
+    @if($solicitacoesPendentes > 0)
+    <a href="{{ route('master.solicitacoes') }}" class="glass flex items-center justify-between gap-4 flex-wrap p-6 rounded-sm no-underline mb-8"
+       style="border:1px solid rgba(245,158,11,0.5); background:rgba(245,158,11,0.08);">
+        <div>
+            <p class="pal-text font-black m-0" style="font-size:1.1rem;">
+                {{ $solicitacoesPendentes }} {{ $solicitacoesPendentes === 1 ? 'pedido de acesso aguardando' : 'pedidos de acesso aguardando' }} sua análise
+            </p>
+            <p class="pal-subtitle m-0">Alunos e professores que pediram cadastro pela página pública.</p>
         </div>
-        @endforeach
-    </div>
+        <span class="pal-btn-primary px-6 py-3 text-sm font-bold rounded-sm whitespace-nowrap">Analisar pedidos &rarr;</span>
+    </a>
+    @endif
 
-
-    {{-- Action Cards --}}
+    {{-- Totais + atalhos --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         @foreach([
-            [route('master.professores'), 'Professores', 'Visualizar e gerenciar docentes do sistema.'],
-            [route('master.alunos'), 'Alunos', 'Gerenciar matrículas e acesso dos estudantes.'],
-            [route('master.materias'), 'Matérias', 'Configurar disciplinas e vínculos curriculares.'],
-        ] as $index => $item)
-        @php
-            [$url, $title, $desc] = $item;
-        @endphp
-        <a href="{{ $url }}" class="group glass block p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline hover:-translate-y-1 pal-card-delay-{{ $index + 1 }} tilt-card">
-            <h3 class="text-lg font-black tracking-tight pal-text mb-2">{{ $title }}</h3>
+            [route('master.professores'), $professoresCount, 'Professores', 'Ver e editar docentes e as matérias de cada um.', 'Ver professores'],
+            [route('master.alunos'), $alunosCount, 'Alunos', 'Ver matrículas, dados de acesso e frequência.', 'Ver alunos'],
+            [route('master.materias'), $materiasCount, 'Matérias', 'Ver disciplinas, salas e professores vinculados.', 'Ver matérias'],
+        ] as $index => [$url, $count, $title, $desc, $acao])
+        <a href="{{ $url }}" class="group glass block p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline pal-card-delay-{{ $index + 1 }}">
+            <p class="pal-text font-black m-0" style="font-size:2.5rem; letter-spacing:-0.04em; line-height:1;">{{ $count }}</p>
+            <h2 class="text-lg font-black tracking-tight pal-text mt-2 mb-2">{{ $title }}</h2>
             <p class="text-sm pal-subtitle leading-relaxed mb-6">{{ $desc }}</p>
-            <span class="font-mono text-[10px] font-bold tracking-[0.15em] uppercase pal-text-muted group-hover:pal-text transition-colors border-b border-white/20 pb-1">Explorar &rarr;</span>
+            <span class="text-sm font-bold pal-text border-b border-white/20 pb-1">{{ $acao }} &rarr;</span>
         </a>
         @endforeach
     </div>
 
-    {{-- Large Action --}}
+    {{-- Presenças --}}
     <a href="{{ route('master.presenca') }}" class="group glass block p-10 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline">
         <div class="flex items-center justify-between gap-8 flex-wrap">
             <div>
-                <p class="pal-eyebrow mb-3">Módulo</p>
-                <h3 class="text-3xl font-black tracking-tighter pal-text mb-3">Central de Chamada QR Code</h3>
-                <p class="text-sm pal-subtitle m-0">Monitore presenças em tempo real e acesse o log completo de atividades.</p>
+                <h2 class="text-3xl font-black tracking-tighter pal-text mb-3">Presenças</h2>
+                <p class="text-sm pal-subtitle m-0">Todas as presenças registradas, com filtros por professor, matéria e aluno.</p>
             </div>
-            <span class="pal-btn-primary px-8 py-4 text-sm font-bold tracking-wide rounded-sm whitespace-nowrap group-hover:bg-indigo-600 group-hover:text-white transition-colors">Acessar Central &rarr;</span>
+            <span class="pal-btn-primary px-8 py-4 text-sm font-bold tracking-wide rounded-sm whitespace-nowrap">Ver presenças &rarr;</span>
         </div>
     </a>
 
