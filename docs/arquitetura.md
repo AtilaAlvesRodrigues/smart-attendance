@@ -119,12 +119,12 @@ São 58 rotas em [`routes/web.php`](../routes/web.php). As principais:
 | Método | Caminho | O que faz |
 |---|---|---|
 | GET | `/login` | Página inicial |
-| GET/POST | `/login/aluno`, `/login/professor` | Login (limite de 10 tentativas a cada 3 min) |
-| GET/POST | `/esqueci-senha/{aluno\|professor}` | Recuperação de senha (3 a cada 10 min) |
-| GET/POST | `/solicitar-acesso/{aluno\|professor}` | Pedido de cadastro (5 a cada 10 min) |
+| GET/POST | `/login/aluno`, `/login/professor` | Login (10 tentativas a cada 3 min por usuário) |
+| GET/POST | `/esqueci-senha/{aluno\|professor}` | Recuperação de senha (3 a cada 10 min por e-mail) |
+| GET/POST | `/solicitar-acesso/{aluno\|professor}` | Pedido de cadastro (5 a cada 10 min por e-mail) |
 | GET/POST | `/criar-senha` | Senha definitiva no primeiro acesso |
 | GET | `/presenca/confirmar/{codigo}` | Link do QR Code; pede login se necessário |
-| GET/POST | `/evento/checkin` | Check-in de palestra, sem login (5 por minuto) |
+| GET/POST | `/evento/checkin` | Check-in de palestra, sem login (5 por minuto por participante) |
 | GET | `/aluno/demonstracao`, `/professor/demonstracao` | Demonstrações dos painéis |
 | GET | `/cron/manter-banco-ativo` | Tarefa diária da Vercel (exige `CRON_SECRET`) |
 

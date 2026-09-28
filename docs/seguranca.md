@@ -52,16 +52,19 @@ As respostas em JSON só devolvem o necessário: a lista de presentes do profess
 
 ## Limite de tentativas
 
-| Rota | Limite |
-|---|---|
-| Login de aluno e de professor | 10 a cada 3 minutos |
-| Criar senha | 10 a cada 3 minutos |
-| Esqueci minha senha | 3 a cada 10 minutos |
-| Pedido de acesso | 5 a cada 10 minutos |
-| Verificação de e-mail do pedido | 20 por minuto |
-| Formulário de check-in de evento | 10 por minuto |
-| Envio de check-in de evento | 5 por minuto |
-| Buscas do Master | 30 por minuto |
+Os limites são contados **por pessoa** (o usuário ou o e-mail informado, junto com o IP), com um teto bem mais alto por IP. Numa instituição, todos os celulares do Wi-Fi saem pelo mesmo IP: limitar só por IP barraria a turma inteira depois das primeiras pessoas. Os limites ficam em [`AppServiceProvider`](../app/Providers/AppServiceProvider.php).
+
+| Rota | Por pessoa | Por IP |
+|---|---|---|
+| Login de aluno e de professor | 10 a cada 3 minutos, por usuário | 300 por minuto |
+| Criar senha | 10 a cada 3 minutos, por sessão | 300 por minuto |
+| Esqueci minha senha | 3 a cada 10 minutos, por e-mail | 100 a cada 10 minutos |
+| Pedido de acesso | 5 a cada 10 minutos, por e-mail | 100 a cada 10 minutos |
+| Check-in de evento | 5 por minuto, por e-mail no evento | 300 por minuto |
+| Verificação de e-mail do pedido | | 20 por minuto |
+| Buscas do Master | 30 por minuto, por administrador | |
+
+O usuário é comparado sem diferenciar maiúsculas e sem espaços nas pontas, então `Aluno@Site.com ` conta como `aluno@site.com`.
 
 ## CSRF
 
