@@ -1,0 +1,41 @@
+name: Nova tarefa
+description: Item de trabalho para o quadro (sprint ou backlog)
+title: "Verbo no infinitivo + o quê (ex.: Criar tela de justificativa de faltas)"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use o padrão do [quadro do projeto](https://github.com/users/AtilaAlvesRodrigues/projects/1): título com verbo no infinitivo, contexto e critérios de aceite.
+        Depois de criar, preencha no quadro: **Status**, **Priority**, **Size**, **Estimate** e **Sprint**.
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto
+      description: Qual problema isto resolve e para quem.
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceite
+      description: O que precisa estar verdadeiro para a tarefa ser concluída.
+      value: |
+        - [ ] 
+        - [ ] Testes automatizados para o que mudou
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo
+      options: [funcionalidade, bug, segurança, design, documentação, teste, infraestrutura, refatoração]
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      multiple: true
+      options: [aluno, professor, master, plataforma]
+    validations:
+      required: true
