@@ -116,3 +116,22 @@ html.light-mode input:focus-visible { outline-color: #6d28d9 !important; }
 /* Modo projeção da chamada: nada por cima do QR Code */
 body:has(#modo-projecao.flex) #theme-toggle,
 body:has(#modo-projecao.flex) #session-timer-widget { display: none !important; }
+
+/* Nada decorativo (blobs, faixa animada) pode alargar a página no celular:
+   o corte precisa estar no html, não só no body, senão o Chrome mobile
+   aumenta a área visível e reduz o zoom da página inteira. */
+html, body { max-width: 100%; overflow-x: hidden; }
+@supports (overflow: clip) { html, body { overflow-x: clip; } }
+.pal-marquee, .pal-marquee-wrap { overflow: hidden; max-width: 100%; }
+
+/* Página inicial no celular: títulos gigantes e a grade de números
+   não cabiam em 375px e alargavam a página (o menu aparecia cortado). */
+@media (max-width: 640px) {
+    .pal-product-item { grid-template-columns: 1fr; gap: 0.75rem; padding: 2.5rem 0; }
+    .pal-product-title { font-size: clamp(1.9rem, 9vw, 2.5rem); overflow-wrap: anywhere; }
+    .pal-stats-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .pal-stat-number { font-size: clamp(2.5rem, 12vw, 3rem); }
+    .pal-container { min-width: 0; }
+}
+/* Blobs decorativos ficam presos à área de conteúdo */
+.pal-page { position: relative; overflow-x: clip; }
