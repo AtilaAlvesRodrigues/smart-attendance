@@ -118,7 +118,7 @@ class PresencaController extends Controller
         $materia_id = (int) $parts[0];
         $timestamp = (int) $parts[1];
 
-        $cacheKey = 'aula_materia_' . $materia_id . '_' . Carbon::createFromTimestamp($timestamp)->format('Y-m-d');
+        $cacheKey = 'aula_materia_' . $materia_id . '_' . Carbon::createFromTimestamp($timestamp, config('app.timezone'))->format('Y-m-d');
         $cacheData = Cache::get($cacheKey);
 
         if (!$cacheData || !is_array($cacheData) || ($cacheData['codigo'] ?? '') !== $codigo_aula) {
@@ -133,7 +133,7 @@ class PresencaController extends Controller
             return view('aluno.presenca.ja_registrado');
         }
 
-        $data_aula = Carbon::createFromTimestamp($timestamp)->format('Y-m-d');
+        $data_aula = Carbon::createFromTimestamp($timestamp, config('app.timezone'))->format('Y-m-d');
         $semestre = (now()->month <= 6 ? '1' : '2') . '/' . now()->year;
         $hora = now()->hour;
         $horario = $hora < 12 ? 'M' : ($hora < 18 ? 'V' : 'N');

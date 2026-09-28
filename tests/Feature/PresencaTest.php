@@ -312,4 +312,31 @@ class PresencaTest extends TestCase
             ->assertOk()
             ->assertExactJson([]);
     }
+
+    public function test_qr_code_gerado_a_noite_e_aceito_no_mesmo_dia(): void
+    {
+        // Entre 21h e 0h em Brasília a data em UTC já é o dia seguinte.
+        $this->travelTo(\Carbon\Carbon::parse("2026-09-27 22:30", "America/Sao_Paulo"));
+
+        $professor = ProfessorModel::factory()->create();
+        $aluno = AlunoModel::factory()->create();
+        $materia = Materia::factory()->create();
+        $professor->materias()->attach($materia->id);
+        $aluno->materias()->attach($materia->id);
+
+        $codigo = $this->actingAs($professor, "professores")
+            ->get("/professor/presenca/gerar/{$materia->id}")
+            ->assertOk()
+            ->viewData("codigo_aula");
+
+        $this->actingAs($aluno, "alunos")
+            ->get("/presenca/confirmar/{$codigo}")
+            ->assertViewIs("aluno.presenca.sucesso");
+
+        $this->assertDatabaseHas("presencas", [
+            "aluno_id" => $aluno->id,
+            "data_aula" => "2026-09-27",
+            "horario" => "N",
+        ]);
+    }
 }
