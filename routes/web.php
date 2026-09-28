@@ -50,6 +50,18 @@ Route::post('/force-logout', function (Request $request) {
 });
 
 Route::get('/', function () { return redirect()->route('login_form'); });
+
+// Agendado na Vercel (vercel.json → crons), 1x por dia: uma consulta simples
+// evita que o banco gratuito do Supabase seja pausado por falta de uso.
+// A Vercel envia "Authorization: Bearer <CRON_SECRET>".
+Route::get('/cron/manter-banco-ativo', function (Request $request) {
+    $segredo = config('services.cron.secret');
+    abort_unless($segredo && hash_equals('Bearer ' . $segredo, (string) $request->header('Authorization')), 404);
+
+    \Illuminate\Support\Facades\DB::select('select 1');
+
+    return response()->noContent();
+})->middleware('throttle:5,1')->name('cron.manter-banco');
 Route::get('/login', [LoginRouterController::class, 'showLoginForm'])->name('login_form');
 
 Route::get('/login/aluno', [AlunoLoginController::class, 'showLoginForm'])->name('login.aluno.form');

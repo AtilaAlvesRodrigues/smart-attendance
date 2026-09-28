@@ -304,7 +304,7 @@ Para garantir que as novas páginas de informação (`/aluno/saiba-mais` e `/pro
 - **Confirmação Instantânea**: Registro de presença via QR Code dinâmico em menos de 3 segundos.
 - **Gestão de Faltas**: Dashboard com percentual de assiduidade em tempo real por disciplina.
 - **Alertas de Risco**: Notificações visuais (vermelho/amarelo) quando o limite de faltas está próximo.
-- **Histórico Acadêmico**: Acesso rápido a datas de presença e justificativas.
+- **Histórico Acadêmico**: Datas em que o aluno esteve presente e em que faltou, por matéria.
 
 ### 👨‍🏫 Perfil: PROFESSOR
 - **Geração de QR Code**: Criação de códigos únicos por aula com tempo de expiração customizável.
