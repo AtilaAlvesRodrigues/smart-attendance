@@ -233,3 +233,13 @@ html.light-mode .sa-aluno {
     .sa-materias { grid-template-columns: 1fr; }
     .sa-btn-confirmar { width: 100%; justify-content: center; }
 }
+
+/* Histórico de aulas por matéria */
+.sa-historico { border-top: 1px solid var(--sa-borda); padding-top: 0.75rem; }
+.sa-historico summary { cursor: pointer; font-weight: 700; font-size: 0.9rem; color: var(--sa-texto); min-height: 32px; display: flex; align-items: center; }
+.sa-historico summary::marker { color: var(--sa-suave); }
+.sa-historico ul { list-style: none; margin: 0.5rem 0 0; padding: 0; max-height: 240px; overflow-y: auto; }
+.sa-historico li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.4rem 0.25rem; font-size: 0.9rem; border-bottom: 1px solid var(--sa-borda); color: var(--sa-suave); }
+.sa-historico li:last-child { border-bottom: none; }
+.sa-hist-presente strong { color: var(--sa-ok); }
+.sa-hist-falta strong { color: var(--sa-risco); }

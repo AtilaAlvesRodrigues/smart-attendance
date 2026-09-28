@@ -81,7 +81,26 @@ class DashboardController extends BaseController
             ->groupBy('materia_id')
             ->pluck('total', 'materia_id');
 
+        // Histórico: cada chamada feita na matéria e se o aluno estava presente
+        $chamadas = Presenca::whereIn('materia_id', $materiaIds)
+            ->select('materia_id', 'codigo_aula', DB::raw('MIN(data_aula) as data_aula'))
+            ->groupBy('materia_id', 'codigo_aula')
+            ->orderByDesc(DB::raw('MIN(data_aula)'))
+            ->get()
+            ->groupBy('materia_id');
+
+        // Chave matéria|código: o mesmo código pode existir em matérias diferentes
+        $codigosPresentes = Presenca::whereIn('materia_id', $materiaIds)
+            ->where('aluno_id', $aluno->id)
+            ->get(['materia_id', 'codigo_aula'])
+            ->mapWithKeys(fn ($p) => [$p->materia_id . '|' . $p->codigo_aula => true]);
+
         foreach ($aluno->materias as $materia) {
+            $materia->historico = ($chamadas[$materia->id] ?? collect())->map(fn ($c) => [
+                'data'     => \Carbon\Carbon::parse($c->data_aula),
+                'presente' => isset($codigosPresentes[$materia->id . '|' . $c->codigo_aula]),
+            ]);
+
             $materia->situacao = new SituacaoAcademica(
                 aulasRealizadas: (int) ($aulasRealizadas[$materia->id] ?? 0),
                 presencas: (int) ($presencasAluno[$materia->id] ?? 0),
