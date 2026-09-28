@@ -12,6 +12,7 @@ use App\Http\Controllers\CriarSenhaController;
 use App\Http\Controllers\SolicitacaoAcessoController;
 use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
+use App\Http\Controllers\MasterTurmaController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -49,6 +50,18 @@ Route::post('/force-logout', function (Request $request) {
 });
 
 Route::get('/', function () { return redirect()->route('login_form'); });
+
+// Agendado na Vercel (vercel.json → crons), 1x por dia: uma consulta simples
+// evita que o banco gratuito do Supabase seja pausado por falta de uso.
+// A Vercel envia "Authorization: Bearer <CRON_SECRET>".
+Route::get('/cron/manter-banco-ativo', function (Request $request) {
+    $segredo = config('services.cron.secret');
+    abort_unless($segredo && hash_equals('Bearer ' . $segredo, (string) $request->header('Authorization')), 404);
+
+    \Illuminate\Support\Facades\DB::select('select 1');
+
+    return response()->noContent();
+})->middleware('throttle:5,1')->name('cron.manter-banco');
 Route::get('/login', [LoginRouterController::class, 'showLoginForm'])->name('login_form');
 
 Route::get('/login/aluno', [AlunoLoginController::class, 'showLoginForm'])->name('login.aluno.form');
@@ -140,6 +153,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::post('/cadastrar/aluno', [MasterCadastroController::class, 'cadastrarAluno'])->name('master.cadastrar.aluno');
         Route::post('/cadastrar/professor', [MasterCadastroController::class, 'cadastrarProfessor'])->name('master.cadastrar.professor');
         Route::post('/cadastrar/materia', [MasterCadastroController::class, 'cadastrarMateria'])->name('master.cadastrar.materia');
+
+        Route::get('/materias/{materia}/turma', [MasterTurmaController::class, 'show'])->name('master.turma');
+        Route::put('/materias/{materia}/turma', [MasterTurmaController::class, 'update'])->name('master.turma.update');
 
         Route::get('/solicitacoes', [SolicitacaoAcessoController::class, 'index'])->name('master.solicitacoes');
         Route::post('/solicitacoes/{solicitacao}/aprovar', [SolicitacaoAcessoController::class, 'aprovar'])->name('master.solicitacoes.aprovar');

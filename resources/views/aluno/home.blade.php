@@ -183,6 +183,20 @@
                             </div>
                             @endforeach
                         </dl>
+
+                        @if($materia->historico->isNotEmpty())
+                        <details class="sa-historico">
+                            <summary>Ver histórico de aulas ({{ $materia->historico->count() }})</summary>
+                            <ul>
+                                @foreach($materia->historico as $aula)
+                                <li class="{{ $aula['presente'] ? 'sa-hist-presente' : 'sa-hist-falta' }}">
+                                    <span>{{ $aula['data']->format('d/m') }} · {{ ucfirst($aula['data']->locale('pt_BR')->translatedFormat('D')) }}</span>
+                                    <strong>{{ $aula['presente'] ? '✓ Presente' : '✕ Falta' }}</strong>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </details>
+                        @endif
                     </article>
                 @endforeach
             </div>

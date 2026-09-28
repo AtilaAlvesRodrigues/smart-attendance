@@ -586,12 +586,12 @@ function palToggleSidebar() {
 
             <x-ui.sidebar-group
                 label="Conteúdo"
-                :open="request()->routeIs('master.materias') || request()->routeIs('master.presenca')">
+                :open="request()->routeIs('master.materias', 'master.turma') || request()->routeIs('master.presenca')">
 
                 <x-ui.sidebar-item
                     href="{{ route('master.materias') }}"
                     label="Matérias"
-                    :active="request()->routeIs('master.materias')"
+                    :active="request()->routeIs('master.materias', 'master.turma')"
                     :badge="$sidebarCounts['total_materias'] ?? null">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

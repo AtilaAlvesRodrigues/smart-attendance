@@ -333,4 +333,37 @@ class MasterCadastroTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['nome']);
     }
+
+    public function test_sem_envio_de_email_master_recebe_o_token_para_entregar(): void
+    {
+        config(['mail.default' => 'log']);
+
+        $response = $this->postJson('/dashboard/master/cadastrar/aluno', [
+            'nome' => 'Carla Dias',
+            'email' => 'carla@example.com',
+            'cpf' => '98765432109',
+            'ra' => '654321',
+        ]);
+
+        $response->assertOk()->assertJsonStructure(['token_provisorio', 'proximo_passo']);
+        $token = $response->json('token_provisorio');
+
+        // O token devolvido é o mesmo que permite o primeiro acesso
+        $aluno = \App\Models\AlunoModel::where('email_search', \App\Models\AlunoModel::generateBlindIndex('carla@example.com'))->first();
+        $this->assertSame($token, $aluno->remember_token);
+        Mail::assertNothingSent();
+    }
+
+    public function test_cadastrar_materia_aponta_para_a_turma(): void
+    {
+        $response = $this->postJson('/dashboard/master/cadastrar/materia', [
+            'nome' => 'Estruturas de Dados',
+            'sala' => 'Lab 3',
+            'carga_horaria' => 60,
+            'total_aulas' => 30,
+        ]);
+
+        $materia = \App\Models\Materia::where('nome', 'Estruturas de Dados')->first();
+        $response->assertOk()->assertJson(['turma_url' => route('master.turma', $materia)]);
+    }
 }

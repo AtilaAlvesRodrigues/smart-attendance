@@ -9,9 +9,26 @@
         }
     },
     "routes": [
-        { "src": "/", "dest": "/api/index.php" },
-        { "src": "/(index\\.php|\\.htaccess)", "status": 404 },
-        { "handle": "filesystem" },
-        { "src": "/(.*)", "dest": "/api/index.php" }
+        {
+            "src": "/",
+            "dest": "/api/index.php"
+        },
+        {
+            "src": "/(index\\.php|\\.htaccess)",
+            "status": 404
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ],
+    "crons": [
+        {
+            "path": "/cron/manter-banco-ativo",
+            "schedule": "0 12 * * *"
+        }
     ]
 }
