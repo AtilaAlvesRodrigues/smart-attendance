@@ -10,6 +10,9 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - Relatório de bugs movido da raiz para `docs/relatorios/`.
 
 ### Corrigido
+- **Limite de tentativas por IP travava turmas inteiras.** No Wi-Fi da instituição todos saem pelo mesmo IP: só 10 alunos conseguiam fazer login a cada 3 minutos, e só 5 pessoas por minuto faziam check-in num evento. Agora o limite é por usuário (ou e-mail) + IP, com um teto alto por IP.
+- O botão de mostrar senha não funcionava na tela Criar senha (dois scripts alternavam o campo ao mesmo tempo), e nenhum botão de senha tinha nome para leitores de tela.
+- A página 404 ficava mais larga que a tela no celular; o site ganhou um ícone de aba.
 - A Central de Presenças do Master calculava faltas sobre as aulas previstas (um aluno com 100% aparecia com "24 de 40") e coloria a média com corte 6. Agora usa a mesma regra do resto do sistema.
 - A verificação de e-mail do pedido de acesso não funcionava: o JavaScript chamava a rota com o método errado.
 

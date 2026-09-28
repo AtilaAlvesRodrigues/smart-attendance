@@ -10,7 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;0,900;1,900&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/usability.css') }}">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <style>
+        /* Os blobs são fixos e passam da borda: não podem alargar a página no celular */
+        html, body { overflow-x: hidden; }
         .blob-404 {
             position: fixed;
             width: 600px;
