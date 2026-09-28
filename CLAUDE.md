@@ -87,6 +87,12 @@ Before making any UI changes, consult `.cursorrules` — it documents known bugs
 | Professor | `professor@teste.com` | `senha123` |
 | Aluno | `aluno.teste@site.com` | `senha123` |
 
+## Documentation
+
+Detailed docs live in `docs/` (Portuguese): `manual-do-usuario.md`, `arquitetura.md`, `banco-de-dados.md`, `regras-academicas.md`, `seguranca.md`, `instalacao.md`, `deploy.md`, `testes-e-ci.md`, `design-e-acessibilidade.md`. When behavior changes, update the matching doc and add an entry under "Não lançado" in `CHANGELOG.md`. Contribution conventions (branch prefixes, Conventional Commits in Portuguese, PR checklist) are in `CONTRIBUTING.md`.
+
+Attendance/grade math always goes through `App\Support\SituacaoAcademica` (used by the student dashboard, the professor grades page and its JS, and the Master attendance center).
+
 ## Deploy
 
 Production runs on Vercel (`vercel.json`, `api/index.php`, runtime `vercel-php`) with PostgreSQL on Supabase in a dedicated `laravel` schema (`DB_SEARCH_PATH=laravel`). The function filesystem is read-only except `/tmp`, so cache/compiled paths are redirected there via env vars, and sessions/cache use the `database` driver. See the Deploy section of `README.md`.
