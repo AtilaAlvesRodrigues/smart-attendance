@@ -1,9 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "atilaalvesrodrigues/smart-attendance",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Chamada por QR Code para instituições de ensino: presença, frequência, faltas e notas em tempo real.",
+    "keywords": [
+        "laravel",
+        "presenca",
+        "qr-code",
+        "educacao",
+        "frequencia"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -85,5 +91,6 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "homepage": "https://github.com/AtilaAlvesRodrigues/smart-attendance"
 }

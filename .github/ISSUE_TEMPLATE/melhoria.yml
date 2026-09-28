@@ -1,0 +1,31 @@
+name: Sugerir uma melhoria
+description: Ideia de funcionalidade nova ou de ajuste
+labels: ["melhoria"]
+body:
+  - type: dropdown
+    id: perfil
+    attributes:
+      label: Para qual perfil?
+      multiple: true
+      options:
+        - Aluno
+        - Professor
+        - Master
+        - Todos
+    validations:
+      required: true
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual problema isso resolve?
+      placeholder: "Ex.: o professor não consegue corrigir uma presença registrada por engano."
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Como você imagina a solução?
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas que você considerou

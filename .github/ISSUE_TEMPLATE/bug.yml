@@ -1,0 +1,53 @@
+name: Relatar um problema
+description: Algo não funciona como deveria
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por avisar! Não inclua senhas, CPFs ou outros dados pessoais reais.
+        Para falhas de segurança, fale direto com o responsável pelo repositório.
+  - type: dropdown
+    id: perfil
+    attributes:
+      label: Em qual perfil?
+      options:
+        - Aluno
+        - Professor
+        - Master
+        - Página pública (sem login)
+    validations:
+      required: true
+  - type: input
+    id: tela
+    attributes:
+      label: Em qual tela?
+      placeholder: "Ex.: Chamada (Projetar em tela cheia), Gerenciar turma..."
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Como reproduzir
+      placeholder: |
+        1. Entrei como professor
+        2. Cliquei em Iniciar chamada
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que aconteceu e o que deveria acontecer
+    validations:
+      required: true
+  - type: input
+    id: dispositivo
+    attributes:
+      label: Dispositivo e navegador
+      placeholder: "Ex.: iPhone 13 com Safari, notebook com Chrome"
+  - type: textarea
+    id: capturas
+    attributes:
+      label: Capturas de tela
+      description: Arraste as imagens para cá.

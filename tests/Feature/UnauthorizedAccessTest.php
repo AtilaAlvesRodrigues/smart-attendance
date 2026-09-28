@@ -190,4 +190,17 @@ class UnauthorizedAccessTest extends TestCase
 
         $this->assertNotSame(200, $response->status());
     }
+
+    public function test_relatorio_de_seguranca_so_para_o_master(): void
+    {
+        $this->actingAs(\App\Models\AlunoModel::factory()->create(), 'alunos')
+            ->get('/dashboard/master/relatorio-seguranca')->assertRedirect();
+        $this->actingAs(\App\Models\ProfessorModel::factory()->create(), 'professores')
+            ->get('/dashboard/master/relatorio-seguranca')->assertRedirect();
+        $this->actingAs(\App\Models\UsuarioMaster::factory()->create(), 'masters')
+            ->get('/dashboard/master/relatorio-seguranca')->assertOk();
+
+        // O endereço antigo, aberto a qualquer perfil, não existe mais
+        $this->get('/pdf-teste-vulnerabilidade')->assertNotFound();
+    }
 }

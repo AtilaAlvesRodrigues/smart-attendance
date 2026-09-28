@@ -173,24 +173,17 @@
                             @forelse($presencas as $p)
                                 @php
                                     $materiaPivot = $p->aluno ? $p->aluno->materias->where('id', $p->materia_id)->first()->pivot ?? null : null;
-                                    $media = null;
-                                    if($materiaPivot) {
-                                        $notas = collect([$materiaPivot->prova1, $materiaPivot->prova2, $materiaPivot->trabalho1, $materiaPivot->trabalho2])
-                                            ->filter(fn($n) => !is_null($n));
-                                        if($notas->isNotEmpty()) {
-                                            $media = round($notas->avg(), 1);
-                                        }
-                                    }
+                                    // Mesma regra do painel do aluno e da tela de notas
+                                    $sit = \App\Support\SituacaoAcademica::doAluno(
+                                        $p->materia_id, $p->aluno_id, (int) ($p->materia->total_aulas ?? 0),
+                                        $materiaPivot ? [$materiaPivot->prova1, $materiaPivot->trabalho1, $materiaPivot->trabalho2, $materiaPivot->prova2] : [],
+                                    );
+                                    $media = $sit->media;
+                                    $faltas = $sit->faltas;
 
-                                    $totalAulas = $p->materia->total_aulas ?? 0;
-                                    $presencasAluno = \App\Models\Presenca::where('materia_id', $p->materia_id)
-                                        ->where('aluno_id', $p->aluno_id)
-                                        ->count();
-                                    $faltas = max(0, $totalAulas - $presencasAluno);
-                                    
                                     $corMedia = 'text-white/70';
                                     if($media !== null) {
-                                        $corMedia = $media >= 6 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
+                                        $corMedia = $media >= \App\Support\SituacaoAcademica::MEDIA_MINIMA ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
                                     }
                                 @endphp
 
@@ -214,10 +207,10 @@
                                     
                                     <td class="py-4 px-6 text-center">
                                         <div class="flex flex-col items-center">
-                                            <span class="{{ $faltas > 0 ? 'text-red-400 font-black' : 'text-green-400' }} text-lg tracking-tighter">
+                                            <span class="{{ $sit->status === 'reprovado_falta' ? 'text-red-400 font-black' : ($faltas > 0 ? 'text-yellow-400 font-black' : 'text-green-400') }} text-lg tracking-tighter">
                                                 {{ $faltas }}
                                             </span>
-                                            <span class="text-[9px] text-white/70 uppercase font-bold">de {{ $totalAulas }}</span>
+                                            <span class="text-xs text-white/70 font-bold">de {{ $sit->limiteFaltas }} permitidas</span>
                                         </div>
                                     </td>
 
@@ -351,9 +344,9 @@
         setupMultiSearch(['filter-professor', 'filter-materia', 'filter-aluno'], '{{ route("master.search.presencas") }}', 'presencas-body', 'presencas-empty', 'pagination-links', (p, esc) => {
             let corMedia = 'text-white/70';
             if (p.media !== null) {
-                corMedia = p.media >= 6 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
+                corMedia = p.media >= 5 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
             }
-            const faltasClass = p.faltas > 0 ? 'text-red-400 font-black' : 'text-green-400';
+            const faltasClass = p.reprovado_falta ? 'text-red-400 font-black' : (p.faltas > 0 ? 'text-yellow-400 font-black' : 'text-green-400');
 
             return `
                 <tr class="hover:bg-white/5 transition-colors group">
@@ -378,7 +371,7 @@
                             <span class="${faltasClass} text-lg tracking-tighter">
                                 ${p.faltas}
                             </span>
-                            <span class="text-[9px] text-white/70 uppercase font-bold">de ${p.total_aulas}</span>
+                            <span class="text-xs text-white/70 font-bold">de ${p.limite_faltas} permitidas</span>
                         </div>
                     </td>
                     <td class="py-4 px-6 text-center">

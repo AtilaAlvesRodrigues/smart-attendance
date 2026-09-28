@@ -131,20 +131,11 @@ class MasterSearchController extends BaseController
 
         $results = $presencas->map(function ($p) {
             $materiaPivot = $p->aluno ? $p->aluno->materias->where('id', $p->materia_id)->first()->pivot ?? null : null;
-            $media = null;
-            if ($materiaPivot) {
-                $notas = collect([$materiaPivot->prova1, $materiaPivot->prova2, $materiaPivot->trabalho1, $materiaPivot->trabalho2])
-                    ->filter(fn($n) => !is_null($n));
-                if ($notas->isNotEmpty()) {
-                    $media = round($notas->avg(), 1);
-                }
-            }
-
-            $totalAulas = $p->materia->total_aulas ?? 0;
-            $presencasAluno = Presenca::where('materia_id', $p->materia_id)
-                ->where('aluno_id', $p->aluno_id)
-                ->count();
-            $faltas = max(0, $totalAulas - $presencasAluno);
+            $sit = \App\Support\SituacaoAcademica::doAluno(
+                $p->materia_id, $p->aluno_id, (int) ($p->materia->total_aulas ?? 0),
+                $materiaPivot ? [$materiaPivot->prova1, $materiaPivot->trabalho1, $materiaPivot->trabalho2, $materiaPivot->prova2] : [],
+            );
+            $media = $sit->media;
 
             return [
                 'id' => $p->id,
@@ -156,8 +147,9 @@ class MasterSearchController extends BaseController
                 'materia_sala' => $p->materia->sala ?? '',
                 'professor_nome' => $p->professor->nome ?? 'N/A',
                 'professor_cpf' => $p->professor ? $p->professor->cpf : 'N/A',
-                'faltas' => $faltas,
-                'total_aulas' => $totalAulas,
+                'faltas' => $sit->faltas,
+                'limite_faltas' => $sit->limiteFaltas,
+                'reprovado_falta' => $sit->status === 'reprovado_falta',
                 'media' => $media
             ];
         });

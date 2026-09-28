@@ -40,7 +40,7 @@
                             class="login-input login-input-password"
                             placeholder="Mínimo 8 caracteres"
                             autocomplete="new-password">
-                        <button type="button" class="login-password-btn" onclick="toggleSenha('pal-senha')">
+                        <button type="button" class="login-password-btn" aria-label="Mostrar senha" aria-pressed="false">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </button>
                     </div>
@@ -53,7 +53,7 @@
                             class="login-input login-input-password"
                             placeholder="Repita a nova senha"
                             autocomplete="new-password">
-                        <button type="button" class="login-password-btn" onclick="toggleSenha('pal-senha-conf')">
+                        <button type="button" class="login-password-btn" aria-label="Mostrar confirmação de senha" aria-pressed="false" data-rotulo="confirmação de senha">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </button>
                     </div>
@@ -72,10 +72,4 @@
 
 @push('scripts')
     <script src="{{ asset('js/pages/login.js') }}"></script>
-    <script>
-        function toggleSenha(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-    </script>
 @endpush

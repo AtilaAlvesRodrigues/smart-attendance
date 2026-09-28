@@ -65,13 +65,13 @@ Route::get('/cron/manter-banco-ativo', function (Request $request) {
 Route::get('/login', [LoginRouterController::class, 'showLoginForm'])->name('login_form');
 
 Route::get('/login/aluno', [AlunoLoginController::class, 'showLoginForm'])->name('login.aluno.form');
-Route::post('/login/aluno', [AlunoLoginController::class, 'attemptAuthentication'])     
-    ->middleware('throttle:10,3')
+Route::post('/login/aluno', [AlunoLoginController::class, 'attemptAuthentication'])
+    ->middleware('throttle:login')
     ->name('login.aluno');
 
 Route::get('/login/professor', [ProfessorLoginController::class, 'showLoginForm'])->name('login.professor.form');
 Route::post('/login/professor', [ProfessorLoginController::class, 'attemptAuthentication'])
-    ->middleware('throttle:10,3')
+    ->middleware('throttle:login')
     ->name('login.professor'); 
 
 // Informational "Saiba Mais" Pages
@@ -84,8 +84,8 @@ Route::get('/professor/demonstracao', function () { return view('pages.professor
 
 use App\Http\Controllers\EventoController;
 
-Route::get('/evento/checkin', [EventoController::class, 'checkinForm'])->middleware('throttle:10,1')->name('evento.checkin');
-Route::post('/evento/checkin/process', [EventoController::class, 'processCheckin'])->middleware('throttle:5,1')->name('evento.checkin.process');
+Route::get('/evento/checkin', [EventoController::class, 'checkinForm'])->middleware('throttle:evento-formulario')->name('evento.checkin');
+Route::post('/evento/checkin/process', [EventoController::class, 'processCheckin'])->middleware('throttle:evento-checkin')->name('evento.checkin.process');
 
 Route::get('/professor/evento/presenca', [EventoController::class, 'presencaDashboard'])->middleware('auth:professores')->name('professor.evento.presenca');
 Route::post('/professor/evento/encerrar', [EventoController::class, 'encerrarSessao'])->middleware('auth:professores')->name('professor.evento.encerrar');
@@ -101,15 +101,15 @@ Route::get('/presenca/confirmar/{codigo_aula}', [PresencaController::class, 'con
 
 // Esqueci Minha Senha (público)
 Route::get('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'show'])->name('esqueci-senha.show');
-Route::post('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'send'])->middleware('throttle:3,10')->name('esqueci-senha.send');
+Route::post('/esqueci-senha/{tipo}', [EsqueciSenhaController::class, 'send'])->middleware('throttle:recuperar-senha')->name('esqueci-senha.send');
 
 // Solicitação de Acesso (público) — pedido de cadastro analisado pelo Master
 Route::get('/solicitar-acesso/{tipo}', [SolicitacaoAcessoController::class, 'show'])->name('solicitar-acesso.show');
-Route::post('/solicitar-acesso/{tipo}', [SolicitacaoAcessoController::class, 'store'])->middleware('throttle:5,10')->name('solicitar-acesso.store');
+Route::post('/solicitar-acesso/{tipo}', [SolicitacaoAcessoController::class, 'store'])->middleware('throttle:solicitar-acesso')->name('solicitar-acesso.store');
 Route::post('/solicitar-acesso/{tipo}/verificar-email', [SolicitacaoAcessoController::class, 'verificarEmail'])->middleware('throttle:20,1')->name('solicitar-acesso.verificar-email');
 
 // Primeiro Acesso — Criação de senha definitiva
-Route::middleware(['primeiro-acesso', 'throttle:10,3'])->group(function () {
+Route::middleware(['primeiro-acesso', 'throttle:criar-senha'])->group(function () {
     Route::get('/criar-senha', [CriarSenhaController::class, 'show'])->name('criar-senha.show');
     Route::post('/criar-senha', [CriarSenhaController::class, 'store'])->name('criar-senha.store');
 });
@@ -118,7 +118,6 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
-    Route::get('/pdf-teste-vulnerabilidade', [PdfTesteVulnerabilidadeController::class, 'index'])->name('pdf.teste.vulnerabilidade');
 
     Route::middleware(['auth:alunos', 'role:aluno'])->group(function () {
         Route::get('/dashboard/aluno', [DashboardController::class, 'alunoIndex'])->name('dashboard.aluno');
@@ -144,6 +143,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
     Route::middleware(['auth:masters', 'role:master'])->prefix('dashboard/master')->group(function () {
          
         Route::get('/', [DashboardController::class, 'masterIndex'])->name('dashboard.master');
+
+        // Relatório interno de testes de segurança: lista vulnerabilidades, então só o Master vê
+        Route::get('/relatorio-seguranca', [PdfTesteVulnerabilidadeController::class, 'index'])->name('pdf.teste.vulnerabilidade');
 
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');

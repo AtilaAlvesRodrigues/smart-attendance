@@ -228,13 +228,13 @@
                     </div>
                     <div>
                         <label class="pal-eyebrow" style="margin-bottom:0.5rem;">Data Início</label>
-                        <input type="text" name="data_inicio" value="{{ request('data_inicio') }}" placeholder="DD/MM/AAAA"
-                            class="datepicker pal-filter-input w-full cursor-pointer">
+                        <input type="date" name="data_inicio" value="{{ request('data_inicio') }}" aria-label="Data de início"
+                            class="pal-filter-input w-full cursor-pointer" style="color-scheme: dark;">
                     </div>
                     <div>
                         <label class="pal-eyebrow" style="margin-bottom:0.5rem;">Data Fim</label>
-                        <input type="text" name="data_fim" value="{{ request('data_fim') }}" placeholder="DD/MM/AAAA"
-                            class="datepicker pal-filter-input w-full cursor-pointer">
+                        <input type="date" name="data_fim" value="{{ request('data_fim') }}" aria-label="Data de fim"
+                            class="pal-filter-input w-full cursor-pointer" style="color-scheme: dark;">
                     </div>
                     <div class="flex gap-2">
                         <button type="submit" class="flex-grow bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-sm transition-all border border-white/10">
@@ -325,14 +325,7 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        flatpickr(".datepicker", {
-            locale: "pt",
-            dateFormat: "Y-m-d", // Mantém formato do banco no value
-            altInput: true,
-            altFormat: "d/m/Y", // Mostra formato bonito para o usuário
-            disableMobile: "true",
-            animate: true
-        });
+        // Datas: campo nativo do navegador (envia AAAA-MM-DD, funciona no celular)
 
         // URLSearchParams para URL limpa sem campos vazios
         const filterForm = document.getElementById('relatorios-filter-form');

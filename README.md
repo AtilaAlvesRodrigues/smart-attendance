@@ -1,471 +1,303 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/PHP-8.2+-7A86C8?style=for-the-badge&logo=php&logoColor=white"/>
-<img src="https://img.shields.io/badge/Laravel-12+-FF2D20?style=for-the-badge&logo=laravel&logoColor=white"/>
-<img src="https://img.shields.io/badge/PostgreSQL-17+-336791?style=for-the-badge&logo=postgresql&logoColor=white"/>
-<a href="https://github.com/AtilaAlvesRodrigues/smart-attendance/actions/workflows/laravel.yml"><img src="https://img.shields.io/github/actions/workflow/status/AtilaAlvesRodrigues/smart-attendance/laravel.yml?branch=main&style=for-the-badge&label=CI"/></a>
-<a href="https://smart-attendance-nine-alpha.vercel.app"><img src="https://img.shields.io/badge/Demo-Online-22C55E?style=for-the-badge&logo=vercel&logoColor=white"/></a>
+# Smart Attendance
 
-# 📋 Smart Attendance
+**Chamada por QR Code para instituições de ensino.**
+O professor projeta um QR Code, o aluno aponta a câmera do celular e a presença é registrada em segundos, com frequência, faltas e notas sempre atualizadas.
 
-> Sistema web de controle de presença inteligente — rápido, preciso e seguro.
-> Desenvolvido como **Projeto Integrador** com PHP/Laravel.
+[![CI](https://img.shields.io/github/actions/workflow/status/AtilaAlvesRodrigues/smart-attendance/laravel.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/AtilaAlvesRodrigues/smart-attendance/actions/workflows/laravel.yml)
+[![Demo](https://img.shields.io/badge/demo-online-22C55E?style=for-the-badge&logo=vercel&logoColor=white)](https://smart-attendance-nine-alpha.vercel.app)
+![Testes](https://img.shields.io/badge/testes-204-7C3AED?style=for-the-badge)
+![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 
-**[🌐 Acessar a demo online](https://smart-attendance-nine-alpha.vercel.app)**
+**[Acessar a demonstração](https://smart-attendance-nine-alpha.vercel.app)** ·
+[Manual do usuário](docs/manual-do-usuario.md) ·
+[Instalação](docs/instalacao.md) ·
+[Documentação completa](docs/README.md)
 
-[⚙️ Instalação](#%EF%B8%8F-instalação) •
-[🧪 Testes](#-testes) •
-[🚀 Deploy](#-deploy) •
-[📱 Teste pelo Celular](#-teste-pelo-celular) •
-[🔐 Segurança](#-segurança) •
-[📁 Estrutura](#-estrutura) •
-[🗄️ Banco de Dados](#%EF%B8%8F-banco-de-dados)
+<img src="docs/img/projecao.jpg" alt="Tela de chamada em modo projeção, com QR Code grande, nome da matéria, número de presentes e validade" width="820">
 
 </div>
 
 ---
 
-## 📌 Sobre o Projeto
+## Sumário
 
-O **Smart Attendance** substitui listas de chamada manuais por um processo digital ágil e seguro. Desenvolvido com foco em boas práticas de segurança — criptografia AES-256, autenticação multi-guard e proteção contra os principais vetores de ataque.
+- [O problema e a solução](#o-problema-e-a-solução)
+- [Experimente](#experimente)
+- [Funcionalidades](#funcionalidades)
+- [Como funciona a chamada](#como-funciona-a-chamada)
+- [Regras acadêmicas](#regras-acadêmicas)
+- [Segurança](#segurança)
+- [Tecnologias](#tecnologias)
+- [Rodando localmente](#rodando-localmente)
+- [Testes e integração contínua](#testes-e-integração-contínua)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Documentação](#documentação)
+- [Próximos passos](#próximos-passos)
+- [Equipe](#equipe)
 
 ---
 
-## 👤 Perfis de Usuário
+## O problema e a solução
 
-| Perfil | Acesso |
+A chamada em papel toma de 5 a 10 minutos de cada aula, depende de o professor transcrever a lista depois e aceita a assinatura de um colega no lugar de quem faltou.
+
+O Smart Attendance substitui a lista por um **QR Code único por aula**:
+
+| | Chamada em papel | Smart Attendance |
+|---|---|---|
+| Tempo por aula | 5 a 10 minutos | Segundos: todos escaneiam ao mesmo tempo |
+| Lançamento | Manual, depois da aula | Automático, com a lista ao vivo na tela do professor |
+| Frequência do aluno | Só no fim do semestre | Sempre visível, com alerta antes de reprovar |
+| Dados pessoais | Em papel, sem controle | CPF, RA e e-mail criptografados no banco |
+
+---
+
+## Experimente
+
+A demonstração está publicada em **https://smart-attendance-nine-alpha.vercel.app**, com dados de teste:
+
+| Perfil | Onde entrar | Usuário | Senha |
+|---|---|---|---|
+| Aluno | Entrar como Aluno | `aluno.teste@site.com` (ou RA `100000000`) | `senha123` |
+| Professor | Entrar como Professor | `professor@teste.com` | `senha123` |
+| Master (administração) | Entrar como Professor | `master@admin.com` | `senha123` |
+
+> [!NOTE]
+> Os dados da demonstração são fictícios e podem ser reiniciados a qualquer momento. Não cadastre dados reais. Na demo, o envio de e-mail está desligado: ao cadastrar alguém, o Master recebe na tela o token de primeiro acesso.
+
+Para ver a chamada funcionando: entre como professor no computador, clique em **Iniciar chamada**, escolha uma matéria e escaneie o QR Code com o celular logado como aluno.
+
+---
+
+## Funcionalidades
+
+### Aluno
+
+<img src="docs/img/painel-aluno.jpg" alt="Painel do aluno no celular com cartões por matéria" width="260" align="right">
+
+- **Registra presença** apontando a câmera para o QR Code da aula. Se ainda não estiver logado, o sistema guarda a presença pendente e conclui depois do login.
+- **Painel por matéria** com a situação em texto e cor (*Em dia*, *Atenção*, *Reprovado*), frequência, faltas usadas em relação ao limite, média e as notas (P1, T1, T2, P2).
+- **Explicação da situação** em linguagem simples, por exemplo "Restam só 1 falta até o limite".
+- **Histórico de aulas**: a data de cada chamada e se esteve presente ou faltou.
+- **Primeiro acesso** com token provisório e criação da senha definitiva.
+- **Esqueci minha senha** e **solicitação de acesso** pela página pública.
+
+<br clear="right">
+
+### Professor
+
+- **Chamada por QR Code** válida por 2 horas, com a lista de presentes atualizada a cada 3 segundos.
+- **Modo projeção**: QR Code em tela cheia, com o nome da matéria, o número de presentes e a validade.
+- **Link da chamada** para copiar e enviar a quem estiver sem câmera.
+- **Turmas e notas**: lança as quatro notas direto na tabela (salva sozinha) e vê a frequência e a situação de cada aluno.
+- **Relatórios** de presença com filtro por matéria e período, prontos para imprimir.
+- **Palestras e eventos**: lista de presença para público externo, sem login, com proteção contra robôs e exportação em PDF.
+
+### Master (administração)
+
+- **Cadastro** de alunos, professores e matérias.
+- **Gerenciar turma**: define os professores e os alunos matriculados de cada matéria.
+- **Pedidos de acesso**: aprova ou rejeita quem pediu cadastro pela página pública; a visão geral avisa quando há pedidos pendentes.
+- **Central de presenças** com todos os registros e filtros por professor, matéria e aluno.
+- **Listagens** de professores, alunos e matérias com busca.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/img/chamada.jpg" alt="Tela da chamada com QR Code e lista de presentes"><br><sub>Chamada aberta, com a lista de presentes ao vivo</sub></td>
+    <td width="50%"><img src="docs/img/notas.jpg" alt="Tabela de notas e situação dos alunos"><br><sub>Notas, frequência e situação de cada aluno</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/img/turma.jpg" alt="Tela Gerenciar turma do Master"><br><sub>Master define professores e alunos da turma</sub></td>
+    <td width="50%"><img src="docs/img/painel-master.jpg" alt="Visão geral do Master"><br><sub>Visão geral da administração</sub></td>
+  </tr>
+</table>
+
+O passo a passo de cada tela está no **[Manual do usuário](docs/manual-do-usuario.md)**.
+
+---
+
+## Como funciona a chamada
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor P as Professor
+    participant S as Smart Attendance
+    actor A as Aluno (celular)
+
+    P->>S: Iniciar chamada (escolhe a matéria)
+    S->>S: Gera código único da aula, válido por 2 h
+    S-->>P: QR Code em tela cheia
+    A->>S: Escaneia o QR Code
+    alt Aluno não está logado
+        S-->>A: Pede login e guarda a presença pendente
+        A->>S: Faz login
+    end
+    S->>S: Confere validade, matrícula e duplicidade
+    S-->>A: Presença confirmada!
+    loop a cada 3 segundos
+        P->>S: Atualiza a lista
+        S-->>P: Nome e RA de quem já registrou
+    end
+```
+
+Os detalhes de cada fluxo (primeiro acesso, pedido de acesso, eventos, notas) estão em [Arquitetura e fluxos](docs/arquitetura.md).
+
+---
+
+## Regras acadêmicas
+
+Uma única classe, [`App\Support\SituacaoAcademica`](app/Support/SituacaoAcademica.php), calcula a situação do aluno. Assim, o painel do aluno, a tela de notas do professor e a central do Master mostram sempre os mesmos números.
+
+| Regra | Como é calculada |
 |---|---|
-| 🎓 **Aluno** | Visualiza presenças e notas |
-| 👨‍🏫 **Professor** | Gerencia chamadas, notas e eventos |
-| 🛠️ **Master** | Painel administrativo completo |
+| Faltas | Aulas já realizadas na matéria − presenças do aluno |
+| Limite de faltas | 25% das aulas previstas no semestre (frequência mínima de 75%) |
+| Reprovado por falta | Quando as faltas **passam** do limite |
+| Média | Média simples das notas lançadas (P1, T1, T2, P2) |
+| Aprovado | As quatro notas lançadas, média ≥ 5,0 e dentro do limite de faltas |
+| Atenção | Faltas perto do limite, média parcial abaixo de 5,0 ou frequência abaixo de 75% |
+
+Mais exemplos em [Regras acadêmicas](docs/regras-academicas.md).
 
 ---
 
-## 🔐 Segurança
+## Segurança
 
 | Camada | Implementação |
 |---|---|
-| 🔒 Criptografia | AES-256 em campos PII (email, CPF, RA, remember_token) |
-| 🔍 Blind Index | SHA-256 nos campos cifrados para buscas seguras |
-| 👥 Autenticação | Multi-Guard independente por perfil (alunos / professores / masters) |
-| 🚦 Rate Limiting | Anti-força bruta por IP em login e envio de e-mail |
-| 🛡️ Headers HTTP | CSP, X-Frame-Options, Permissions-Policy |
-| 🔑 CSRF | Token em todos os formulários e requisições AJAX |
-| 🤖 Honeypot | Anti-bot no check-in público de eventos |
-| 📋 Logging | Registro de falhas de autenticação e erros de envio de e-mail |
+| Dados pessoais | CPF, RA e e-mail criptografados com AES-256 (cast `encrypted`) |
+| Busca em dados criptografados | *Blind index*: hash SHA-256 com a chave da aplicação, nas colunas `*_search` |
+| Perfis isolados | Três *guards* de autenticação independentes (aluno, professor, master) e middleware de papel |
+| Força bruta | Limite de tentativas no login, na recuperação de senha, no check-in de eventos e nas buscas |
+| CSRF | Token em todos os formulários e requisições AJAX |
+| XSS | Saída escapada no Blade; dados do usuário inseridos no JavaScript com `textContent` |
+| SQL injection | Consultas com *bindings*; colunas de nota validadas por lista permitida |
+| Cabeçalhos HTTP | `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` |
+| Robôs | *Honeypot* no check-in público de eventos |
+| Sessão | Expira em 1 hora, com aviso na tela e sincronização entre abas |
+| QR Code | Único por aula, com validade de 2 horas, nunca exibido em página pública |
 
-> 🧪 Cada camada tem testes automatizados em `tests/Feature` (CSRF, XSS, SQL/Column Injection, headers, rate limit, honeypot, criptografia, blind index e isolamento entre painéis).
+Cada camada tem teste automatizado. Detalhes, arquivos envolvidos e limitações conhecidas: [Segurança](docs/seguranca.md).
 
 ---
 
-## 📊 Status do Projeto
+## Tecnologias
 
-| Módulo | Status |
+| Área | Tecnologia |
 |---|---|
-| Autenticação Multi-Guard | ✅ Concluído |
-| Controle de Presença (QR Code) | ✅ Concluído |
-| Gerenciamento de Notas | ✅ Concluído |
-| Painel Master | ✅ Concluído |
-| Cadastro Direto (Master) | ✅ Concluído |
-| Solicitação de Acesso (fluxo público) | ✅ Concluído |
-| E-mail de Primeiro Acesso | ✅ Concluído |
-| Eventos / Palestras com Check-in | ✅ Concluído |
-| Testes Automatizados (180 testes) | ✅ Concluído |
-| CI/CD (GitHub Actions) | ✅ Concluído |
-| Deploy (Vercel + Supabase) | ✅ Concluído |
+| Backend | PHP 8.2+ e Laravel 12 |
+| Banco de dados | PostgreSQL 17 (produção no Supabase; SQLite em memória nos testes) |
+| Frontend | Blade, Tailwind CSS 4, Vite 7 e JavaScript sem framework |
+| QR Code e PDF | qrcodejs e jsPDF |
+| Testes | PHPUnit 11 |
+| CI | GitHub Actions |
+| Hospedagem | Vercel (runtime `vercel-php`) e Supabase |
 
 ---
 
-## 🛠️ Stack
+## Rodando localmente
 
-<div align="center">
-
-![PHP](https://img.shields.io/badge/PHP-7A86C8?style=flat-square&logo=php&logoColor=white)
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white)
-![Blade](https://img.shields.io/badge/Blade-FF2D20?style=flat-square&logo=laravel&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)
-
-</div>
-
----
-
-## ⚙️ Instalação
+Pré-requisitos: PHP 8.2+ com `pdo_pgsql`, Composer, Node.js 22 e PostgreSQL.
 
 ```bash
-# 1. Clonar o repositório
 git clone https://github.com/AtilaAlvesRodrigues/smart-attendance.git
 cd smart-attendance
-
-# 2. Instalar dependências (PHP e Node)
 composer install
 npm install && npm run build
-
-# 3. Configurar o ambiente
 cp .env.example .env
 php artisan key:generate
+```
 
-# 4. Configurar o Banco de Dados no .env
-# DB_CONNECTION=pgsql
-# DB_HOST=127.0.0.1
-# DB_PORT=5432
-# DB_DATABASE=smart_attendance
-# DB_USERNAME=postgres
-# DB_PASSWORD=sua_senha_aqui
+Crie o banco `smart_attendance`, ajuste `DB_USERNAME` e `DB_PASSWORD` no `.env` e rode:
 
-# 5. Configurar e-mail SMTP no .env (ver seção E-mails abaixo)
-
-# 6. Rodar migrações e popular o banco
+```bash
 php artisan migrate --seed
-
-# 7. Iniciar o servidor (apenas PC local)
 php artisan serve
 ```
 
-Acesse: `http://localhost:8000`
-
-> Para testar pelo celular, veja a seção **[Teste pelo Celular](#-teste-pelo-celular)** abaixo.
+Acesse `http://localhost:8000` e use os logins da tabela acima. Para testar com o celular na mesma rede ou pela internet, veja o [guia de instalação](docs/instalacao.md).
 
 ---
 
-## 📱 Teste pelo Celular
-
-O sistema precisa ser acessível pelo celular para que o QR Code de presença e o check-in de eventos funcionem. Há duas formas:
-
-### Opção 1 — Rede Local (mesma WiFi)
-
-Todos os dispositivos (PC do professor + celulares dos alunos) precisam estar **na mesma rede WiFi**.
+## Testes e integração contínua
 
 ```bash
-# 1. Descubra o IP local da sua máquina
-ipconfig          # Windows → procure "IPv4 Address"
-ip a              # Linux/Mac → procure o IP da interface (ex: 192.168.0.43)
-
-# 2. Suba o servidor ouvindo em todas as interfaces
-php artisan serve --host=0.0.0.0 --port=8000
-
-# 3. Acesse no navegador pelo IP local
-http://192.168.0.43:8000
-
-# 4. O QR Code gerado vai codificar automaticamente esse IP
-#    → Celulares na mesma rede WiFi conseguem escanear
+composer test                               # suíte completa
+php artisan test --filter=SituacaoAcademica  # um arquivo específico
 ```
 
-> **Importante:** O professor deve sempre acessar o sistema pelo IP local (não por `localhost`), para que a URL gerada no QR seja acessível pelos alunos.
+São **204 testes** (558 verificações) cobrindo login dos três perfis, chamada e QR Code, regras de frequência e notas, cadastros, turmas, eventos e cada camada de segurança.
 
-### Opção 2 — Cloudflare Tunnel (redes diferentes / 4G)
-
-Use quando professor e alunos **não estão na mesma rede** (ex: alunos com dados móveis).
-
-```bash
-# 1. Instalar o cloudflared (Windows)
-# Baixe em: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/
-
-# 2. Com o servidor já rodando (php artisan serve), execute em outro terminal:
-cloudflared tunnel --url http://localhost:8000
-
-# 3. Copie o URL público gerado (ex: https://xyz-example.trycloudflare.com)
-
-# 4. Atualize o APP_URL no .env:
-APP_URL=https://xyz-example.trycloudflare.com
-
-# 5. Limpe o cache de configuração e reinicie o servidor:
-php artisan config:clear
-# Reinicie php artisan serve
-
-# 6. Acesse o sistema pelo URL do cloudflare — qualquer celular (inclusive 4G) consegue escanear
-```
-
-> **Atenção:** O URL do Cloudflare Tunnel muda a cada reinicialização. Sempre atualize `APP_URL` no `.env` e rode `php artisan config:clear` ao iniciar uma nova sessão.
-
-### Fluxo de Teste Completo (QR de Presença)
-
-```
-1. Logar como Professor  →  http://IP:8000/professor/login
-2. Acessar Presença      →  Sidebar → Presença → selecionar matéria → Gerar QR
-3. Celular do aluno escaneia o QR
-4. Aluno faz login (ou usa token de primeiro acesso)
-5. Presença registrada   →  aparece na lista do professor em tempo real
-```
-
-### Fluxo de Teste Completo (Check-in de Palestra)
-
-```
-1. Logar como Professor  →  Sidebar → Eventos → Gestão de Palestra
-2. O QR Code e o link de acesso são exibidos automaticamente
-3. Celular do participante escaneia o QR (ou acessa o link)
-4. Preenche nome e e-mail → clica "Confirmar Presença"
-5. Lista atualiza no painel do professor a cada 30 segundos
-6. Professor clica "Encerrar Palestra" para fechar o acesso e gerar PDF
-```
+O [pipeline do GitHub Actions](.github/workflows/laravel.yml) roda em todo push e Pull Request para a `main`, contra um PostgreSQL 17 real, em 6 módulos: configuração, banco de dados, segurança, classes, suíte completa e relatório em PDF. Veja [Testes e CI](docs/testes-e-ci.md).
 
 ---
 
-## 💾 Usuários de Teste
-
-| Perfil | Email | Senha |
-| --- | --- | --- |
-| **Admin Master** | `master@admin.com` | `senha123` |
-| **Professor** | `professor@teste.com` | `senha123` |
-| **Aluno** | `aluno.teste@site.com` | `senha123` |
-
-> Rodar `php artisan db:seed` múltiplas vezes não duplica dados.
->
-> Na demo online esses mesmos usuários estão disponíveis. Os dados são de teste e podem ser reiniciados a qualquer momento.
-
----
-
-## 🧪 Testes
-
-```bash
-composer test                              # suíte completa (SQLite em memória)
-php artisan test --filter=PresencaTest     # um arquivo específico
-```
-
-O pipeline do GitHub Actions ([`.github/workflows/laravel.yml`](.github/workflows/laravel.yml)) roda em todo push e Pull Request para a `main`, contra um PostgreSQL 17 real:
-
-| Módulo | O que verifica |
-|---|---|
-| 1 · Configuração | Instala dependências, compila o Vite, gera relatórios de pacotes desatualizados e `npm audit` |
-| 2 · Banco de Dados | Migrations, rollback e seed idempotente |
-| 3 · Segurança | `composer audit`, testes de segurança e `route:list` |
-| 4 · Classes | Primeiro acesso, isolamento entre painéis, papéis, cadastro e solicitações |
-| 5 · Testes Finais | Suíte completa |
-| 6 · Trabalho Completo | Gera o relatório PDF do pipeline (disponível em *Actions → execução → Artifacts*) |
-
----
-
-## 🚀 Deploy
-
-A demo roda na **Vercel** com o runtime [`vercel-php`](https://github.com/vercel-community/php) e banco **PostgreSQL no Supabase**.
-
-| Arquivo | Função |
-|---|---|
-| [`vercel.json`](vercel.json) | Build do Vite, arquivos estáticos de `public/` e demais rotas para o PHP |
-| [`api/index.php`](api/index.php) | Entrada da função serverless → `public/index.php` |
-| [`.vercelignore`](.vercelignore) | Impede o upload de `.env`, `vendor` e caches locais |
-
-Variáveis de ambiente necessárias na Vercel (além de `APP_KEY` e `DB_*`):
-
-```env
-APP_ENV=production
-APP_DEBUG=false
-LOG_CHANNEL=stderr
-SESSION_DRIVER=database
-SESSION_SECURE_COOKIE=true
-CACHE_STORE=database          # QR Codes e check-ins precisam de cache compartilhado
-DB_SEARCH_PATH=laravel        # schema próprio, fora da API REST pública do Supabase
-DB_SSLMODE=require
-# O sistema de arquivos da função é somente leitura, exceto /tmp:
-APP_CONFIG_CACHE=/tmp/config.php
-APP_EVENTS_CACHE=/tmp/events.php
-APP_PACKAGES_CACHE=/tmp/packages.php
-APP_ROUTES_CACHE=/tmp/routes.php
-APP_SERVICES_CACHE=/tmp/services.php
-VIEW_COMPILED_PATH=/tmp
-```
-
-Use o **Session pooler** do Supabase (`aws-0-<região>.pooler.supabase.com:5432`), pois a Vercel não tem IPv6.
-As migrations são aplicadas a partir de uma máquina local apontando para o banco de produção:
-
-```bash
-php artisan migrate --force --seed
-```
-
-> ⚠️ A `APP_KEY` também é o *pepper* do Blind Index: o seed precisa usar a mesma chave da produção, e trocar a chave exige `php artisan secure:data`.
->
-> 📧 Na demo o e-mail está com `MAIL_MAILER=log` — os e-mails de primeiro acesso não são enviados. Configure SMTP (seção abaixo) para ativá-los.
-
----
-
-## 🧩 Funcionalidades
-
-### 🎓 Aluno
-- Visualiza presenças e frequência por matéria
-- Acompanha notas (prova1, trabalho1, trabalho2, prova2)
-- Primeiro acesso via token enviado por e-mail
-
-### 👨‍🏫 Professor
-- Gera QR Code por sessão de aula (TTL 2h no cache)
-- Monitora lista de presença em tempo real (polling automático)
-- Lança e edita notas por turma
-- Gerencia eventos/palestras com check-in público sem login
-- Gera relatório PDF da lista de presença do evento
-
-### 🛠️ Master
-- Cadastra professores, alunos e matérias diretamente (sem fluxo de solicitação)
-- Aprova ou rejeita solicitações públicas de acesso (`/solicitar-acesso/{aluno|professor}`)
-- Envia e-mail de primeiro acesso automaticamente ao cadastrar
-- Visualiza contadores de usuários e matérias
-- Acessa central de presenças
-- Gerencia vínculos entre professores e matérias
-
----
-
-## 📧 Envio de E-mails
-
-O sistema envia e-mails automaticamente nos seguintes eventos:
-
-| Evento | Destinatário | Descrição |
-|---|---|---|
-| Cadastro pelo Master | Aluno / Professor | Token provisório de primeiro acesso via SMTP |
-| Esqueci minha senha | Aluno / Professor | Novo token de redefinição de senha |
-
-### Configuração SMTP (Gmail)
-
-O envio usa **Gmail SMTP** com **App Password** (não a senha da conta Google).
-
-1. Acesse [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-2. Ative a verificação em duas etapas (obrigatório)
-3. Crie uma senha de app para "Smart Attendance"
-4. No `.env`, configure:
-
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_SCHEME=smtp   # porta 587 negocia TLS (STARTTLS); use smtps com a porta 465
-MAIL_USERNAME=seu@gmail.com
-MAIL_PASSWORD=xxxxxxxxxxxxxxxx   # App Password sem espaços
-MAIL_FROM_ADDRESS="seu@gmail.com"
-MAIL_FROM_NAME="Smart Attendance"
-```
-
-5. Limpe o cache: `php artisan config:clear`
-
-> **Importante:** nunca commite o `.env` real — use apenas `.env.example` com placeholders.
-
----
-
-## 🗂️ Arquitetura
-
-### Autenticação Multi-Guard
-
-Três guards independentes, cada um com seu próprio modelo, tabela e sessão:
-
-| Guard | Model | Tabela | Rota base |
-|---|---|---|---|
-| `auth:alunos` | `AlunoModel` | `alunos` | `/aluno/*` |
-| `auth:professores` | `ProfessorModel` | `professores` | `/professor/*` |
-| `auth:masters` | `UsuarioMaster` | `usuario_masters` | `/master/*` |
-
-### Criptografia e Blind Index
-
-Campos PII (email, CPF, RA) são cifrados com AES-256 via cast `encrypted` do Laravel. Para buscas, o trait `HasBlindIndex` gera um hash SHA-256 determinístico armazenado em colunas `*_search`. O campo `nome` é armazenado em texto plano para facilitar exibição e pesquisa direta.
-
-### Fluxo de Presença (Disciplinas)
-
-1. Professor gera QR Code para uma sessão → armazenado no cache com chave `aula_materia_{id}_{data}` (TTL 2h)
-2. O QR Code codifica a URL usando o **host real da requisição** — se o professor acessar pelo IP local, o celular dos alunos na mesma rede consegue escanear
-3. Aluno escaneia → `PresencaController` valida o cache e cria registro em `presencas`
-4. Professor vê lista em tempo real via polling AJAX (a cada 3s)
-5. Rate limiting: 5 tentativas por minuto por usuário
-
-### Fluxo de Eventos / Palestras
-
-1. Professor acessa Gestão de Palestra → sistema gera um **token único de sessão** (16 chars)
-2. QR Code e link de acesso são exibidos com o token embutido na URL (`/evento/checkin?token=...`)
-3. Participante acessa o link (sem necessidade de login), preenche nome e e-mail
-4. Check-in é registrado no **servidor** (Laravel Cache, TTL 8h), não no localStorage
-5. Professor vê a lista atualizar a cada 30 segundos via AJAX
-6. Ao encerrar, o cache da sessão é limpo e um PDF pode ser gerado
-
-### Fluxo de Primeiro Acesso
-
-1. Master cadastra usuário em `/dashboard/master/cadastrar`
-2. Sistema cria conta com `remember_token` como token de acesso inicial
-3. E-mail é enviado com o token provisório
-4. Usuário usa o token como senha no primeiro login
-5. Sistema redireciona para `/criar-senha` onde define a senha definitiva
-6. `remember_token` é zerado após a criação da senha
-7. Se o aluno tinha um QR Code pendente antes do login, é redirecionado para confirmar presença automaticamente
-
----
-
-## 📁 Estrutura
+## Estrutura do projeto
 
 ```
 smart-attendance/
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── AlunoLoginController.php
-│   │   │   ├── ProfessorLoginController.php
-│   │   │   ├── DashboardController.php
-│   │   │   ├── EventoController.php            # Eventos / palestras
-│   │   │   ├── MasterCadastroController.php    # Cadastro direto pelo master
-│   │   │   ├── PresencaController.php          # QR Code de disciplinas
-│   │   │   ├── GerenciarMateriaController.php
-│   │   │   ├── MasterSearchController.php
-│   │   │   ├── SolicitacaoAcessoController.php # Fluxo público de cadastro
-│   │   │   ├── CriarSenhaController.php
-│   │   │   └── EsqueciSenhaController.php
-│   │   ├── Middleware/
-│   │   │   ├── CheckRole.php
-│   │   │   ├── PrimeiroAcessoMiddleware.php
-│   │   │   └── SecurityHeaders.php
-│   │   └── View/Composers/SidebarComposer.php
-│   ├── Models/
-│   │   ├── AlunoModel.php
-│   │   ├── ProfessorModel.php
-│   │   ├── UsuarioMaster.php
-│   │   ├── Materia.php
-│   │   ├── Presenca.php
-│   │   └── SolicitacaoAcesso.php   # Pedidos públicos de cadastro
-│   ├── Mail/
-│   │   └── PrimeiroAcessoMail.php
-│   └── Traits/
-│       └── HasBlindIndex.php
+│   │   ├── Controllers/      # Um controller por área: login, painéis, presença, turma, eventos...
+│   │   ├── Middleware/       # CheckRole, PrimeiroAcesso, SecurityHeaders
+│   │   └── View/Composers/   # Dados do menu lateral
+│   ├── Models/               # AlunoModel, ProfessorModel, UsuarioMaster, Materia, Presenca, SolicitacaoAcesso
+│   ├── Support/              # SituacaoAcademica (regra de frequência e notas)
+│   ├── Traits/               # HasBlindIndex (busca em campos criptografados)
+│   ├── Mail/                 # E-mail de primeiro acesso
+│   └── Console/Commands/     # secure:data (criptografa dados legados)
 ├── database/
-│   ├── migrations/
-│   └── seeders/
+│   ├── migrations/           # Estrutura do banco
+│   ├── seeders/              # Dados de demonstração
+│   └── factories/            # Dados para testes
+├── resources/views/          # Telas Blade, separadas por perfil (aluno, professor, master)
 ├── public/
-│   ├── js/pages/
-│   │   ├── evento-checkin.js   # Check-in de eventos (envia ao servidor)
-│   │   └── evento-presenca.js  # Painel do professor (polling servidor)
-│   └── css/
-├── resources/views/
-│   ├── aluno/
-│   ├── professor/
-│   ├── master/
-│   │   ├── home.blade.php
-│   │   └── cadastrar.blade.php
-│   ├── pages/
-│   │   ├── evento-checkin.blade.php
-│   │   └── evento-presenca.blade.php
-│   ├── emails/
-│   │   └── primeiro-acesso.blade.php
-│   └── layouts/theme.blade.php
-├── routes/web.php
-├── api/index.php               # Entrada serverless (Vercel)
-└── vercel.json                 # Configuração do deploy
+│   ├── css/                  # Temas por perfil + usability.css (acessibilidade)
+│   └── js/                   # Tema, modais e páginas de eventos
+├── routes/web.php            # 58 rotas
+├── tests/                    # Feature (fluxos e segurança) e Unit (regras)
+├── api/index.php             # Entrada serverless na Vercel
+├── docs/                     # Documentação e capturas de tela
+└── vercel.json               # Build, rotas e tarefa diária da Vercel
 ```
 
 ---
 
-## 🗄️ Banco de Dados
+## Documentação
 
-As tabelas principais utilizam **Surrogate Keys** (nunca RA/CPF como PK), **criptografia AES-256** nas colunas sensíveis e **Blind Index SHA-256** para buscas seguras.
-
-| Tabela | Descrição |
+| Documento | Conteúdo |
 |---|---|
-| `alunos` | Dados dos alunos (PII cifrado) |
-| `professores` | Dados dos professores (PII cifrado) |
-| `usuario_masters` | Administradores do sistema |
-| `materias` | Disciplinas cadastradas |
-| `aluno_materia` | Pivot com notas (prova1, trabalho1, trabalho2, prova2) |
-| `materia_professor` | Pivot de vínculo professor ↔ matéria |
-| `presencas` | Registros de check-in via QR Code de disciplina |
-| `solicitacoes_acesso` | Pedidos públicos de cadastro (status: pendente/aprovado/rejeitado) |
-| `sessions` | Sessões dos usuários (driver `database`) |
-| `cache` | Cache da aplicação (QR Codes ativos, sessões de eventos — TTL 2h/8h) |
-
+| [Manual do usuário](docs/manual-do-usuario.md) | Passo a passo de cada tela, por perfil |
+| [Arquitetura e fluxos](docs/arquitetura.md) | Camadas, autenticação, rotas e diagramas dos fluxos |
+| [Banco de dados](docs/banco-de-dados.md) | Tabelas, colunas, relacionamentos e diagrama |
+| [Regras acadêmicas](docs/regras-academicas.md) | Frequência, faltas, notas e situação, com exemplos |
+| [Segurança](docs/seguranca.md) | Cada camada de proteção, onde está no código e como é testada |
+| [Instalação](docs/instalacao.md) | Ambiente local, variáveis, teste pelo celular e e-mail |
+| [Deploy](docs/deploy.md) | Publicação na Vercel com PostgreSQL no Supabase |
+| [Testes e CI](docs/testes-e-ci.md) | Suítes de teste e módulos do pipeline |
+| [Design e acessibilidade](docs/design-e-acessibilidade.md) | Identidade visual, padrões de interface e acessibilidade |
+| [Como contribuir](CONTRIBUTING.md) | Fluxo de branches, commits e Pull Requests |
+| [Histórico de mudanças](CHANGELOG.md) | O que mudou em cada versão |
 
 ---
 
+## Próximos passos
 
-<div align="center">
+- Justificativa de faltas, com análise pelo professor
+- QR Code que muda a cada 30 segundos, para impedir o envio por foto
+- Correção de presença pelo professor
+- Edição e exclusão de cadastros pelo Master
+- Exportação de relatórios em planilha
+- Envio de e-mails pelo servidor da instituição
 
-Desenvolvido por **Atila Alves Rodrigues** · Projeto Integrador · 2026
+---
 
-</div>
+## Equipe
+
+Projeto Integrador criado por **Átila Alves Rodrigues**, com contribuições de **Matheus Evangelista** e **João Vitor Leonardi**.
+Veja todos os contribuidores em [Contributors](https://github.com/AtilaAlvesRodrigues/smart-attendance/graphs/contributors).

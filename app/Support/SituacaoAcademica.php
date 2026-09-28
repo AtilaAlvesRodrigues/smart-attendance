@@ -54,6 +54,21 @@ class SituacaoAcademica
         $this->status = $this->calcularStatus(count($notas));
     }
 
+    /**
+     * Situação de um aluno em uma matéria direto do banco (2 consultas).
+     * Use em telas que mostram poucas linhas; para listas grandes, agrupe as
+     * contagens antes e use o construtor.
+     *
+     * @param  array<int, float|string|null>  $notas
+     */
+    public static function doAluno(int $materiaId, int $alunoId, int $aulasPrevistas, array $notas = []): self
+    {
+        $realizadas = \App\Models\Presenca::where('materia_id', $materiaId)->distinct('codigo_aula')->count('codigo_aula');
+        $presencas = \App\Models\Presenca::where('materia_id', $materiaId)->where('aluno_id', $alunoId)->count();
+
+        return new self($realizadas, $presencas, $aulasPrevistas, $notas);
+    }
+
     private function calcularStatus(int $totalNotas): string
     {
         if ($this->faltas > $this->limiteFaltas && $this->aulasPrevistas > 0) {
