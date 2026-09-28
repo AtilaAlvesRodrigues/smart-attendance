@@ -83,7 +83,7 @@
                                     </span>
                                 </td>
                                 <td class="py-4 px-6 text-right">
-                                    <button class="text-white/70 group-hover:text-white transition-colors">
+                                    <button type="button" class="text-white/70 group-hover:text-white transition-colors" aria-label="Ver detalhes">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                     </button>
                                 </td>
@@ -245,7 +245,7 @@
                         </span>
                     </td>
                     <td class="py-4 px-6 text-right">
-                        <button class="text-white/70 group-hover:text-white transition-colors">
+                        <button type="button" class="text-white/70 group-hover:text-white transition-colors" aria-label="Ver detalhes">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </button>
                     </td>

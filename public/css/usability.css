@@ -135,3 +135,5 @@ html, body { max-width: 100%; overflow-x: hidden; }
 }
 /* Blobs decorativos ficam presos à área de conteúdo */
 .pal-page { position: relative; overflow-x: clip; }
+/* Campos de data nativos acompanham o tema */
+html.light-mode input[type="date"] { color-scheme: light !important; }

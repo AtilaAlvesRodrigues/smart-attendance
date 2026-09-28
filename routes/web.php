@@ -118,7 +118,6 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
-    Route::get('/pdf-teste-vulnerabilidade', [PdfTesteVulnerabilidadeController::class, 'index'])->name('pdf.teste.vulnerabilidade');
 
     Route::middleware(['auth:alunos', 'role:aluno'])->group(function () {
         Route::get('/dashboard/aluno', [DashboardController::class, 'alunoIndex'])->name('dashboard.aluno');
@@ -144,6 +143,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
     Route::middleware(['auth:masters', 'role:master'])->prefix('dashboard/master')->group(function () {
          
         Route::get('/', [DashboardController::class, 'masterIndex'])->name('dashboard.master');
+
+        // Relatório interno de testes de segurança: lista vulnerabilidades, então só o Master vê
+        Route::get('/relatorio-seguranca', [PdfTesteVulnerabilidadeController::class, 'index'])->name('pdf.teste.vulnerabilidade');
 
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');

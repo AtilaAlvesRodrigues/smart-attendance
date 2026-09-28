@@ -212,4 +212,28 @@ class GerenciarMateriaTest extends TestCase
 
         $response->assertJsonValidationErrors('campo');
     }
+
+    public function test_relatorio_filtra_por_data_e_ignora_data_invalida(): void
+    {
+        $professor = \App\Models\ProfessorModel::factory()->create();
+        $aluno = \App\Models\AlunoModel::factory()->create(['nome' => 'Aluno Filtro']);
+        $materia = \App\Models\Materia::factory()->create();
+        $professor->materias()->attach($materia->id);
+
+        $presenca = \App\Models\Presenca::create([
+            'aluno_id' => $aluno->id, 'professor_id' => $professor->id, 'materia_id' => $materia->id,
+            'data_aula' => '2026-09-01', 'semestre' => '2/2026', 'horario' => 'N', 'codigo_aula' => 'R1',
+        ]);
+        $presenca->forceFill(['created_at' => '2026-09-01 20:00:00'])->save();
+
+        $this->actingAs($professor, 'professores');
+
+        $this->get('/professor/gerenciar/relatorios?data_inicio=2026-09-01&data_fim=2026-09-01')
+            ->assertOk()->assertSee('Aluno Filtro');
+        $this->get('/professor/gerenciar/relatorios?data_inicio=2026-09-02')
+            ->assertOk()->assertDontSee('Aluno Filtro');
+        // Formato errado não quebra a página: o filtro é ignorado
+        $this->get('/professor/gerenciar/relatorios?data_inicio=01/09/2026&data_fim=abc')
+            ->assertOk()->assertSee('Aluno Filtro');
+    }
 }

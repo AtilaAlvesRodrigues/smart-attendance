@@ -61,11 +61,14 @@ class GerenciarMateriaController extends BaseController
             $query->where('materia_id', $request->materia_id);
         }
 
-        if ($request->filled('data_inicio')) {
+        // Datas inválidas são ignoradas em vez de quebrar a consulta
+        $dataValida = fn ($v) => is_string($v) && \DateTime::createFromFormat('Y-m-d', $v) !== false;
+
+        if ($request->filled('data_inicio') && $dataValida($request->data_inicio)) {
             $query->whereDate('created_at', '>=', $request->data_inicio);
         }
 
-        if ($request->filled('data_fim')) {
+        if ($request->filled('data_fim') && $dataValida($request->data_fim)) {
             $query->whereDate('created_at', '<=', $request->data_fim);
         }
 

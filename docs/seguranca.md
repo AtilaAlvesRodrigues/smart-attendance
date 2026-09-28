@@ -113,6 +113,7 @@ Alunos, professores, administradores e matérias usam *soft delete*: o registro 
 - Banco num schema próprio (`laravel`), fora da API REST automática do Supabase, com um usuário exclusivo da aplicação.
 - Variáveis sensíveis marcadas como *sensitive* na Vercel. Veja [Deploy](deploy.md).
 - A tarefa diária `/cron/manter-banco-ativo` só responde com o `CRON_SECRET` correto; sem ele, devolve 404.
+- O relatório interno de testes de segurança fica em `/dashboard/master/relatorio-seguranca`, visível só para o Master.
 
 ---
 
@@ -122,6 +123,5 @@ Alunos, professores, administradores e matérias usam *soft delete*: o registro 
 |---|---|---|
 | O QR Code vale 2 horas | Uma foto do QR enviada a quem está fora da sala funciona enquanto a chamada estiver aberta | QR que muda a cada 30 segundos, ou confirmação por localização ou rede da instituição |
 | Sem Content-Security-Policy | Menos uma barreira contra XSS | Definir uma CSP; hoje há scripts inline e bibliotecas de CDN a considerar |
-| `/pdf-teste-vulnerabilidade` aberto a qualquer usuário logado | Um relatório interno de testes pode ser visto por alunos | Restringir ao Master ou remover da aplicação publicada |
 | Sem autenticação em dois fatores | Uma senha vazada dá acesso à conta | 2FA para professores e administradores |
 | O professor não corrige presenças | Um erro de registro não pode ser desfeito pela interface | Tela de correção, com registro de quem alterou |
