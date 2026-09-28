@@ -36,8 +36,8 @@ class GerenciarMateriaController extends BaseController
 
         // Aulas já realizadas (chamadas efetivamente feitas)
         $aulasRealizadas = Presenca::where('materia_id', $materia_id)
-            ->distinct('data_aula')
-            ->count('data_aula');
+            ->distinct('codigo_aula')
+            ->count('codigo_aula');
 
         $presencasPorAluno = Presenca::where('materia_id', $materia_id)
             ->select('aluno_id', DB::raw('COUNT(*) as total_presencas'))
