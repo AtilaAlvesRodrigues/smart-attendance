@@ -58,21 +58,9 @@ class MasterCadastroController extends BaseController
             ]);
         });
 
-        try {
-            Mail::to($request->email)->send(new PrimeiroAcessoMail(
-                nomeUsuario: $user->nome,
-                emailUsuario: $user->email,
-                token: $token,
-                loginUrl: route('login.aluno.form'),
-            ));
-        } catch (\Throwable $e) {
-            \Log::error('Falha ao enviar e-mail de primeiro acesso para aluno ID ' . $user->id . ' [' . get_class($e) . ']');
-        }
+        $emailEntregue = $this->enviarPrimeiroAcesso($user, $token, route('login.aluno.form'), 'aluno');
 
-        return response()->json([
-            'success' => true,
-            'message' => "Aluno {$user->nome} cadastrado e e-mail enviado.",
-        ]);
+        return response()->json($this->respostaCadastro("Aluno {$user->nome} cadastrado.", $emailEntregue, $token));
     }
 
     /**
@@ -127,21 +115,9 @@ class MasterCadastroController extends BaseController
             ]);
         });
 
-        try {
-            Mail::to($request->email)->send(new PrimeiroAcessoMail(
-                nomeUsuario: $user->nome,
-                emailUsuario: $user->email,
-                token: $token,
-                loginUrl: route('login.professor.form'),
-            ));
-        } catch (\Throwable $e) {
-            \Log::error('Falha ao enviar e-mail de primeiro acesso para professor ID ' . $user->id . ': ' . $e->getMessage());
-        }
+        $emailEntregue = $this->enviarPrimeiroAcesso($user, $token, route('login.professor.form'), 'professor');
 
-        return response()->json([
-            'success' => true,
-            'message' => "Professor {$user->nome} cadastrado e e-mail enviado.",
-        ]);
+        return response()->json($this->respostaCadastro("Professor {$user->nome} cadastrado.", $emailEntregue, $token));
     }
 
     /**
@@ -181,7 +157,50 @@ class MasterCadastroController extends BaseController
 
         return response()->json([
             'success' => true,
-            'message' => "Matéria {$materia->nome} cadastrada com sucesso.",
+            'message' => "Matéria {$materia->nome} cadastrada. Agora defina o professor e os alunos da turma.",
+            'turma_url' => route('master.turma', $materia),
         ]);
+    }
+
+    /**
+     * Envia o e-mail de primeiro acesso. Retorna false quando o e-mail não sai
+     * de verdade: envio desativado (mailer "log", como na demonstração) ou falha.
+     */
+    private function enviarPrimeiroAcesso($user, string $token, string $loginUrl, string $tipo): bool
+    {
+        if (config('mail.default') === 'log') {
+            return false;
+        }
+
+        try {
+            Mail::to($user->email)->send(new PrimeiroAcessoMail(
+                nomeUsuario: $user->nome,
+                emailUsuario: $user->email,
+                token: $token,
+                loginUrl: $loginUrl,
+            ));
+            return true;
+        } catch (\Throwable $e) {
+            \Log::error('Falha ao enviar e-mail de primeiro acesso para ' . $tipo . ' ID ' . $user->id . ' [' . get_class($e) . ']');
+            return false;
+        }
+    }
+
+    /**
+     * Sem e-mail entregue, o Master recebe o token para repassar à pessoa;
+     * caso contrário ela nunca conseguiria fazer o primeiro acesso.
+     */
+    private function respostaCadastro(string $mensagem, bool $emailEntregue, string $token): array
+    {
+        if ($emailEntregue) {
+            return ['success' => true, 'message' => $mensagem . ' E-mail de primeiro acesso enviado.'];
+        }
+
+        return [
+            'success' => true,
+            'message' => $mensagem . ' O e-mail não foi enviado: entregue o token abaixo à pessoa. Ela usa o token como senha no primeiro login e depois cria a senha definitiva.',
+            'token_provisorio' => $token,
+            'proximo_passo' => 'Para participar das aulas, matricule em Matérias → Gerenciar turma.',
+        ];
     }
 }

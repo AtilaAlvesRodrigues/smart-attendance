@@ -49,7 +49,7 @@
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
                 <h2 class="text-4xl font-black tracking-tighter pal-title">Grade Curricular</h2>
-                <p class="pal-subtitle font-medium">Configuração de horários, salas e vínculos acadêmicos.</p>
+                <p class="pal-subtitle font-medium">Clique em uma matéria para ver os detalhes, ou em “Gerenciar turma” para definir professores e alunos matriculados.</p>
             </div>
 
             <!-- Matérias Section -->
@@ -64,6 +64,7 @@
                                 <th class="py-4 px-6 text-center">Noturno</th>
                                 <th class="py-4 px-6 text-center">Docentes</th>
                                 <th class="py-4 px-6 text-center">Alunos</th>
+                                <th class="py-4 px-6 text-right"><span class="sr-only">Ações</span></th>
                             </tr>
                         </thead>
                         <tbody id="materias-body" class="divide-y divide-white/5">
@@ -94,6 +95,9 @@
                                     <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-sm text-xs font-bold border border-purple-500/20">
                                         {{ $materia->alunos_count }}
                                     </span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <a href="{{ route('master.turma', $materia) }}" onclick="event.stopPropagation()" class="inline-flex items-center px-3 py-2 rounded-sm text-sm font-bold whitespace-nowrap border border-white/20 pal-text hover:bg-white/10">Gerenciar turma</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -263,6 +267,9 @@
                         <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-sm text-xs font-bold border border-purple-500/20">
                             ${materia.alunos_count ?? 0}
                         </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <a href="{{ url('/dashboard/master/materias') }}/${Number(materia.id)}/turma" onclick="event.stopPropagation()" class="inline-flex items-center px-3 py-2 rounded-sm text-sm font-bold whitespace-nowrap border border-white/20 pal-text hover:bg-white/10">Gerenciar turma</a>
                     </td>
                 </tr>
             `);

@@ -12,6 +12,7 @@ use App\Http\Controllers\CriarSenhaController;
 use App\Http\Controllers\SolicitacaoAcessoController;
 use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
+use App\Http\Controllers\MasterTurmaController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -140,6 +141,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::post('/cadastrar/aluno', [MasterCadastroController::class, 'cadastrarAluno'])->name('master.cadastrar.aluno');
         Route::post('/cadastrar/professor', [MasterCadastroController::class, 'cadastrarProfessor'])->name('master.cadastrar.professor');
         Route::post('/cadastrar/materia', [MasterCadastroController::class, 'cadastrarMateria'])->name('master.cadastrar.materia');
+
+        Route::get('/materias/{materia}/turma', [MasterTurmaController::class, 'show'])->name('master.turma');
+        Route::put('/materias/{materia}/turma', [MasterTurmaController::class, 'update'])->name('master.turma.update');
 
         Route::get('/solicitacoes', [SolicitacaoAcessoController::class, 'index'])->name('master.solicitacoes');
         Route::post('/solicitacoes/{solicitacao}/aprovar', [SolicitacaoAcessoController::class, 'aprovar'])->name('master.solicitacoes.aprovar');

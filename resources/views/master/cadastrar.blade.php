@@ -252,6 +252,36 @@
         return document.getElementById('feedback-' + formId);
     }
 
+    // Token provisório (quando o e-mail não foi enviado) e atalho para a turma.
+    // Montado com textContent: nada vindo do servidor vira HTML.
+    function mostrarProximosPassos(el, data) {
+        if (data.token_provisorio) {
+            var caixa = document.createElement('div');
+            caixa.style.cssText = 'margin-top:0.75rem; padding:0.75rem; border:1px dashed currentColor; border-radius:4px;';
+            var rotulo = document.createElement('p');
+            rotulo.style.cssText = 'margin:0 0 0.35rem; font-weight:700;';
+            rotulo.textContent = 'Token de primeiro acesso:';
+            var codigo = document.createElement('code');
+            codigo.style.cssText = 'font-size:1.15rem; font-weight:800; letter-spacing:0.05em; user-select:all;';
+            codigo.textContent = data.token_provisorio;
+            caixa.append(rotulo, codigo);
+            el.append(caixa);
+        }
+        if (data.proximo_passo) {
+            var dica = document.createElement('p');
+            dica.style.cssText = 'margin:0.6rem 0 0;';
+            dica.textContent = data.proximo_passo;
+            el.append(dica);
+        }
+        if (data.turma_url) {
+            var link = document.createElement('a');
+            link.href = data.turma_url;
+            link.textContent = 'Montar a turma agora →';
+            link.style.cssText = 'display:inline-block; margin-top:0.6rem; font-weight:800; color:inherit; text-decoration:underline;';
+            el.append(link);
+        }
+    }
+
     function showFeedback(el, msg, success) {
         el.textContent = msg;
         el.style.display = 'block';
@@ -315,6 +345,7 @@
 
                 if (res.ok && data.success) {
                     showFeedback(feedback, data.message, true);
+                    mostrarProximosPassos(feedback, data);
                     form.reset();
                 } else if (res.status === 419) {
                     showFeedback(feedback, 'Sessao expirada. Recarregue a pagina e tente novamente.', false);
