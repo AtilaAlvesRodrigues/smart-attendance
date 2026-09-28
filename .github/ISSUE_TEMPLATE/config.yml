@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentação
+    url: https://github.com/AtilaAlvesRodrigues/smart-attendance/tree/main/docs
+    about: Manual do usuário, instalação, arquitetura e mais.
+  - name: Demonstração online
+    url: https://smart-attendance-nine-alpha.vercel.app
+    about: Teste o sistema com os usuários de exemplo.
