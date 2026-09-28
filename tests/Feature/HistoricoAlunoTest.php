@@ -45,4 +45,25 @@ class HistoricoAlunoTest extends TestCase
         $this->assertTrue($materias['Física']->historico->first()['presente']);
         $response->assertSee('Ver histórico de aulas (2)');
     }
+
+    public function test_central_do_master_mostra_as_mesmas_faltas_do_aluno(): void
+    {
+        $prof = ProfessorModel::factory()->create();
+        $aluno = AlunoModel::factory()->create();
+        $materia = Materia::factory()->create(['total_aulas' => 40]);
+        $aluno->materias()->attach($materia->id);
+        // 3 aulas dadas, o aluno foi a todas: 0 faltas (e não 40 − 3 = 37)
+        foreach (['A1' => '2026-09-01', 'A2' => '2026-09-08', 'A3' => '2026-09-15'] as $codigo => $data) {
+            $this->chamada($materia, $prof, $aluno, $codigo, $data);
+        }
+
+        $this->actingAs(\App\Models\UsuarioMaster::factory()->create(), 'masters');
+
+        $this->getJson('/dashboard/master/search/presencas')
+            ->assertOk()
+            ->assertJsonPath('0.faltas', 0)
+            ->assertJsonPath('0.limite_faltas', 10);
+
+        $this->get('/dashboard/master/presenca')->assertOk()->assertSee('de 10 permitidas');
+    }
 }
