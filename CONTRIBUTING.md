@@ -57,6 +57,14 @@ Mais detalhes em [Testes e CI](docs/testes-e-ci.md).
 
 Ao mudar um comportamento, atualize o documento correspondente em [`docs/`](docs/README.md) e registre a mudança no [`CHANGELOG.md`](CHANGELOG.md), na seção *Não lançado*.
 
+## Quadro do projeto
+
+As tarefas ficam no [quadro do projeto](https://github.com/users/AtilaAlvesRodrigues/projects/1), organizado em sprints de 4 semanas. O README do quadro explica o fluxo das colunas (Backlog → A fazer → Em andamento → Em revisão → Concluído), prioridades, estimativas e a Definição de Pronto.
+
+- Toda tarefa é uma issue com título no infinitivo, contexto e critérios de aceite (modelo **Nova tarefa**).
+- Etiquetas: `tipo:` (funcionalidade, bug, segurança, design, documentação, teste, infraestrutura, refatoração), `área:` (aluno, professor, master, plataforma) e `status:` (bloqueado, atrasado).
+- No Pull Request, escreva `Closes #número` para a issue fechar sozinha no merge.
+
 ## Reportando problemas
 
 Use as [issues do repositório](https://github.com/AtilaAlvesRodrigues/smart-attendance/issues/new/choose), com o modelo de bug ou de sugestão. Para falhas de segurança, fale direto com o responsável pelo repositório, sem abrir issue pública.
