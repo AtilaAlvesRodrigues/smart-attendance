@@ -17,7 +17,7 @@ permissions:
 # Banco de testes descartável (container do próprio job) — não precisa de secrets,
 # assim o pipeline também roda em Pull Requests vindos de forks.
 env:
-  PHP_VERSION: '8.3'
+  PHP_VERSION: '8.4'
   NODE_VERSION: '22'
   APP_ENV: testing
   DB_CONNECTION: pgsql
