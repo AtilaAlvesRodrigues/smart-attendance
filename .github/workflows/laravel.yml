@@ -41,6 +41,7 @@ jobs:
   configuracao:
     name: "1 - Configuracao"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v5
@@ -67,6 +68,7 @@ jobs:
         with:
           path: ~/.composer/cache/files
           key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
 
       - name: Instalar dependencias
         run: |
@@ -101,6 +103,7 @@ jobs:
   modulos:
     name: ${{ matrix.nome }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: configuracao
     strategy:
       fail-fast: false
@@ -149,6 +152,7 @@ jobs:
         with:
           path: ~/.composer/cache/files
           key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
 
       - name: Instalar dependencias e preparar ambiente
         run: |
@@ -201,6 +205,7 @@ jobs:
   trabalho_completo:
     name: "6 - Trabalho Completo"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: modulos
     if: github.event_name != 'pull_request'
 

@@ -16,7 +16,7 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 | [SEC-03](#sec-03) | `trustProxies('*')` sem `trustHosts` | Média | Aberta |
 | [SEC-04](#sec-04) | Scripts de CDN sem Subresource Integrity | Média | Aberta |
 | [SEC-05](#sec-05) | Link da chamada pode ser repassado ao vivo a quem está fora da sala | Média | Parcial |
-| [SEC-06](#sec-06) | Dependências npm com 6 avisos (2 críticos, só no build/dev) | Média | Aberta |
+| [SEC-06](#sec-06) | Dependências npm com 6 avisos (2 críticos, só no build/dev) | Média | **Resolvida** |
 | [SEC-07](#sec-07) | Sem autenticação em dois fatores | Média | Aberta |
 | [SEC-08](#sec-08) | CSP ainda libera `onclick=` e `style=` inline | Baixa | Parcial |
 | [SEC-09](#sec-09) | Padrões inseguros no `.env.example` | Baixa | Aberta |
@@ -79,9 +79,11 @@ Desde a rotação do QR Code (token que muda a cada 30 segundos), uma **foto ou 
 ## SEC-06
 ### Dependências npm com avisos
 
+> **Resolvida** em novembro de 2026 com `npm audit fix`: `npm audit` mostra 0 vulnerabilidades, o build e os testes passam. O texto abaixo registra o que foi encontrado.
+
 `npm audit` aponta 6 avisos: `concurrently` e `shell-quote` (críticos), `axios`, `follow-redirects`, `source-map-js` e `vite` (altos). Todos têm correção por `npm audit fix`. São dependências de **build e desenvolvimento**: não rodam no servidor de produção, e o aviso do Vite vale para o servidor de desenvolvimento. O risco real é o ambiente de quem desenvolve e o CI.
 
-**Correção:** `npm audit fix`, `npm run build` e rodar os testes.
+**Correção aplicada:** `npm audit fix`, `npm run build` e suíte de testes.
 
 ## SEC-07
 ### Sem autenticação em dois fatores
@@ -116,6 +118,7 @@ O README fala em sessão de 1 hora, o `.env.example` define `SESSION_LIFETIME=30
 | O quê | Como |
 |---|---|
 | Oito avisos do `composer audit` (Symfony) | Atualização dos pacotes ([SEC-01](#sec-01)) |
+| Seis avisos do `npm audit` | `npm audit fix` ([SEC-06](#sec-06)) |
 | QR Code vivo por 2 horas e reaproveitável por foto | Token HMAC de 30 s na URL ([`QrToken`](../app/Support/QrToken.php)); tolerância de uma janela. Resta [SEC-05](#sec-05). |
 | Ausência de Content-Security-Policy / CSP com `unsafe-inline` em scripts | CSP com *nonce* por requisição, `object-src 'none'`, `base-uri`, `form-action` e `frame-ancestors`. Resta [SEC-08](#sec-08). |
 | Cabeçalhos de segurança fora das páginas 404 | `SecurityHeaders` agora é middleware global. |
