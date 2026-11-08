@@ -11,6 +11,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
 
 ### Alterado
+- Pacotes Symfony atualizados (`http-foundation`, `http-kernel`, `mime`, `routing`, `yaml`): corrige os 8 avisos do `composer audit`.
 - Quem escaneia o QR Code precisa fazê-lo na hora; se o login demorar mais de 1 minuto, é preciso escanear de novo.
 - Nas views, todo `<script>` e `<style>` em bloco agora usa `@nonce`.
 

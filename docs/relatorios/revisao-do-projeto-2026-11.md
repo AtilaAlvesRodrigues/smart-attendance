@@ -7,7 +7,7 @@ Revisão técnica do Smart Attendance sobre o commit `6411a3e` (branch `main`), 
 | Verificação | Resultado |
 |---|---|
 | Suíte de testes (`php artisan test`) | **222 passando**, 771 verificações (eram 209 antes: 13 testes novos, 9 do QR rotativo e 4 da CSP) |
-| `composer audit` | 8 avisos, todos Symfony → [SEC-01](../falhas-de-seguranca.md#sec-01) |
+| `composer audit` | 8 avisos, todos Symfony → [SEC-01](../falhas-de-seguranca.md#sec-01); **corrigidos** atualizando os pacotes (hoje sem avisos) |
 | `npm audit` | 6 avisos (2 críticos, 4 altos), todos de build/dev → [SEC-06](../falhas-de-seguranca.md#sec-06) |
 | Teste manual no navegador | Login do professor, tela de chamada, rotação real do QR Code (token trocou de janela em 30 s), console sem violações de CSP |
 | Leitura de código | `PresencaController`, `SecurityHeaders`, rotas, `bootstrap/app.php`, `.env.example`, views da chamada, workflow do CI |
@@ -39,7 +39,7 @@ O projeto é **pesado em interface**: a camada de apresentação tem mais que o 
 
 | # | Risco | Onde | Ação |
 |---|---|---|---|
-| 1 | Pacotes Symfony com avisos que tocam host, proxy e roteamento | `composer.lock` | Atualizar ([SEC-01](../falhas-de-seguranca.md#sec-01)) |
+| 1 | ~~Pacotes Symfony com avisos que tocam host, proxy e roteamento~~ | `composer.lock` | **Resolvido** ([SEC-01](../falhas-de-seguranca.md#sec-01)) |
 | 2 | Conta Master pública na demonstração | README | Isolar ou trocar a senha ([SEC-02](../falhas-de-seguranca.md#sec-02)) |
 | 3 | `trustProxies('*')` sem `trustHosts` | `bootstrap/app.php` | Definir hosts confiáveis ([SEC-03](../falhas-de-seguranca.md#sec-03)) |
 | 4 | Scripts de CDN sem integridade | views com QR e PDF | Empacotar via Vite ([SEC-04](../falhas-de-seguranca.md#sec-04)) |
@@ -78,7 +78,7 @@ O estado de "chamada aberta" (código, validade e professor) fica só no cache (
 
 ## Próximos passos recomendados
 
-1. Atualizar dependências ([SEC-01](../falhas-de-seguranca.md#sec-01), [SEC-06](../falhas-de-seguranca.md#sec-06)) e ativar o Dependabot.
+1. Atualizar as dependências npm ([SEC-06](../falhas-de-seguranca.md#sec-06)) e ativar o Dependabot.
 2. Conectar o deploy da Vercel ao GitHub (preview em cada PR) e conferir as telas restantes com a nova CSP.
 3. Definir `trustHosts` e `APP_URL`; empacotar `qrcodejs` e `jspdf` pelo Vite.
 4. Tabela `aulas` + classe `AulaAtiva`.

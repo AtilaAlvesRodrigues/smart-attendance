@@ -11,7 +11,7 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 
 | ID | Falha | Gravidade | Situação |
 |---|---|---|---|
-| [SEC-01](#sec-01) | Dependências PHP com 8 avisos de segurança (Symfony) | Alta | Aberta |
+| [SEC-01](#sec-01) | Dependências PHP com 8 avisos de segurança (Symfony) | Alta | **Resolvida** |
 | [SEC-02](#sec-02) | Conta Master da demonstração com senha pública | Alta | Aberta |
 | [SEC-03](#sec-03) | `trustProxies('*')` sem `trustHosts` | Média | Aberta |
 | [SEC-04](#sec-04) | Scripts de CDN sem Subresource Integrity | Média | Aberta |
@@ -27,6 +27,8 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 ## SEC-01
 ### Dependências PHP com avisos de segurança
 
+> **Resolvida** em novembro de 2026: `symfony/http-foundation`, `http-kernel`, `mime`, `routing` e `yaml` foram atualizados para a série 7.4.22/7.4.23 e o `composer audit` não aponta mais avisos. O texto abaixo registra o que foi encontrado.
+
 `composer audit` aponta 8 avisos, todos em pacotes Symfony que o Laravel 12 usa por baixo:
 
 | Pacote | Aviso | Resumo |
@@ -41,8 +43,8 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 | `symfony/yaml` | PKSA-nktx-f1n1-b4yd | Tempo de parsing exponencial em um único documento YAML |
 
 **Impacto:** os dois de `http-foundation` sobre host e proxy combinam com [SEC-03](#sec-03). O de `mime` afeta os e-mails de primeiro acesso e recuperação de senha.
-**Correção:** `composer update symfony/http-foundation symfony/http-kernel symfony/mime symfony/routing symfony/yaml --with-all-dependencies`, rodar a suíte e conferir `composer audit`.
-**Por que importa no CI:** o módulo 3 do pipeline roda `composer audit`; enquanto isso estiver aberto, esse módulo falha.
+**Correção aplicada:** `composer update symfony/http-foundation symfony/http-kernel symfony/mime symfony/routing symfony/yaml --with-all-dependencies`, suíte completa e `composer audit` conferidos.
+**No CI:** o módulo 3 roda `composer audit` e falhava enquanto o aviso estava aberto.
 
 ## SEC-02
 ### Conta Master da demonstração com senha pública
@@ -113,6 +115,7 @@ O README fala em sessão de 1 hora, o `.env.example` define `SESSION_LIFETIME=30
 
 | O quê | Como |
 |---|---|
+| Oito avisos do `composer audit` (Symfony) | Atualização dos pacotes ([SEC-01](#sec-01)) |
 | QR Code vivo por 2 horas e reaproveitável por foto | Token HMAC de 30 s na URL ([`QrToken`](../app/Support/QrToken.php)); tolerância de uma janela. Resta [SEC-05](#sec-05). |
 | Ausência de Content-Security-Policy / CSP com `unsafe-inline` em scripts | CSP com *nonce* por requisição, `object-src 'none'`, `base-uri`, `form-action` e `frame-ancestors`. Resta [SEC-08](#sec-08). |
 | Cabeçalhos de segurança fora das páginas 404 | `SecurityHeaders` agora é middleware global. |
