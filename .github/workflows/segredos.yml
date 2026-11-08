@@ -1,0 +1,29 @@
+name: Segredos
+
+# Procura chaves, senhas e tokens comitados por engano (histórico inteiro).
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Varredura de segredos
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      # Action de terceiros fixada por SHA de commit (v2); o Dependabot propõe as atualizações.
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Só passa/falha: nada de publicar o trecho do segredo achado em artefato, resumo ou comentário.
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+          GITLEAKS_ENABLE_SUMMARY: false
+          GITLEAKS_ENABLE_COMMENTS: false

@@ -6,9 +6,9 @@ Revisão técnica do Smart Attendance sobre o commit `6411a3e` (branch `main`), 
 
 | Verificação | Resultado |
 |---|---|
-| Suíte de testes (`php artisan test`) | **222 passando**, 771 verificações (eram 209 antes: 13 testes novos, 9 do QR rotativo e 4 da CSP) |
+| Suíte de testes (`php artisan test`) | **232 passando**, 1.066 verificações (eram 209 antes: 23 testes novos) |
 | `composer audit` | 8 avisos, todos Symfony → [SEC-01](../falhas-de-seguranca.md#sec-01); **corrigidos** atualizando os pacotes (hoje sem avisos) |
-| `npm audit` | 6 avisos (2 críticos, 4 altos), todos de build/dev → [SEC-06](../falhas-de-seguranca.md#sec-06) |
+| `npm audit` | 6 avisos (2 críticos, 4 altos), todos de build/dev → [SEC-06](../falhas-de-seguranca.md#sec-06); **corrigidos** com `npm audit fix` (hoje 0) |
 | Teste manual no navegador | Login do professor, tela de chamada, rotação real do QR Code (token trocou de janela em 30 s), console sem violações de CSP |
 | Leitura de código | `PresencaController`, `SecurityHeaders`, rotas, `bootstrap/app.php`, `.env.example`, views da chamada, workflow do CI |
 
@@ -41,8 +41,8 @@ O projeto é **pesado em interface**: a camada de apresentação tem mais que o 
 |---|---|---|---|
 | 1 | ~~Pacotes Symfony com avisos que tocam host, proxy e roteamento~~ | `composer.lock` | **Resolvido** ([SEC-01](../falhas-de-seguranca.md#sec-01)) |
 | 2 | Conta Master pública na demonstração | README | Isolar ou trocar a senha ([SEC-02](../falhas-de-seguranca.md#sec-02)) |
-| 3 | `trustProxies('*')` sem `trustHosts` | `bootstrap/app.php` | Definir hosts confiáveis ([SEC-03](../falhas-de-seguranca.md#sec-03)) |
-| 4 | Scripts de CDN sem integridade | views com QR e PDF | Empacotar via Vite ([SEC-04](../falhas-de-seguranca.md#sec-04)) |
+| 3 | ~~`trustProxies('*')` sem `trustHosts`~~ | `bootstrap/app.php` | **Resolvido** ([SEC-03](../falhas-de-seguranca.md#sec-03)) |
+| 4 | ~~Scripts de CDN sem integridade~~ | views com QR e PDF | **Resolvido**: servidos localmente ([SEC-04](../falhas-de-seguranca.md#sec-04)) |
 | 5 | Chamada depende do cache | `PresencaController` | Ver abaixo |
 | 6 | Presença por cumplicidade (repasse ao vivo do link) | fluxo do QR | Rede ou localização ([SEC-05](../falhas-de-seguranca.md#sec-05)) |
 
@@ -68,7 +68,7 @@ O estado de "chamada aberta" (código, validade e professor) fica só no cache (
 | **Content-Security-Policy endurecida.** *Nonce* por requisição em todo `<script>` e `<style>`, sem `unsafe-inline` em scripts e blocos de estilo, mais `object-src`, `base-uri`, `form-action`, `frame-ancestors`; middleware agora global (404 também) | `SecurityHeaders`, diretiva `@nonce` no `AppServiceProvider`, 25 views |
 | **LICENSE (MIT)** | `LICENSE`, README |
 | **Documentos novos** | `docs/falhas-de-seguranca.md`, este relatório, `docs/revisao-github-actions.md` |
-| **Testes novos** | `QrRotativoTest` (9) e `SecurityHeadersTest` (5, reescrito) |
+| **Testes novos** | `QrRotativoTest` (9), `SecurityHeadersTest` (5, reescrito) e `CspCoberturaTest` (4, cerca de 30 telas) |
 
 ### Comportamento novo que a equipe precisa saber
 
@@ -78,8 +78,8 @@ O estado de "chamada aberta" (código, validade e professor) fica só no cache (
 
 ## Próximos passos recomendados
 
-1. Atualizar as dependências npm ([SEC-06](../falhas-de-seguranca.md#sec-06)) e ativar o Dependabot.
-2. Conectar o deploy da Vercel ao GitHub (preview em cada PR) e conferir as telas restantes com a nova CSP.
+1. Conectar o deploy da Vercel ao GitHub: **o Átila precisa instalar o app da Vercel** (a conta da Vercel não enxerga o repositório dele). Antes, cadastrar variáveis de *Preview* com um banco de teste.
+2. Conferir as telas num navegador real com a nova CSP: o teste automatizado `CspCoberturaTest` já cobre o nonce em cerca de 30 telas dos quatro perfis.
 3. Definir `trustHosts` e `APP_URL`; empacotar `qrcodejs` e `jspdf` pelo Vite.
 4. Tabela `aulas` + classe `AulaAtiva`.
 5. Migrar `onclick=`/`style=` e remover as exceções `*-attr` da CSP.

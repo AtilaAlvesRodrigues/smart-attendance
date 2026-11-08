@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Confiar no Cloudflare e proxies reversos (necessário para sessões e URLs corretas)
         $middleware->trustProxies(at: '*');
 
+        // Só aceita os domínios do projeto no cabeçalho Host (veja App\Support\HostsConfiaveis).
+        // Não vale em APP_ENV=local nem nos testes automáticos.
+        $middleware->trustHosts(at: fn () => \App\Support\HostsConfiaveis::padroes(), subdomains: false);
+
         // Security headers + CSP em TODAS as respostas (global, não só no grupo web),
         // para que páginas de erro como o 404 também levem a política e o nonce.
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);

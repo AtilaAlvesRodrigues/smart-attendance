@@ -1,6 +1,8 @@
 # Revisão das GitHub Actions
 
-Análise do pipeline atual ([`.github/workflows/laravel.yml`](../.github/workflows/laravel.yml)) e levantamento de melhorias e de novas actions. Nada aqui foi ativado: os trechos de código são propostas prontas para virar Pull Request.
+Análise do pipeline atual ([`.github/workflows/laravel.yml`](../.github/workflows/laravel.yml)) e levantamento de melhorias e de novas actions.
+
+**Já aplicado nesta revisão:** Dependabot ([`dependabot.yml`](../.github/dependabot.yml)), revisão de dependências em PRs, varredura de segredos (gitleaks), `timeout-minutes: 15` nos jobs do CI (itens A2 e A7 abaixo). O gitleaks está fixado por SHA e sem publicação de resultados; o `restore-keys` do Composer (A12) foi **descartado** de propósito, para o cache continuar preso ao `composer.lock`. O restante é proposta.
 
 ## Como o pipeline é hoje
 
@@ -38,7 +40,7 @@ Um único workflow, "Smart Attendance — CI/CD", disparado em push e Pull Reque
 | A9 | Sem análise estática (PHPStan/Larastan) | Erros de tipo e código morto só aparecem em execução | Média |
 | A10 | Sem verificação de segredos vazados | Uma chave comitada por engano passaria | Média |
 | A11 | O nome diz "CI/CD" mas não há *deploy* no workflow | Confusão; o deploy é feito fora (CLI da Vercel) | Baixa |
-| A12 | Cache do Composer sem `restore-keys` | Qualquer mudança no `composer.lock` descarta todo o cache | Baixa |
+| A12 | Cache do Composer sem `restore-keys` | Qualquer mudança no `composer.lock` descarta todo o cache. **Mantido assim de propósito**: um cache vindo de outro `composer.lock` poderia instalar pacotes que não são os do lock | Baixa |
 
 ## Melhorias no workflow atual
 
@@ -50,11 +52,7 @@ Um único workflow, "Smart Attendance — CI/CD", disparado em push e Pull Reque
 3. **Matriz de PHP:** `php-version: ['8.2', '8.3', '8.4']` no módulo de testes finais, com `fail-fast: false`.
 4. **`timeout-minutes: 15`** em cada job.
 5. **Tornar o `npm audit` consistente:** `npm audit --audit-level=high` e falhar, ou manter informativo mas dizer isso no relatório.
-6. **Cache com `restore-keys`:**
-   ```yaml
-   key: composer-${{ hashFiles('composer.lock') }}
-   restore-keys: composer-
-   ```
+6. **Cache do Composer:** manter a chave presa ao `composer.lock`, sem `restore-keys`; a perda de velocidade é pequena e evita um cache de outro conjunto de dependências.
 7. **Relatório PDF com o resultado real:** usar `${{ needs.modulos.result }}` em vez de "PASSOU" fixo.
 8. **Renomear** o workflow para "CI" enquanto não houver deploy nele.
 
@@ -98,7 +96,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/dependency-review-action@v4
-        with: { fail-on-severity: high }
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime, development
 ```
 
 ### 3. Estilo de código (Pint) e análise estática
@@ -139,8 +139,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with: { fetch-depth: 0 }
-      - uses: gitleaks/gitleaks-action@v2
-        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      - uses: gitleaks/gitleaks-action@<sha-do-commit> # v2, fixar por SHA
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+          GITLEAKS_ENABLE_SUMMARY: false
+          GITLEAKS_ENABLE_COMMENTS: false
 ```
 
 Ative também **Secret scanning** e **Push protection** em *Settings → Code security*. Elas são grátis em repositórios públicos.
@@ -163,6 +167,10 @@ Depois que o deploy de *preview* estiver conectado, um job simples com `curl -sI
 - **Labeler** (`actions/labeler`) que aplica `docs`, `tests`, `ci` conforme os arquivos mudados, combinando com as etiquetas dos modelos de issue.
 - **Release Drafter** para montar o texto do `CHANGELOG` a partir dos PRs, quando o projeto passar a numerar versões.
 - **Stale** (`actions/stale`) para issues paradas, hoje são 16 abertas.
+
+> **Para a revisão de dependências rodar:** ligue o **Dependency graph** em *Settings → Code security* e crie a variável de repositório `DEPENDENCY_GRAPH_ATIVO` com o valor `true` (*Settings → Secrets and variables → Actions → Variables*). Sem isso o job fica "pulado"; com o graph desligado e o job ativo, a action falha com "Dependency review is not supported on this repository".
+
+> Em *Settings → Code security*, ative também **Dependabot alerts**, **Secret scanning** e **Push protection** (grátis em repositório público). A `dependency-review-action` só funciona com o **Dependency graph** ligado.
 
 ## Ordem sugerida
 

@@ -99,7 +99,7 @@ Cada resposta leva uma política com um *nonce* novo (gerado em [`SecurityHeader
 
 | Diretiva | Valor |
 |---|---|
-| `script-src` | `'self'`, o nonce e `https://cdnjs.cloudflare.com` (QR Code e PDF) |
+| `script-src` | `'self'` e o nonce. Nenhuma CDN: `qrcodejs` e `jsPDF` ficam em `public/js/vendor/` ([hashes](../public/js/vendor/LEIA-ME.md)) |
 | `style-src` | `'self'`, o nonce e `https://fonts.googleapis.com` |
 | `script-src-attr`, `style-src-attr` | `'unsafe-inline'`, **temporário**: ainda há atributos `onclick=` e `style=` nas views ([SEC-08](falhas-de-seguranca.md#sec-08)) |
 | `object-src` | `'none'` |
@@ -109,6 +109,10 @@ Cada resposta leva uma política com um *nonce* novo (gerado em [`SecurityHeader
 | `upgrade-insecure-requests` | só em requisições HTTPS |
 
 Escreveu um `<script>` ou `<style>` novo numa view? Use `<script @nonce>` / `<style @nonce>`; sem isso o navegador bloqueia o bloco. O `SecurityHeadersTest` falha se alguma página tiver bloco sem nonce.
+
+## Host confiável
+
+O cabeçalho `Host` (e `X-Forwarded-Host`) só é aceito se o domínio estiver na lista de [`HostsConfiaveis`](../app/Support/HostsConfiaveis.php): domínios do projeto na Vercel, `APP_URL`, os endereços de cada deploy (`VERCEL_URL`) e os da variável `TRUSTED_HOSTS`. Qualquer outro recebe 400. Isso impede que o link de um e-mail de recuperação de senha seja montado com o domínio de um atacante. Não vale em `APP_ENV=local` nem nos testes automáticos.
 
 ## Robôs no check-in de eventos
 
