@@ -45,6 +45,7 @@ O projeto é **pesado em interface**: a camada de apresentação tem mais que o 
 | 4 | ~~Scripts de CDN sem integridade~~ | views com QR e PDF | **Resolvido**: servidos localmente ([SEC-04](../falhas-de-seguranca.md#sec-04)) |
 | 5 | Chamada depende do cache | `PresencaController` | Ver abaixo |
 | 6 | Presença por cumplicidade (repasse ao vivo do link) | fluxo do QR | Rede ou localização ([SEC-05](../falhas-de-seguranca.md#sec-05)) |
+| 7 | **PHP de produção possivelmente sem a correção das CVE-2026-109618/109619** (RCE, CVSS 9.2) | runtime `vercel-php@0.9.0` | Confirmar a versão e atualizar o runtime ou a hospedagem ([SEC-11](../falhas-de-seguranca.md#sec-11)) |
 
 ### Sobre o item 5: a chamada vive no cache
 

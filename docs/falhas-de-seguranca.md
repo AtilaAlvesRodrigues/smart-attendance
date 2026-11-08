@@ -21,6 +21,7 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 | [SEC-08](#sec-08) | CSP ainda libera `onclick=` e `style=` inline | Baixa | Parcial |
 | [SEC-09](#sec-09) | Padrões inseguros no `.env.example` | Baixa | Aberta |
 | [SEC-10](#sec-10) | Tempo de sessão documentado de formas diferentes | Baixa | Aberta |
+| [SEC-11](#sec-11) | PHP em produção possivelmente sem a correção das CVE-2026-109618 e CVE-2026-109619 | Alta (não confirmada) | Aberta |
 
 ---
 
@@ -114,6 +115,41 @@ O arquivo de exemplo vem com `APP_DEBUG=true`, `LOG_LEVEL=debug`, `SESSION_ENCRY
 
 O README fala em sessão de 1 hora, o `.env.example` define `SESSION_LIFETIME=30` e o `config/session.php` usa 120 como padrão. A sessão efetiva depende do `.env` de cada ambiente, o que torna o comportamento imprevisível.
 **Correção:** escolher um valor, aplicá-lo nos três lugares e documentá-lo em [Segurança](seguranca.md).
+
+## SEC-11
+### PHP em produção possivelmente sem a correção das CVEs críticas
+
+Em 21 de outubro de 2026 foram divulgadas duas vulnerabilidades **no interpretador PHP** (CVSS 9.2), que podem permitir execução remota de código, inclusive sem autenticação:
+
+| CVE | Resumo |
+|---|---|
+| CVE-2026-109618 | Corrupção de memória quando o PHP ultrapassa o `memory_limit`: a limpeza dos recursos manipula estruturas parcialmente inicializadas |
+| CVE-2026-109619 | Estado interno residual, deixado após a liberação de memória, é reaproveitado por uma requisição seguinte no mesmo *worker* |
+
+Versões corrigidas: **8.2.35, 8.3.36, 8.4.27 e 8.5.12**. Fonte: CERT-EU, *Security Advisory 2026-018*, e os avisos GHSA-w8hw-w9fx-j79w e GHSA-6wmf-4rv5-p3rp do projeto PHP. A [análise de segurança](#referencias-desta-falha) do projeto concluiu que **não há falha no código do Smart Attendance**: o risco está no PHP em execução.
+
+**Situação no projeto (verificada em novembro de 2026):**
+
+| Onde | PHP | Corrigido? |
+|---|---|---|
+| `composer.json` | exige `^8.2.35` e `platform.php` 8.2.35 | Só impede instalar em PHP antigo; **não muda o PHP de produção** |
+| CI (GitHub Actions) | série 8.4 (`setup-php` instala a última 8.4.x) | Provavelmente sim; versão exata não registrada |
+| Máquina de desenvolvimento | 8.5.10 (conferido em `php -v`) | **Não**: abaixo de 8.5.12 |
+| **Produção (Vercel)** | embutido no runtime `vercel-php@0.9.0` | **Não confirmado.** Esse runtime foi publicado pela última vez em 15/jan/2026, antes das correções |
+
+**Impacto:** se o runtime de produção usar um PHP anterior às versões corrigidas, o sistema inteiro (dados pessoais criptografados, sessões, contas Master) fica exposto a uma falha que nenhuma proteção da aplicação impede. A exposição **não foi comprovada**: ninguém conseguiu ler a versão do PHP em produção.
+
+**Como confirmar e corrigir:**
+1. Descobrir a versão em produção, por exemplo com uma rota restrita ao Master que mostre `PHP_VERSION`, ou pela documentação do `vercel-php`.
+2. Se for anterior às corrigidas: procurar uma versão mais nova do runtime; se não houver, trocar a hospedagem por uma imagem oficial do PHP (por exemplo `php:8.4` em contêiner), mantendo o banco no Supabase.
+3. Atualizar o PHP das máquinas de desenvolvimento (`brew upgrade php`, 8.5.12 ou superior).
+4. Registrar a versão em uso, a data e os testes feitos depois da atualização.
+
+Medidas temporárias de mitigação não substituem a atualização do PHP.
+
+#### Referências desta falha
+- *Relatório de Análise de Segurança do Smart Attendance* e *Relatório das Modificações Executadas no Smart Attendance* (Átila Alves Rodrigues, novembro de 2026).
+- CERT-EU, *Critical vulnerabilities in PHP*, Security Advisory 2026-018: https://cert.europa.eu/publications/security-advisories/2026-018/
 
 ---
 
