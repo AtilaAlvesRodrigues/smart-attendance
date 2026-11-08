@@ -75,6 +75,8 @@ O Supabase gratuito pausa o banco depois de cerca de 7 dias sem uso. O `vercel.j
 
 Hoje o projeto `smart-attendance` da Vercel (conta `jooaoleonardi's projects`) **não está ligado ao repositório**: os deploys saem pela CLI. Ligando, cada Pull Request ganha uma URL de *preview* e cada merge na `main` publica em produção.
 
+> **Situação em novembro de 2026:** `vercel git connect` foi tentado e a Vercel respondeu "Failed to connect": a conta `jooaoleonardi` da Vercel não tem acesso ao repositório `AtilaAlvesRodrigues/smart-attendance`. O passo 1 abaixo precisa ser feito primeiro.
+
 1. **O dono do repositório** (`AtilaAlvesRodrigues`) instala o [app da Vercel no GitHub](https://github.com/apps/vercel) com acesso a `smart-attendance`. Um *fork* só aparece se o app tiver acesso a ele.
 2. Na Vercel: *Project → Settings → Git → Connect Git Repository* e escolha `AtilaAlvesRodrigues/smart-attendance`. Pela CLI: `vercel git connect https://github.com/AtilaAlvesRodrigues/smart-attendance`.
 3. Em *Settings → Git*, confirme **Production Branch = `main`**.

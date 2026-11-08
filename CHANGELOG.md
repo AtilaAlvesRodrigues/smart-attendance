@@ -7,10 +7,13 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 ### Adicionado
 - **QR Code que muda a cada 30 segundos.** O link da chamada leva um token assinado (HMAC) que vale na janela atual e na anterior; uma foto ou print do QR Code deixa de registrar presença em até 1 minuto. A tela do professor renova o QR sozinha e mostra a contagem regressiva.
 - **Content-Security-Policy com nonce por requisição** em todas as respostas, inclusive páginas de erro: scripts e estilos em bloco injetados deixam de executar. Novas diretivas `object-src`, `base-uri`, `form-action` e `frame-ancestors`.
+- **Dependabot**, revisão de dependências em Pull Requests e varredura de segredos (gitleaks); `timeout-minutes` nos jobs do CI e `restore-keys` no cache do Composer.
+- `CspCoberturaTest`: confere o nonce em cerca de 30 telas dos quatro perfis.
 - Arquivo `LICENSE` (MIT), já declarada no `composer.json`.
 - Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
 
 ### Alterado
+- Dependências npm atualizadas com `npm audit fix` (0 vulnerabilidades).
 - Pacotes Symfony atualizados (`http-foundation`, `http-kernel`, `mime`, `routing`, `yaml`): corrige os 8 avisos do `composer audit`.
 - Quem escaneia o QR Code precisa fazê-lo na hora; se o login demorar mais de 1 minuto, é preciso escanear de novo.
 - Nas views, todo `<script>` e `<style>` em bloco agora usa `@nonce`.

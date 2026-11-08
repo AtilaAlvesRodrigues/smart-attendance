@@ -19,7 +19,7 @@ DB_CONNECTION=pgsql DB_DATABASE=smart_attendance_test php artisan test
 
 ## O que está coberto
 
-São **222 testes** e 771 verificações. As tabelas abaixo contam os métodos de teste de cada arquivo; alguns rodam mais de uma vez com dados diferentes, por isso a soma é um pouco menor que o total.
+São **226 testes** e 1.005 verificações. As tabelas abaixo contam os métodos de teste de cada arquivo; alguns rodam mais de uma vez com dados diferentes, por isso a soma é um pouco menor que o total.
 
 ### Fluxos do sistema
 

@@ -1,6 +1,8 @@
 # Revisão das GitHub Actions
 
-Análise do pipeline atual ([`.github/workflows/laravel.yml`](../.github/workflows/laravel.yml)) e levantamento de melhorias e de novas actions. Nada aqui foi ativado: os trechos de código são propostas prontas para virar Pull Request.
+Análise do pipeline atual ([`.github/workflows/laravel.yml`](../.github/workflows/laravel.yml)) e levantamento de melhorias e de novas actions.
+
+**Já aplicado nesta revisão:** Dependabot ([`dependabot.yml`](../.github/dependabot.yml)), revisão de dependências em PRs, varredura de segredos (gitleaks), `timeout-minutes: 15` nos jobs do CI e `restore-keys` no cache do Composer (itens A2, A7 e A12 abaixo). O restante é proposta.
 
 ## Como o pipeline é hoje
 
@@ -163,6 +165,8 @@ Depois que o deploy de *preview* estiver conectado, um job simples com `curl -sI
 - **Labeler** (`actions/labeler`) que aplica `docs`, `tests`, `ci` conforme os arquivos mudados, combinando com as etiquetas dos modelos de issue.
 - **Release Drafter** para montar o texto do `CHANGELOG` a partir dos PRs, quando o projeto passar a numerar versões.
 - **Stale** (`actions/stale`) para issues paradas, hoje são 16 abertas.
+
+> Em *Settings → Code security*, ative também **Dependabot alerts**, **Secret scanning** e **Push protection** (grátis em repositório público). A `dependency-review-action` só funciona com o **Dependency graph** ligado.
 
 ## Ordem sugerida
 
