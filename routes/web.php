@@ -4,6 +4,7 @@ use App\Http\Controllers\AlunoLoginController;
 use App\Http\Controllers\ProfessorLoginController;
 use App\Http\Controllers\LoginRouterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AmbienteController;
 use App\Http\Controllers\PdfTesteVulnerabilidadeController;
 use App\Http\Controllers\MasterSearchController;
 use App\Http\Controllers\PresencaController;
@@ -147,6 +148,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
         // Relatório interno de testes de segurança: lista vulnerabilidades, então só o Master vê
         Route::get('/relatorio-seguranca', [PdfTesteVulnerabilidadeController::class, 'index'])->name('pdf.teste.vulnerabilidade');
+
+        // Versão do PHP em execução e se já tem a correção das CVEs críticas (SEC-11). JSON, só Master.
+        Route::get('/ambiente/php', [AmbienteController::class, 'php'])->name('master.ambiente.php');
 
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');

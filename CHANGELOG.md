@@ -11,11 +11,13 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - `CspCoberturaTest`: confere o nonce em cerca de 30 telas dos quatro perfis.
 - **`trustHosts`:** o cabeçalho `Host` só é aceito para os domínios do projeto (`HostsConfiaveis`); outros recebem 400. Domínio próprio exige a variável `TRUSTED_HOSTS`.
 - Bibliotecas `qrcodejs`, `jsPDF` e `jsPDF-AutoTable` servidas de `public/js/vendor/` (hash igual ao da cdnjs, conferido por teste); a CSP não cita mais nenhuma CDN de scripts.
+- Rota `/dashboard/master/ambiente/php` (só Master): mostra a versão do PHP em execução e se ela já tem a correção das CVE-2026-109618/109619 (`VersaoPhp`, `AmbienteController`).
 - Registro da **SEC-11**: o PHP em produção (runtime `vercel-php@0.9.0`) pode estar sem a correção das CVE-2026-109618 e CVE-2026-109619; versão não confirmada. Correção do documento das Actions: o CI usa PHP 8.4, não 8.3.
 - Arquivo `LICENSE` (MIT), já declarada no `composer.json`.
 - Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
 
 ### Alterado
+- Teste de assinatura do QR rotativo deixou de ser instável (falhava em 1 de cada 16 execuções).
 - Dependências npm atualizadas com `npm audit fix` (0 vulnerabilidades).
 - Pacotes Symfony atualizados (`http-foundation`, `http-kernel`, `mime`, `routing`, `yaml`): corrige os 8 avisos do `composer audit`.
 - Quem escaneia o QR Code precisa fazê-lo na hora; se o login demorar mais de 1 minuto, é preciso escanear de novo.

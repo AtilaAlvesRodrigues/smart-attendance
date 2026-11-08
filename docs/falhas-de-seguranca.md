@@ -140,7 +140,7 @@ Versões corrigidas: **8.2.35, 8.3.36, 8.4.27 e 8.5.12**. Fonte: CERT-EU, *Secur
 **Impacto:** se o runtime de produção usar um PHP anterior às versões corrigidas, o sistema inteiro (dados pessoais criptografados, sessões, contas Master) fica exposto a uma falha que nenhuma proteção da aplicação impede. A exposição **não foi comprovada**: ninguém conseguiu ler a versão do PHP em produção.
 
 **Como confirmar e corrigir:**
-1. Descobrir a versão em produção, por exemplo com uma rota restrita ao Master que mostre `PHP_VERSION`, ou pela documentação do `vercel-php`.
+1. **Descobrir a versão em produção:** entre como Master e abra `/dashboard/master/ambiente/php` no site publicado. A resposta (JSON) traz `php_versao`, a primeira versão corrigida da série e `cves_corrigidas` (`true`, `false` ou `null` se a série for mais nova que as conhecidas). Só versões e flags: nenhum segredo. A rota fica disponível depois do próximo deploy de produção.
 2. Se for anterior às corrigidas: procurar uma versão mais nova do runtime; se não houver, trocar a hospedagem por uma imagem oficial do PHP (por exemplo `php:8.4` em contêiner), mantendo o banco no Supabase.
 3. Atualizar o PHP das máquinas de desenvolvimento (`brew upgrade php`, 8.5.12 ou superior).
 4. Registrar a versão em uso, a data e os testes feitos depois da atualização.
