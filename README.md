@@ -7,7 +7,7 @@ O professor projeta um QR Code, o aluno aponta a câmera do celular e a presenç
 
 [![CI](https://img.shields.io/github/actions/workflow/status/AtilaAlvesRodrigues/smart-attendance/laravel.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/AtilaAlvesRodrigues/smart-attendance/actions/workflows/laravel.yml)
 [![Demo](https://img.shields.io/badge/demo-online-22C55E?style=for-the-badge&logo=vercel&logoColor=white)](https://smart-attendance-nine-alpha.vercel.app)
-![Testes](https://img.shields.io/badge/testes-226-7C3AED?style=for-the-badge)
+![Testes](https://img.shields.io/badge/testes-232-7C3AED?style=for-the-badge)
 ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -181,6 +181,7 @@ Mais exemplos em [Regras acadêmicas](docs/regras-academicas.md).
 | XSS | Saída escapada no Blade; dados do usuário inseridos no JavaScript com `textContent` |
 | SQL injection | Consultas com *bindings*; colunas de nota validadas por lista permitida |
 | Cabeçalhos HTTP | `Content-Security-Policy` com *nonce* por requisição, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` |
+| Host | Só aceita os domínios do projeto no cabeçalho `Host` (evita link de e-mail com domínio de atacante) |
 | Robôs | *Honeypot* no check-in público de eventos |
 | Sessão | Expira em 1 hora, com aviso na tela e sincronização entre abas |
 | QR Code | Único por aula, com token que muda a cada 30 segundos (foto ou print deixa de valer em até 1 minuto), nunca exibido em página pública |
@@ -234,7 +235,7 @@ composer test                               # suíte completa
 php artisan test --filter=SituacaoAcademica  # um arquivo específico
 ```
 
-São **226 testes** (1.005 verificações) cobrindo login dos três perfis, chamada e QR Code, regras de frequência e notas, cadastros, turmas, eventos e cada camada de segurança.
+São **232 testes** (1.066 verificações) cobrindo login dos três perfis, chamada e QR Code, regras de frequência e notas, cadastros, turmas, eventos e cada camada de segurança.
 
 O [pipeline do GitHub Actions](.github/workflows/laravel.yml) roda em todo push e Pull Request para a `main`, contra um PostgreSQL 17 real, em 6 módulos: configuração, banco de dados, segurança, classes, suíte completa e relatório em PDF. Veja [Testes e CI](docs/testes-e-ci.md).
 

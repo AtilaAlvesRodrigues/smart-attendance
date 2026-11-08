@@ -23,6 +23,7 @@ Ordem das rotas no `vercel.json`:
 
 | Variável | Valor | Por quê |
 |---|---|---|
+| `TRUSTED_HOSTS` | domínios extras, separados por vírgula (opcional) | **Obrigatória se o site tiver domínio próprio** (ex.: `chamada.escola.edu.br`). Sem ela, qualquer `Host` fora da lista recebe 400. Os domínios `*.vercel.app` do projeto já estão incluídos |
 | `APP_KEY` | chave gerada por `php artisan key:generate --show` | Criptografia e *blind indexes*. Marcar como *sensitive* |
 | `APP_ENV` / `APP_DEBUG` | `production` / `false` | Erros sem detalhes internos |
 | `APP_LOCALE` | `pt_BR` | |

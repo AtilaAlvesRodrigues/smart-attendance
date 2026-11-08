@@ -6,7 +6,7 @@ Revisão técnica do Smart Attendance sobre o commit `6411a3e` (branch `main`), 
 
 | Verificação | Resultado |
 |---|---|
-| Suíte de testes (`php artisan test`) | **226 passando**, 1.005 verificações (eram 209 antes: 17 testes novos) |
+| Suíte de testes (`php artisan test`) | **232 passando**, 1.066 verificações (eram 209 antes: 23 testes novos) |
 | `composer audit` | 8 avisos, todos Symfony → [SEC-01](../falhas-de-seguranca.md#sec-01); **corrigidos** atualizando os pacotes (hoje sem avisos) |
 | `npm audit` | 6 avisos (2 críticos, 4 altos), todos de build/dev → [SEC-06](../falhas-de-seguranca.md#sec-06); **corrigidos** com `npm audit fix` (hoje 0) |
 | Teste manual no navegador | Login do professor, tela de chamada, rotação real do QR Code (token trocou de janela em 30 s), console sem violações de CSP |
@@ -41,8 +41,8 @@ O projeto é **pesado em interface**: a camada de apresentação tem mais que o 
 |---|---|---|---|
 | 1 | ~~Pacotes Symfony com avisos que tocam host, proxy e roteamento~~ | `composer.lock` | **Resolvido** ([SEC-01](../falhas-de-seguranca.md#sec-01)) |
 | 2 | Conta Master pública na demonstração | README | Isolar ou trocar a senha ([SEC-02](../falhas-de-seguranca.md#sec-02)) |
-| 3 | `trustProxies('*')` sem `trustHosts` | `bootstrap/app.php` | Definir hosts confiáveis ([SEC-03](../falhas-de-seguranca.md#sec-03)) |
-| 4 | Scripts de CDN sem integridade | views com QR e PDF | Empacotar via Vite ([SEC-04](../falhas-de-seguranca.md#sec-04)) |
+| 3 | ~~`trustProxies('*')` sem `trustHosts`~~ | `bootstrap/app.php` | **Resolvido** ([SEC-03](../falhas-de-seguranca.md#sec-03)) |
+| 4 | ~~Scripts de CDN sem integridade~~ | views com QR e PDF | **Resolvido**: servidos localmente ([SEC-04](../falhas-de-seguranca.md#sec-04)) |
 | 5 | Chamada depende do cache | `PresencaController` | Ver abaixo |
 | 6 | Presença por cumplicidade (repasse ao vivo do link) | fluxo do QR | Rede ou localização ([SEC-05](../falhas-de-seguranca.md#sec-05)) |
 

@@ -50,8 +50,8 @@ class SecurityHeaders
     {
         $diretivas = [
             "default-src 'self'",
-            // Scripts: só os do próprio site, os com nonce e a CDN dos QR Codes/PDF.
-            "script-src 'self' 'nonce-{$nonce}' https://cdnjs.cloudflare.com",
+            // Scripts: só os do próprio site e os blocos com nonce (bibliotecas em public/js/vendor).
+            "script-src 'self' 'nonce-{$nonce}'",
             // Atributos onclick=... das telas antigas (débito: migrar para addEventListener).
             "script-src-attr 'unsafe-inline'",
             "style-src 'self' 'nonce-{$nonce}' https://fonts.googleapis.com",

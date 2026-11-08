@@ -9,6 +9,8 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - **Content-Security-Policy com nonce por requisição** em todas as respostas, inclusive páginas de erro: scripts e estilos em bloco injetados deixam de executar. Novas diretivas `object-src`, `base-uri`, `form-action` e `frame-ancestors`.
 - **Dependabot**, revisão de dependências em Pull Requests e varredura de segredos (gitleaks); `timeout-minutes` nos jobs do CI e `restore-keys` no cache do Composer.
 - `CspCoberturaTest`: confere o nonce em cerca de 30 telas dos quatro perfis.
+- **`trustHosts`:** o cabeçalho `Host` só é aceito para os domínios do projeto (`HostsConfiaveis`); outros recebem 400. Domínio próprio exige a variável `TRUSTED_HOSTS`.
+- Bibliotecas `qrcodejs`, `jsPDF` e `jsPDF-AutoTable` servidas de `public/js/vendor/` (hash igual ao da cdnjs, conferido por teste); a CSP não cita mais nenhuma CDN de scripts.
 - Arquivo `LICENSE` (MIT), já declarada no `composer.json`.
 - Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
 

@@ -13,8 +13,8 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 |---|---|---|---|
 | [SEC-01](#sec-01) | Dependências PHP com 8 avisos de segurança (Symfony) | Alta | **Resolvida** |
 | [SEC-02](#sec-02) | Conta Master da demonstração com senha pública | Alta | Aberta |
-| [SEC-03](#sec-03) | `trustProxies('*')` sem `trustHosts` | Média | Aberta |
-| [SEC-04](#sec-04) | Scripts de CDN sem Subresource Integrity | Média | Aberta |
+| [SEC-03](#sec-03) | `trustProxies('*')` sem `trustHosts` | Média | **Resolvida** |
+| [SEC-04](#sec-04) | Scripts de CDN sem Subresource Integrity | Média | **Resolvida** |
 | [SEC-05](#sec-05) | Link da chamada pode ser repassado ao vivo a quem está fora da sala | Média | Parcial |
 | [SEC-06](#sec-06) | Dependências npm com 6 avisos (2 críticos, só no build/dev) | Média | **Resolvida** |
 | [SEC-07](#sec-07) | Sem autenticação em dois fatores | Média | Aberta |
@@ -57,12 +57,16 @@ O README publica `master@admin.com` / `senha123` para a demonstração em `smart
 ## SEC-03
 ### `trustProxies('*')` sem `trustHosts`
 
+> **Resolvida** em novembro de 2026: [`HostsConfiaveis`](../app/Support/HostsConfiaveis.php) lista os domínios aceitos e `trustHosts` em `bootstrap/app.php` devolve **400** para qualquer outro `Host` ou `X-Forwarded-Host` (conferido com o app em `APP_ENV=production`: `evil.com` e `evil.vercel.app` recebem 400). Não há curinga `*.vercel.app`. **Domínio novo** (por exemplo, um da escola) precisa entrar na variável `TRUSTED_HOSTS`, senão o site responde 400. O texto abaixo registra o que foi encontrado.
+
 Em [`bootstrap/app.php`](../bootstrap/app.php) o sistema confia em qualquer proxy (`trustProxies(at: '*')`) e não define hosts confiáveis. Um cliente pode enviar `X-Forwarded-Host` ou `Host` próprios, e o Laravel gera URLs com esse valor. Isso afeta os links do QR Code e os links dos e-mails de primeiro acesso e de recuperação de senha, e dá base para *host header poisoning* (um e-mail de recuperação com link para outro domínio).
 
 **Correção:** definir `APP_URL` correto em produção e adicionar `$middleware->trustHosts(at: [...])` com os domínios reais; na Vercel, restringir a confiança de proxy aos cabeçalhos que a plataforma realmente envia. Corrigir [SEC-01](#sec-01) também.
 
 ## SEC-04
 ### Scripts de CDN sem Subresource Integrity
+
+> **Resolvida** em novembro de 2026: `qrcodejs`, `jspdf` e `jspdf-autotable` agora são servidos de `public/js/vendor/`, cópias sem alteração cujo SHA-512 é idêntico ao publicado pela cdnjs. A CSP não libera mais nenhuma CDN de scripts, e o `VendorIntegrityTest` falha se um arquivo for alterado. O texto abaixo registra o que foi encontrado.
 
 `qrcodejs`, `jspdf` e `jspdf-autotable` são carregados de `cdnjs.cloudflare.com` sem o atributo `integrity` (nenhuma view usa SRI). Se a CDN ou a conta do autor for comprometida, o script malicioso roda dentro do sistema, inclusive na tela do professor, com acesso à sessão. A CSP libera o host `cdnjs.cloudflare.com` inteiro, não um arquivo específico.
 
@@ -119,6 +123,8 @@ O README fala em sessão de 1 hora, o `.env.example` define `SESSION_LIFETIME=30
 |---|---|
 | Oito avisos do `composer audit` (Symfony) | Atualização dos pacotes ([SEC-01](#sec-01)) |
 | Seis avisos do `npm audit` | `npm audit fix` ([SEC-06](#sec-06)) |
+| Host header poisoning | `trustHosts` com lista exata de domínios ([SEC-03](#sec-03)) |
+| Scripts de CDN sem integridade | Bibliotecas servidas pelo próprio site, com teste de hash ([SEC-04](#sec-04)) |
 | QR Code vivo por 2 horas e reaproveitável por foto | Token HMAC de 30 s na URL ([`QrToken`](../app/Support/QrToken.php)); tolerância de uma janela. Resta [SEC-05](#sec-05). |
 | Ausência de Content-Security-Policy / CSP com `unsafe-inline` em scripts | CSP com *nonce* por requisição, `object-src 'none'`, `base-uri`, `form-action` e `frame-ancestors`. Resta [SEC-08](#sec-08). |
 | Cabeçalhos de segurança fora das páginas 404 | `SecurityHeaders` agora é middleware global. |
