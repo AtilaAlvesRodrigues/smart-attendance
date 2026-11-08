@@ -14,7 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 
-    <script>
+    <script @nonce>
         // Initialize theme instantly to prevent flash
         if (localStorage.getItem('pal_theme') === 'light') {
             document.documentElement.classList.add('light-mode');
@@ -98,7 +98,7 @@
 
     {{-- ===== GLOBAL SCRIPTS ===== --}}
     <script src="{{ asset('js/theme.js') }}"></script>
-    <script>
+    <script @nonce>
         // Set --pal-nav-h so the fixed sidebar starts exactly below the nav
         (function () {
             function setNavH() {

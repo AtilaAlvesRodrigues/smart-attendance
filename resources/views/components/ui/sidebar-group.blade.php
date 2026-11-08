@@ -5,7 +5,7 @@
 ])
 
 @once
-<style>
+<style @nonce>
 .pal-sidebar-group-trigger {
     display: flex;
     align-items: center;
@@ -73,7 +73,7 @@
     }
 }
 </style>
-<script>
+<script @nonce>
 function palToggleSidebarGroup(btn) {
     var group = btn.closest('.pal-sidebar-group');
     group.dataset.open = group.dataset.open === 'true' ? 'false' : 'true';

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Support\QrToken;
 use App\Models\Presenca;
 use App\Models\Materia;
 use App\Models\AlunoModel;
@@ -89,11 +90,45 @@ class PresencaController extends Controller
         if ($hora < 12) $horario = 'M';
         elseif ($hora < 18) $horario = 'V';
 
-        // Gera URL com o host real da requisição (funciona em rede local via IP)
-        $presencaUrl = $request->getSchemeAndHttpHost()
-            . route('presenca.confirmar', $codigo_aula, false);
+        // URL com o host real da requisição (funciona em rede local via IP) e o token
+        // rotativo do QR Code. A tela do professor pede um novo a cada QrToken::STEP segundos.
+        $presencaUrl = $this->urlDoQr($request, $codigo_aula);
+        $qrRenovaEm = QrToken::segundosAteProximo();
 
-        return view('professor.presenca.gerar', compact('professor', 'materia', 'codigo_aula', 'semestre', 'horario', 'expiraEmTimestamp', 'presencaUrl'));
+        return view('professor.presenca.gerar', compact('professor', 'materia', 'codigo_aula', 'semestre', 'horario', 'expiraEmTimestamp', 'presencaUrl', 'qrRenovaEm'));
+    }
+
+    /**
+     * Devolve a URL do QR Code com o token do momento (polling da tela do professor).
+     * Só o professor dono da chamada ainda aberta recebe o token.
+     */
+    public function tokenQr(Request $request, $codigo_aula)
+    {
+        $parts = explode('-', $codigo_aula);
+        if (count($parts) < 3 || !ctype_digit($parts[0]) || !ctype_digit($parts[1])) {
+            abort(404);
+        }
+
+        $cacheKey = 'aula_materia_' . (int) $parts[0] . '_' . Carbon::createFromTimestamp((int) $parts[1], config('app.timezone'))->format('Y-m-d');
+        $cacheData = Cache::get($cacheKey);
+
+        if (!is_array($cacheData)
+            || ($cacheData['codigo'] ?? '') !== $codigo_aula
+            || (int) ($cacheData['professor_id'] ?? 0) !== (int) Auth::guard('professores')->id()
+            || ($cacheData['expira_em'] ?? 0) <= time()) {
+            abort(404);
+        }
+
+        return response()->json([
+            'url' => $this->urlDoQr($request, $codigo_aula),
+            'renova_em' => QrToken::segundosAteProximo(),
+        ])->header('Cache-Control', 'no-store');
+    }
+
+    private function urlDoQr(Request $request, string $codigo_aula): string
+    {
+        return $request->getSchemeAndHttpHost()
+            . route('presenca.confirmar', ['codigo_aula' => $codigo_aula, 't' => QrToken::gerar($codigo_aula)], false);
     }
 
     /**
@@ -102,7 +137,10 @@ class PresencaController extends Controller
     public function confirmarPresenca(Request $request, $codigo_aula)
     {
         if (!Auth::guard('alunos')->check()) {
-            session(['pending_attendance_code' => $codigo_aula]);
+            session([
+                'pending_attendance_code'  => $codigo_aula,
+                'pending_attendance_token' => $request->query('t'),
+            ]);
             return redirect()->route('login.aluno.form')->with('info', 'Faça login para confirmar sua presença.');
         }
 
@@ -131,6 +169,11 @@ class PresencaController extends Controller
 
         if (Presenca::where('aluno_id', $aluno->id)->where('codigo_aula', $codigo_aula)->exists()) {
             return view('aluno.presenca.ja_registrado');
+        }
+
+        // O QR Code muda a cada 30 s: um link antigo (foto ou print repassado) não registra presença.
+        if (!QrToken::validar($codigo_aula, $request->query('t'))) {
+            return view('aluno.presenca.erro', ['mensagem' => 'Este QR Code expirou. Escaneie o código que está na tela do professor agora.']);
         }
 
         $data_aula = Carbon::createFromTimestamp($timestamp, config('app.timezone'))->format('Y-m-d');

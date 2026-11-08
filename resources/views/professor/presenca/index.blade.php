@@ -164,7 +164,7 @@
 @endsection
 
 @push('scripts')
-    <script>
+    <script @nonce>
         // Profile Modal
         const profileModal = document.getElementById('profile-modal');
         const openProfileBtn = document.getElementById('open-profile');

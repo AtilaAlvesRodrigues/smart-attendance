@@ -8,7 +8,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/theme_aluno.css') }}">
-    <style>
+    <style @nonce>
         /* Force display of some elements for demo */
         .pal-modal-overlay { z-index: 3000; }
     </style>
@@ -136,7 +136,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script @nonce>
     function confirmDemoPresence() {
         const toast = document.getElementById('demo-toast');
         toast.classList.add('active');

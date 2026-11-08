@@ -19,7 +19,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/theme_master.css') }}">
-    <style>
+    <style @nonce>
         @media print {
             body { background: white !important; color: black !important; }
             .no-print, nav, .blob, .blob-2, footer, #cursor-glow, #theme-toggle { display: none !important; }
@@ -240,7 +240,7 @@
         </main>
     </div>
 @push('scripts')
-<script>
+<script @nonce>
     document.addEventListener('DOMContentLoaded', () => {
         // Profile Modal Logic
         const pModal = document.getElementById('profile-modal');

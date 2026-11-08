@@ -118,7 +118,7 @@
 </main>
 
 @push('scripts')
-<script>
+<script @nonce>
     // Profile Modal Logic
     const modal = document.getElementById('profile-modal');
     const openBtn = document.getElementById('open-profile');

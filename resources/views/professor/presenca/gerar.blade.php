@@ -45,7 +45,11 @@
 
                     <div id="qrcode" class="p-5 rounded-sm bg-white shadow-2xl" role="img" aria-label="QR Code para registrar presença em {{ $materia->nome }}"></div>
 
-                    <button type="button" id="btn-projetar" class="pal-dashboard-btn pal-dashboard-btn-solid mt-6"
+                    <p class="pal-subtitle" style="margin:1rem 0 0; font-size:0.9rem;" aria-live="off">
+                        O QR Code muda a cada 30 segundos — foto ou print não vale. Troca em <strong class="pal-text tabular-nums" id="qr-renova-texto">30</strong> s.
+                    </p>
+
+                    <button type="button" id="btn-projetar"class="pal-dashboard-btn pal-dashboard-btn-solid mt-6"
                             style="background:#efefef; color:#050505; padding:0.8rem 1.5rem; font-size:0.95rem; font-weight:800; display:inline-flex; align-items:center; gap:0.5rem;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/></svg>
                         Projetar em tela cheia
@@ -163,12 +167,48 @@
 
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
-        const qrContent = @json($presencaUrl);
-        new QRCode(document.getElementById('qrcode'), {
+    <script @nonce>
+        // O QR Code leva um token que muda a cada 30 s (veja App\Support\QrToken).
+        // qrContent sempre guarda o link do momento, usado também por "Copiar link".
+        let qrContent = @json($presencaUrl);
+        const qrTokenUrl = @json(route('professor.presenca.token', $codigo_aula));
+        const qrPrincipal = new QRCode(document.getElementById('qrcode'), {
             text: qrContent, width: 260, height: 260,
             colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H
         });
+        let qrProjecaoObj = null;
+        const qrRenovaTexto = document.getElementById('qr-renova-texto');
+        let qrProximaTroca = Date.now() + {{ (int) $qrRenovaEm }} * 1000;
+        let qrTrocaTimer;
+
+        function agendarTrocaQr() {
+            clearTimeout(qrTrocaTimer);
+            // +400 ms de folga para o servidor já estar na janela nova
+            qrTrocaTimer = setTimeout(renovarQr, Math.max(1000, qrProximaTroca - Date.now() + 400));
+        }
+
+        async function renovarQr() {
+            try {
+                const resposta = await fetch(qrTokenUrl, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
+                if (resposta.status === 404) return; // chamada encerrada: o aviso de expiração cuida do resto
+                if (!resposta.ok) throw new Error('HTTP ' + resposta.status);
+                const dados = await resposta.json();
+                qrContent = dados.url;
+                qrPrincipal.makeCode(qrContent);
+                if (qrProjecaoObj) qrProjecaoObj.makeCode(qrContent);
+                qrProximaTroca = Date.now() + dados.renova_em * 1000;
+            } catch (erro) {
+                console.error('Erro ao renovar o QR Code:', erro);
+                qrProximaTroca = Date.now() + 5000; // tenta de novo em 5 s
+            }
+            agendarTrocaQr();
+        }
+
+        setInterval(() => {
+            const s = Math.max(0, Math.ceil((qrProximaTroca - Date.now()) / 1000));
+            qrRenovaTexto.textContent = s;
+        }, 500);
+        agendarTrocaQr();
 
         // ========== MODO PROJEÇÃO ==========
         const projecao = document.getElementById('modo-projecao');
@@ -180,7 +220,7 @@
             projecao.classList.add('flex');
             if (!qrProjecaoPronto) {
                 const lado = Math.floor(Math.min(window.innerHeight * 0.62, window.innerWidth * 0.8));
-                new QRCode(qrProjecao, { text: qrContent, width: lado, height: lado, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+                qrProjecaoObj = new QRCode(qrProjecao, { text: qrContent, width: lado, height: lado, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
                 qrProjecaoPronto = true;
             }
             if (projecao.requestFullscreen) projecao.requestFullscreen().catch(() => {});

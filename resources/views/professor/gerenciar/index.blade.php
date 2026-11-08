@@ -85,7 +85,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script @nonce>
     // Tilt effect
     document.addEventListener('DOMContentLoaded', () => {
         const cards = document.querySelectorAll('.tilt-card');

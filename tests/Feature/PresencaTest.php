@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AlunoModel;
 use App\Models\Materia;
 use App\Models\ProfessorModel;
+use App\Support\QrToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -153,7 +154,7 @@ class PresencaTest extends TestCase
 
         $this->actingAs($aluno, 'alunos');
 
-        $response = $this->get("/presenca/confirmar/{$codigo}");
+        $response = $this->get("/presenca/confirmar/{$codigo}?t=" . QrToken::gerar($codigo));
 
         $response->assertStatus(200);
         $response->assertViewIs('aluno.presenca.sucesso');
@@ -190,7 +191,7 @@ class PresencaTest extends TestCase
 
         $this->actingAs($aluno, 'alunos');
 
-        $response = $this->get("/presenca/confirmar/{$codigo}");
+        $response = $this->get("/presenca/confirmar/{$codigo}?t=" . QrToken::gerar($codigo));
 
         $response->assertStatus(200);
         $response->assertViewIs('aluno.presenca.erro');
@@ -244,11 +245,11 @@ class PresencaTest extends TestCase
 
         $this->actingAs($aluno, 'alunos');
 
-        $response = $this->get("/presenca/confirmar/{$codigo}");
+        $response = $this->get("/presenca/confirmar/{$codigo}?t=" . QrToken::gerar($codigo));
 
         $response->assertViewIs('aluno.presenca.sucesso');
 
-        $response = $this->get("/presenca/confirmar/{$codigo}");
+        $response = $this->get("/presenca/confirmar/{$codigo}?t=" . QrToken::gerar($codigo));
 
         $response->assertStatus(200);
         $response->assertViewIs('aluno.presenca.ja_registrado');
@@ -330,7 +331,7 @@ class PresencaTest extends TestCase
             ->viewData("codigo_aula");
 
         $this->actingAs($aluno, "alunos")
-            ->get("/presenca/confirmar/{$codigo}")
+            ->get("/presenca/confirmar/{$codigo}?t=" . QrToken::gerar($codigo))
             ->assertViewIs("aluno.presenca.sucesso");
 
         $this->assertDatabaseHas("presencas", [

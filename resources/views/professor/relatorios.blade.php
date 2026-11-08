@@ -17,7 +17,7 @@
 @endsection
 
 @push('styles')
-<style>
+<style @nonce>
     @media print {
         .no-print { display: none !important; }
         body { background: white !important; }
@@ -323,7 +323,7 @@
         </main>
     </div>
 @push('scripts')
-<script>
+<script @nonce>
     document.addEventListener('DOMContentLoaded', function() {
         // Datas: campo nativo do navegador (envia AAAA-MM-DD, funciona no celular)
 
