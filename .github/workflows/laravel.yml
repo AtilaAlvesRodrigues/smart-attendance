@@ -211,6 +211,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 10
+          persist-credentials: false # o token não fica em .git/config, que iria parar no PDF se algo o lesse
 
       - uses: actions/download-artifact@v5
         with:
@@ -243,19 +244,19 @@ jobs:
             echo "| 5 | Testes Finais (Suite Completa) | PASSOU |"
             echo
             echo "## Pacotes PHP desatualizados"
-            echo '```'; tr '`' "'" < composer-outdated.txt; echo '```'
+            tr -d '\r' < composer-outdated.txt | sed 's/^/    /'
             echo
             echo "## Pacotes NPM desatualizados"
-            echo '```'; tr '`' "'" < npm-outdated.txt; echo '```'
+            tr -d '\r' < npm-outdated.txt | sed 's/^/    /'
             echo
             echo "## Auditoria NPM"
-            echo '```'; tr '`' "'" < npm-audit.txt; echo '```'
+            tr -d '\r' < npm-audit.txt | sed 's/^/    /'
             echo
             echo "## Arquivos modificados no commit"
-            echo '```'; git diff-tree --no-commit-id -r --name-status HEAD | head -40 | tr '`' "'"; echo '```'
+            git diff-tree --no-commit-id -r --name-status HEAD | head -40 | sed 's/^/    /'
             echo
             echo "## Historico recente"
-            echo '```'; git log --oneline -5 --no-color | tr '`' "'"; echo '```'
+            git log --oneline -5 --no-color | sed 's/^/    /'
             echo
             echo "*Relatorio gerado automaticamente pelo GitHub Actions.*"
           } > relatorio.md
@@ -265,7 +266,7 @@ jobs:
           printf '@page { size: A4; margin: 20mm 25mm; }\nbody { font-family: sans-serif; font-size: 11pt; }\npre { white-space: pre-wrap; font-size: 9pt; }\ntable { border-collapse: collapse; }\ntd, th { border: 1px solid #999; padding: 4px 8px; }\n' > relatorio.css
           # -raw_html/-raw_tex: texto vindo de commits e arquivos nunca vira marcação (evita que o
           # WeasyPrint carregue file:// ou URLs ao gerar o PDF)
-          pandoc --from=markdown-raw_html-raw_tex-raw_attribute relatorio.md -o relatorio-pipeline.pdf --pdf-engine=weasyprint \
+          pandoc --sandbox --from=markdown-raw_html-raw_tex-raw_attribute relatorio.md -o relatorio-pipeline.pdf --pdf-engine=weasyprint \
             --css=relatorio.css --metadata title="Smart Attendance — Relatorio de Pipeline" --standalone
 
       - name: Publicar relatorio PDF
