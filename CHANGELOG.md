@@ -7,7 +7,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 ### Adicionado
 - **QR Code que muda a cada 30 segundos.** O link da chamada leva um token assinado (HMAC) que vale na janela atual e na anterior; uma foto ou print do QR Code deixa de registrar presença em até 1 minuto. A tela do professor renova o QR sozinha e mostra a contagem regressiva.
 - **Content-Security-Policy com nonce por requisição** em todas as respostas, inclusive páginas de erro: scripts e estilos em bloco injetados deixam de executar. Novas diretivas `object-src`, `base-uri`, `form-action` e `frame-ancestors`.
-- **Dependabot**, revisão de dependências em Pull Requests e varredura de segredos (gitleaks); `timeout-minutes` nos jobs do CI e `restore-keys` no cache do Composer.
+- **Dependabot**, revisão de dependências em Pull Requests e varredura de segredos (gitleaks); `timeout-minutes` nos jobs do CI. O gitleaks fica fixado por SHA e não publica os segredos encontrados.
 - `CspCoberturaTest`: confere o nonce em cerca de 30 telas dos quatro perfis.
 - **`trustHosts`:** o cabeçalho `Host` só é aceito para os domínios do projeto (`HostsConfiaveis`); outros recebem 400. Domínio próprio exige a variável `TRUSTED_HOSTS`.
 - Bibliotecas `qrcodejs`, `jsPDF` e `jsPDF-AutoTable` servidas de `public/js/vendor/` (hash igual ao da cdnjs, conferido por teste); a CSP não cita mais nenhuma CDN de scripts.

@@ -18,3 +18,6 @@ jobs:
       - uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
+          # inclui as dependências de desenvolvimento (o padrão só olha as de runtime)
+          fail-on-scopes: runtime, development
+          comment-summary-in-pr: on-failure

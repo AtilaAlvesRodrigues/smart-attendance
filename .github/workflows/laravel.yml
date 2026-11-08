@@ -68,7 +68,6 @@ jobs:
         with:
           path: ~/.composer/cache/files
           key: composer-${{ hashFiles('composer.lock') }}
-          restore-keys: composer-
 
       - name: Instalar dependencias
         run: |
@@ -152,7 +151,6 @@ jobs:
         with:
           path: ~/.composer/cache/files
           key: composer-${{ hashFiles('composer.lock') }}
-          restore-keys: composer-
 
       - name: Instalar dependencias e preparar ambiente
         run: |
