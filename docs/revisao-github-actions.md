@@ -34,7 +34,7 @@ Um único workflow, "Smart Attendance — CI/CD", disparado em push e Pull Reque
 | A3 | `npm audit` termina com `\|\| true` e nunca falha, enquanto `composer audit` falha | Tratamento inconsistente: as vulnerabilidades npm passam sem ninguém ver | Média |
 | A4 | Os módulos 2 a 5 repetem `composer install`, `npm ci` e `npm run build` quatro vezes | Minutos desperdiçados; o módulo 5 já roda a suíte inteira, que inclui os testes dos módulos 3 e 4 | Média |
 | A5 | O módulo 6 escreve "PASSOU" fixo na tabela | Só roda se os módulos passaram (`needs`), mas o texto não reflete o resultado real | Baixa |
-| A6 | Só PHP 8.3 no CI; o `composer.json` exige `^8.2.35` | Quebra em 8.2 ou 8.4 passa despercebida | Média |
+| A6 | Só PHP 8.4 no CI; o `composer.json` exige `^8.2.35` | Uma quebra em 8.2 ou 8.3 passa despercebida (o `setup-php` não fixa o patch: pega a última 8.4.x) | Média |
 | A7 | Sem `timeout-minutes` | Um job travado consome até 6 horas | Média |
 | A8 | O Laravel Pint está instalado, mas não roda no CI (e não há `pint.json`) | Estilo de código não é verificado | Média |
 | A9 | Sem análise estática (PHPStan/Larastan) | Erros de tipo e código morto só aparecem em execução | Média |
@@ -49,7 +49,7 @@ Um único workflow, "Smart Attendance — CI/CD", disparado em push e Pull Reque
    - uses: actions/checkout@<sha-completo> # v5
    ```
 2. **Instalar uma vez e reaproveitar.** Um job `configuracao` instala e compila; os demais baixam o resultado como artefato, ou então juntar os módulos 3, 4 e 5 num único job com passos separados (a suíte completa já cobre os filtros).
-3. **Matriz de PHP:** `php-version: ['8.2', '8.3', '8.4']` no módulo de testes finais, com `fail-fast: false`.
+3. **Matriz de PHP:** `php-version: ['8.2', '8.3', '8.4']` (todas em versão de patch corrigida, veja [SEC-11](falhas-de-seguranca.md#sec-11)) no módulo de testes finais, com `fail-fast: false`.
 4. **`timeout-minutes: 15`** em cada job.
 5. **Tornar o `npm audit` consistente:** `npm audit --audit-level=high` e falhar, ou manter informativo mas dizer isso no relatório.
 6. **Cache do Composer:** manter a chave presa ao `composer.lock`, sem `restore-keys`; a perda de velocidade é pequena e evita um cache de outro conjunto de dependências.

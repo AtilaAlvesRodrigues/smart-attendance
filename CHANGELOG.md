@@ -11,6 +11,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - `CspCoberturaTest`: confere o nonce em cerca de 30 telas dos quatro perfis.
 - **`trustHosts`:** o cabeçalho `Host` só é aceito para os domínios do projeto (`HostsConfiaveis`); outros recebem 400. Domínio próprio exige a variável `TRUSTED_HOSTS`.
 - Bibliotecas `qrcodejs`, `jsPDF` e `jsPDF-AutoTable` servidas de `public/js/vendor/` (hash igual ao da cdnjs, conferido por teste); a CSP não cita mais nenhuma CDN de scripts.
+- Registro da **SEC-11**: o PHP em produção (runtime `vercel-php@0.9.0`) pode estar sem a correção das CVE-2026-109618 e CVE-2026-109619; versão não confirmada. Correção do documento das Actions: o CI usa PHP 8.4, não 8.3.
 - Arquivo `LICENSE` (MIT), já declarada no `composer.json`.
 - Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
 
