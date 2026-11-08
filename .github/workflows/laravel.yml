@@ -243,19 +243,19 @@ jobs:
             echo "| 5 | Testes Finais (Suite Completa) | PASSOU |"
             echo
             echo "## Pacotes PHP desatualizados"
-            echo '```'; cat composer-outdated.txt; echo '```'
+            echo '```'; tr '`' "'" < composer-outdated.txt; echo '```'
             echo
             echo "## Pacotes NPM desatualizados"
-            echo '```'; cat npm-outdated.txt; echo '```'
+            echo '```'; tr '`' "'" < npm-outdated.txt; echo '```'
             echo
             echo "## Auditoria NPM"
-            echo '```'; cat npm-audit.txt; echo '```'
+            echo '```'; tr '`' "'" < npm-audit.txt; echo '```'
             echo
             echo "## Arquivos modificados no commit"
-            echo '```'; git diff-tree --no-commit-id -r --name-status HEAD | head -40; echo '```'
+            echo '```'; git diff-tree --no-commit-id -r --name-status HEAD | head -40 | tr '`' "'"; echo '```'
             echo
             echo "## Historico recente"
-            echo '```'; git log --oneline -5 --no-color; echo '```'
+            echo '```'; git log --oneline -5 --no-color | tr '`' "'"; echo '```'
             echo
             echo "*Relatorio gerado automaticamente pelo GitHub Actions.*"
           } > relatorio.md
@@ -263,7 +263,9 @@ jobs:
       - name: Converter para PDF
         run: |
           printf '@page { size: A4; margin: 20mm 25mm; }\nbody { font-family: sans-serif; font-size: 11pt; }\npre { white-space: pre-wrap; font-size: 9pt; }\ntable { border-collapse: collapse; }\ntd, th { border: 1px solid #999; padding: 4px 8px; }\n' > relatorio.css
-          pandoc relatorio.md -o relatorio-pipeline.pdf --pdf-engine=weasyprint \
+          # -raw_html/-raw_tex: texto vindo de commits e arquivos nunca vira marcação (evita que o
+          # WeasyPrint carregue file:// ou URLs ao gerar o PDF)
+          pandoc --from=markdown-raw_html-raw_tex-raw_attribute relatorio.md -o relatorio-pipeline.pdf --pdf-engine=weasyprint \
             --css=relatorio.css --metadata title="Smart Attendance — Relatorio de Pipeline" --standalone
 
       - name: Publicar relatorio PDF
