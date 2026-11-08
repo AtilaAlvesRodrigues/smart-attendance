@@ -14,10 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Confiar no Cloudflare e proxies reversos (necessário para sessões e URLs corretas)
         $middleware->trustProxies(at: '*');
 
-        // Global security headers for all web responses
-        $middleware->appendToGroup('web', [
-            \App\Http\Middleware\SecurityHeaders::class,
-        ]);
+        // Security headers + CSP em TODAS as respostas (global, não só no grupo web),
+        // para que páginas de erro como o 404 também levem a política e o nonce.
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
         // Registrar aliases de middleware que o aplicativo espera usar nas rotas
         $middleware->alias([

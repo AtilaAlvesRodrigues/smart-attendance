@@ -7,7 +7,7 @@ O professor projeta um QR Code, o aluno aponta a câmera do celular e a presenç
 
 [![CI](https://img.shields.io/github/actions/workflow/status/AtilaAlvesRodrigues/smart-attendance/laravel.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/AtilaAlvesRodrigues/smart-attendance/actions/workflows/laravel.yml)
 [![Demo](https://img.shields.io/badge/demo-online-22C55E?style=for-the-badge&logo=vercel&logoColor=white)](https://smart-attendance-nine-alpha.vercel.app)
-![Testes](https://img.shields.io/badge/testes-204-7C3AED?style=for-the-badge)
+![Testes](https://img.shields.io/badge/testes-222-7C3AED?style=for-the-badge)
 ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -132,12 +132,15 @@ sequenceDiagram
     P->>S: Iniciar chamada (escolhe a matéria)
     S->>S: Gera código único da aula, válido por 2 h
     S-->>P: QR Code em tela cheia
-    A->>S: Escaneia o QR Code
+    loop a cada 30 segundos
+        S-->>P: Troca o token do QR Code
+    end
+    A->>S: Escaneia o QR Code (token do momento)
     alt Aluno não está logado
         S-->>A: Pede login e guarda a presença pendente
         A->>S: Faz login
     end
-    S->>S: Confere validade, matrícula e duplicidade
+    S->>S: Confere token, validade, matrícula e duplicidade
     S-->>A: Presença confirmada!
     loop a cada 3 segundos
         P->>S: Atualiza a lista
@@ -177,10 +180,10 @@ Mais exemplos em [Regras acadêmicas](docs/regras-academicas.md).
 | CSRF | Token em todos os formulários e requisições AJAX |
 | XSS | Saída escapada no Blade; dados do usuário inseridos no JavaScript com `textContent` |
 | SQL injection | Consultas com *bindings*; colunas de nota validadas por lista permitida |
-| Cabeçalhos HTTP | `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` |
+| Cabeçalhos HTTP | `Content-Security-Policy` com *nonce* por requisição, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` |
 | Robôs | *Honeypot* no check-in público de eventos |
 | Sessão | Expira em 1 hora, com aviso na tela e sincronização entre abas |
-| QR Code | Único por aula, com validade de 2 horas, nunca exibido em página pública |
+| QR Code | Único por aula, com token que muda a cada 30 segundos (foto ou print deixa de valer em até 1 minuto), nunca exibido em página pública |
 
 Cada camada tem teste automatizado. Detalhes, arquivos envolvidos e limitações conhecidas: [Segurança](docs/seguranca.md).
 
@@ -231,7 +234,7 @@ composer test                               # suíte completa
 php artisan test --filter=SituacaoAcademica  # um arquivo específico
 ```
 
-São **204 testes** (558 verificações) cobrindo login dos três perfis, chamada e QR Code, regras de frequência e notas, cadastros, turmas, eventos e cada camada de segurança.
+São **222 testes** (771 verificações) cobrindo login dos três perfis, chamada e QR Code, regras de frequência e notas, cadastros, turmas, eventos e cada camada de segurança.
 
 O [pipeline do GitHub Actions](.github/workflows/laravel.yml) roda em todo push e Pull Request para a `main`, contra um PostgreSQL 17 real, em 6 módulos: configuração, banco de dados, segurança, classes, suíte completa e relatório em PDF. Veja [Testes e CI](docs/testes-e-ci.md).
 
@@ -277,9 +280,12 @@ smart-attendance/
 | [Banco de dados](docs/banco-de-dados.md) | Tabelas, colunas, relacionamentos e diagrama |
 | [Regras acadêmicas](docs/regras-academicas.md) | Frequência, faltas, notas e situação, com exemplos |
 | [Segurança](docs/seguranca.md) | Cada camada de proteção, onde está no código e como é testada |
+| [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md) | Registro das falhas abertas, com gravidade e correção |
 | [Instalação](docs/instalacao.md) | Ambiente local, variáveis, teste pelo celular e e-mail |
 | [Deploy](docs/deploy.md) | Publicação na Vercel com PostgreSQL no Supabase |
 | [Testes e CI](docs/testes-e-ci.md) | Suítes de teste e módulos do pipeline |
+| [Revisão das GitHub Actions](docs/revisao-github-actions.md) | Análise do pipeline e novas actions sugeridas |
+| [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md) | Relatório técnico: pontos fortes, riscos e dívida técnica |
 | [Design e acessibilidade](docs/design-e-acessibilidade.md) | Identidade visual, padrões de interface e acessibilidade |
 | [Como contribuir](CONTRIBUTING.md) | Fluxo de branches, commits e Pull Requests |
 | [Histórico de mudanças](CHANGELOG.md) | O que mudou em cada versão |
@@ -289,7 +295,6 @@ smart-attendance/
 ## Próximos passos
 
 - Justificativa de faltas, com análise pelo professor
-- QR Code que muda a cada 30 segundos, para impedir o envio por foto
 - Correção de presença pelo professor
 - Edição e exclusão de cadastros pelo Master
 - Exportação de relatórios em planilha
@@ -301,3 +306,9 @@ smart-attendance/
 
 Projeto Integrador criado por **Átila Alves Rodrigues**, com contribuições de **Matheus Evangelista** e **João Vitor Leonardi**.
 Veja todos os contribuidores em [Contributors](https://github.com/AtilaAlvesRodrigues/smart-attendance/graphs/contributors).
+
+---
+
+## Licença
+
+Distribuído sob a licença [MIT](LICENSE).

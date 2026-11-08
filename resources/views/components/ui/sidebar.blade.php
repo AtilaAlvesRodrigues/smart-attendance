@@ -6,7 +6,7 @@
 @if($isProfessor || $isMaster)
 
 @once
-<style>
+<style @nonce>
 /* ===== Sidebar ===== */
 #pal-sidebar {
     position: fixed;
@@ -401,7 +401,7 @@ html.sidebar-collapsed #pal-sidebar-reopen {
     }
 }
 </style>
-<script>
+<script @nonce>
 (function() {
     // Restaura estado colapsado antes do primeiro render
     if (localStorage.getItem('pal_sidebar_collapsed') === '1') {

@@ -104,7 +104,7 @@ class QrCodePresencaTest extends TestCase
 
         $response = $this
             ->actingAs($aluno, 'alunos')
-            ->get(route('presenca.confirmar', $codigoAula));
+            ->get(route('presenca.confirmar', ['codigo_aula' => $codigoAula, 't' => \App\Support\QrToken::gerar($codigoAula)]));
 
         $response->assertStatus(200);
 
@@ -129,12 +129,12 @@ class QrCodePresencaTest extends TestCase
 
         // Primeiro acesso — registra presença
         $this->actingAs($aluno, 'alunos')
-            ->get(route('presenca.confirmar', $codigoAula));
+            ->get(route('presenca.confirmar', ['codigo_aula' => $codigoAula, 't' => \App\Support\QrToken::gerar($codigoAula)]));
 
         // Segundo acesso — deve cair na view de "já registrado"
         $response = $this
             ->actingAs($aluno, 'alunos')
-            ->get(route('presenca.confirmar', $codigoAula));
+            ->get(route('presenca.confirmar', ['codigo_aula' => $codigoAula, 't' => \App\Support\QrToken::gerar($codigoAula)]));
 
         $response->assertStatus(200);
 
@@ -190,7 +190,7 @@ class QrCodePresencaTest extends TestCase
 
         $response = $this
             ->actingAs($alunoForaDeMatricula, 'alunos')
-            ->get(route('presenca.confirmar', $codigoAula));
+            ->get(route('presenca.confirmar', ['codigo_aula' => $codigoAula, 't' => \App\Support\QrToken::gerar($codigoAula)]));
 
         $response->assertStatus(200);
 
@@ -208,7 +208,7 @@ class QrCodePresencaTest extends TestCase
         [$professor, $materia] = $this->criarProfessorComMateria();
         $codigoAula            = $this->gerarCodigoNoCache($professor, $materia);
 
-        $response = $this->get(route('presenca.confirmar', $codigoAula));
+        $response = $this->get(route('presenca.confirmar', ['codigo_aula' => $codigoAula, 't' => \App\Support\QrToken::gerar($codigoAula)]));
 
         $response->assertRedirect(route('login.aluno.form'));
     }

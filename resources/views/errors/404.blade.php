@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
     <link rel="stylesheet" href="{{ asset('css/usability.css') }}">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <style>
+    <style @nonce>
         /* Os blobs são fixos e passam da borda: não podem alargar a página no celular */
         html, body { overflow-x: hidden; }
         .blob-404 {
@@ -148,7 +148,7 @@
 
     </main>
 
-    <script>
+    <script @nonce>
         // Cursor glow (same as main theme)
         const glow = document.getElementById('pal-cursor-glow');
         if (glow) {

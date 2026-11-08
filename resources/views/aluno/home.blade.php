@@ -116,7 +116,7 @@
                 <p class="sa-pendente-titulo">Você tem uma presença para confirmar</p>
                 <p class="sa-pendente-texto">Você escaneou o QR Code da aula antes de entrar. Falta só um toque.</p>
             </div>
-            <a href="{{ route('presenca.confirmar', session('pending_attendance_code')) }}" class="sa-btn-confirmar">
+            <a href="{{ route('presenca.confirmar', ['codigo_aula' => session('pending_attendance_code'), 't' => session('pending_attendance_token')]) }}" class="sa-btn-confirmar">
                 Confirmar presença
             </a>
         </div>
@@ -218,7 +218,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script @nonce>
     const modal = document.getElementById('profile-modal');
     const openBtn = document.getElementById('open-profile');
     const closeBtn = document.getElementById('close-profile');

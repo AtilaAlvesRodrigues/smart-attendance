@@ -114,7 +114,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script @nonce>
     document.querySelectorAll('[data-lista]').forEach(lista => {
         const itens = [...lista.querySelectorAll('[data-item]')];
         const contador = lista.querySelector('[data-contador]');

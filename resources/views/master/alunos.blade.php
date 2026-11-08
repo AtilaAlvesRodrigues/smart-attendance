@@ -169,7 +169,7 @@
 
 @push('scripts')
     <script src="{{ asset('js/dashboard_modal.js') }}"></script>
-    <script>
+    <script @nonce>
         document.addEventListener('DOMContentLoaded', () => {
              const escapeHtml = (unsafe) => {
                 if (unsafe === null || unsafe === undefined) return '';

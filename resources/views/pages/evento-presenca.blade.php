@@ -93,7 +93,7 @@
         </div>
     </main>
 
-    <style>
+    <style @nonce>
     @keyframes toastPop {
         0% { opacity: 0; transform: translateY(-30px) scale(0.9); }
         100% { opacity: 1; transform: translateY(-80px) scale(1); }
@@ -150,7 +150,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="{{ asset('js/pages/evento-presenca.js') }}"></script>
-<script>
+<script @nonce>
     document.addEventListener('DOMContentLoaded', () => {
         const profInfo = {
             name: "{{ $professor->nome ?? 'Docente' }}",

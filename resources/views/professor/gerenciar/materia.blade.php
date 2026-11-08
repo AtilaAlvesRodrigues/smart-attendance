@@ -17,7 +17,7 @@
 @endsection
 
 @push('styles')
-<style>
+<style @nonce>
     /* Input de nota estilizado para Glassmorphism */
     .nota-input {
         width: 70px;
@@ -242,7 +242,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script @nonce>
     document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         const saveUrl = "{{ route('professor.gerenciar.salvar_notas', $materia->id) }}";

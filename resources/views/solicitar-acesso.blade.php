@@ -89,7 +89,7 @@
 
 @push('scripts')
     <script src="{{ asset('js/pages/login.js') }}"></script>
-    <script>
+    <script @nonce>
         const emailInput  = document.getElementById('campo-email');
         const feedback    = document.getElementById('email-feedback');
         const btnSubmit   = document.getElementById('btn-submit');

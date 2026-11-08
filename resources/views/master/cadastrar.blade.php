@@ -240,7 +240,7 @@
 </main>
 
 @push('scripts')
-<script>
+<script @nonce>
 (function () {
     'use strict';
 

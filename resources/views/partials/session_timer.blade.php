@@ -35,7 +35,7 @@
     </div>
 </div>
 
-<style>
+<style @nonce>
 /* Força a caixa do timer a ficar perfeitamente alinhada e centralizada */
 #session-timer-widget {
     display: inline-flex !important;
@@ -89,7 +89,7 @@
 }
 </style>
 
-<script>
+<script @nonce>
 (function() {
     const serverExpiresAt = Number("{{ $expiresAtMs }}");
     const LOCAL_STORAGE_KEY = 'smart_session_expires_at';
@@ -229,7 +229,7 @@
 })();
 </script>
 @else
-<script>
+<script @nonce>
     localStorage.removeItem('smart_session_expires_at');
     localStorage.removeItem('smart_session_timed_out');
 </script>

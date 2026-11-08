@@ -130,6 +130,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
             Route::get('/', [PresencaController::class, 'index'])->name('professor.presenca.index');
             Route::get('/gerar/{materia_id}', [PresencaController::class, 'gerarQr'])->name('professor.presenca.gerar');
             Route::get('/check/{codigo_aula}', [PresencaController::class, 'getPresencas'])->name('professor.presenca.check');
+            Route::get('/token/{codigo_aula}', [PresencaController::class, 'tokenQr'])->middleware('throttle:60,1')->name('professor.presenca.token');
         });
 
         Route::prefix('gerenciar')->group(function () {

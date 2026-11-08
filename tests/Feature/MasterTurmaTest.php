@@ -109,7 +109,7 @@ class MasterTurmaTest extends TestCase
 
         // ...e o aluno recém-matriculado confirma a presença.
         $this->actingAs($aluno, 'alunos')
-            ->get("/presenca/confirmar/{$codigo}")
+            ->get("/presenca/confirmar/{$codigo}?t=" . \App\Support\QrToken::gerar($codigo))
             ->assertViewIs('aluno.presenca.sucesso');
     }
 
