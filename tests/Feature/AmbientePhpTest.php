@@ -57,6 +57,18 @@ class AmbientePhpTest extends TestCase
         }
     }
 
+    public function test_rota_tem_limite_de_requisicoes(): void
+    {
+        $master = UsuarioMaster::factory()->create();
+        $this->actingAs($master, 'masters');
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->getJson('/dashboard/master/ambiente/php')->assertOk();
+        }
+
+        $this->getJson('/dashboard/master/ambiente/php')->assertStatus(429);
+    }
+
     public function test_visitante_sem_login_nao_acessa(): void
     {
         $this->getJson('/dashboard/master/ambiente/php')->assertUnauthorized();

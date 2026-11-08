@@ -150,7 +150,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::get('/relatorio-seguranca', [PdfTesteVulnerabilidadeController::class, 'index'])->name('pdf.teste.vulnerabilidade');
 
         // Versão do PHP em execução e se já tem a correção das CVEs críticas (SEC-11). JSON, só Master.
-        Route::get('/ambiente/php', [AmbienteController::class, 'php'])->name('master.ambiente.php');
+        Route::get('/ambiente/php', [AmbienteController::class, 'php'])->middleware('throttle:10,1')->name('master.ambiente.php');
 
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');
