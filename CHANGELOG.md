@@ -4,6 +4,16 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 
 ## Não lançado
 
+### Adicionado
+- **QR Code que muda a cada 30 segundos.** O link da chamada leva um token assinado (HMAC) que vale na janela atual e na anterior; uma foto ou print do QR Code deixa de registrar presença em até 1 minuto. A tela do professor renova o QR sozinha e mostra a contagem regressiva.
+- **Content-Security-Policy com nonce por requisição** em todas as respostas, inclusive páginas de erro: scripts e estilos em bloco injetados deixam de executar. Novas diretivas `object-src`, `base-uri`, `form-action` e `frame-ancestors`.
+- Arquivo `LICENSE` (MIT), já declarada no `composer.json`.
+- Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
+
+### Alterado
+- Quem escaneia o QR Code precisa fazê-lo na hora; se o login demorar mais de 1 minuto, é preciso escanear de novo.
+- Nas views, todo `<script>` e `<style>` em bloco agora usa `@nonce`.
+
 ### Documentação
 - Repositório reorganizado: README reescrito, pasta `docs/` com manual do usuário, arquitetura, banco de dados, regras acadêmicas, segurança, instalação, deploy, testes e design.
 - Guia de contribuição, este histórico e modelos de issue e de Pull Request.

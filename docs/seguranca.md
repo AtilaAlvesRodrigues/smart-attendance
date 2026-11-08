@@ -91,6 +91,24 @@ Enviados em todas as respostas web:
 | `X-XSS-Protection` | `1; mode=block` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
+| `Content-Security-Policy` | Ver [abaixo](#content-security-policy) |
+
+### Content-Security-Policy
+
+Cada resposta leva uma política com um *nonce* novo (gerado em [`SecurityHeaders`](../app/Http/Middleware/SecurityHeaders.php)). Todo `<script>` e `<style>` em bloco nas views usa a diretiva `@nonce`; um bloco injetado por um atacante não tem o nonce e o navegador não o executa.
+
+| Diretiva | Valor |
+|---|---|
+| `script-src` | `'self'`, o nonce e `https://cdnjs.cloudflare.com` (QR Code e PDF) |
+| `style-src` | `'self'`, o nonce e `https://fonts.googleapis.com` |
+| `script-src-attr`, `style-src-attr` | `'unsafe-inline'`, **temporário**: ainda há atributos `onclick=` e `style=` nas views ([SEC-08](falhas-de-seguranca.md#sec-08)) |
+| `object-src` | `'none'` |
+| `base-uri`, `form-action` | `'self'` |
+| `frame-ancestors` | `'none'` |
+| `default-src`, `connect-src` | `'self'` |
+| `upgrade-insecure-requests` | só em requisições HTTPS |
+
+Escreveu um `<script>` ou `<style>` novo numa view? Use `<script @nonce>` / `<style @nonce>`; sem isso o navegador bloqueia o bloco. O `SecurityHeadersTest` falha se alguma página tiver bloco sem nonce.
 
 ## Robôs no check-in de eventos
 
@@ -99,7 +117,8 @@ O formulário público de check-in tem um campo oculto, `hp_field`, que pessoas 
 ## QR Code e presença
 
 - Cada chamada tem um código `{matéria}-{timestamp}-{aleatório}`, guardado no cache por 2 horas.
-- A confirmação exige código válido, aluno matriculado na matéria e nenhum registro anterior na mesma chamada.
+- O QR Code leva também um **token que muda a cada 30 segundos** (`?t={janela}.{assinatura}`): HMAC-SHA256 do código da aula e da janela, com a `APP_KEY` ([`QrToken`](../app/Support/QrToken.php)). O servidor aceita a janela atual e a anterior, então uma foto do QR Code deixa de valer em no máximo 60 segundos. A tela do professor busca o token novo em `/professor/presenca/token/{código}`, só para o dono da chamada.
+- A confirmação exige código válido, token válido, aluno matriculado na matéria e nenhum registro anterior na mesma chamada.
 - O código nunca aparece em página pública: a página inicial mostra só o nome e a sala da aula em andamento.
 
 ## Exclusão lógica
@@ -119,9 +138,11 @@ Alunos, professores, administradores e matérias usam *soft delete*: o registro 
 
 ## Limitações conhecidas
 
+A lista completa de falhas abertas, com gravidade e correção, está em [Falhas de segurança conhecidas](falhas-de-seguranca.md).
+
 | Limitação | Impacto | Caminho de solução |
 |---|---|---|
-| O QR Code vale 2 horas | Uma foto do QR enviada a quem está fora da sala funciona enquanto a chamada estiver aberta | QR que muda a cada 30 segundos, ou confirmação por localização ou rede da instituição |
-| Sem Content-Security-Policy | Menos uma barreira contra XSS | Definir uma CSP; hoje há scripts inline e bibliotecas de CDN a considerar |
+| O link do QR pode ser repassado ao vivo | Um aluno presente manda o link do momento a um colega ausente, que confirma em até 60 s ([SEC-05](falhas-de-seguranca.md#sec-05)) | Confirmação por localização ou rede da instituição |
+| A CSP ainda libera `onclick=` e `style=` inline | Um HTML injetado ainda poderia executar JavaScript por atributo de evento ([SEC-08](falhas-de-seguranca.md#sec-08)) | Migrar os atributos para scripts e classes e remover as exceções `*-attr` |
 | Sem autenticação em dois fatores | Uma senha vazada dá acesso à conta | 2FA para professores e administradores |
 | O professor não corrige presenças | Um erro de registro não pode ser desfeito pela interface | Tela de correção, com registro de quem alterou |

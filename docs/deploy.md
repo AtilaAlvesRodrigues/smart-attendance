@@ -71,6 +71,19 @@ Para recriar os dados de demonstração, use `migrate:fresh --seed --force`. Iss
 
 O Supabase gratuito pausa o banco depois de cerca de 7 dias sem uso. O `vercel.json` agenda uma chamada diária, às 12:00 UTC (9:00 em Brasília), para `/cron/manter-banco-ativo`, que faz uma consulta simples. A Vercel envia `Authorization: Bearer <CRON_SECRET>`; sem esse cabeçalho, a rota devolve 404.
 
+## Deploy automático pelo GitHub
+
+Hoje o projeto `smart-attendance` da Vercel (conta `jooaoleonardi's projects`) **não está ligado ao repositório**: os deploys saem pela CLI. Ligando, cada Pull Request ganha uma URL de *preview* e cada merge na `main` publica em produção.
+
+1. **O dono do repositório** (`AtilaAlvesRodrigues`) instala o [app da Vercel no GitHub](https://github.com/apps/vercel) com acesso a `smart-attendance`. Um *fork* só aparece se o app tiver acesso a ele.
+2. Na Vercel: *Project → Settings → Git → Connect Git Repository* e escolha `AtilaAlvesRodrigues/smart-attendance`. Pela CLI: `vercel git connect https://github.com/AtilaAlvesRodrigues/smart-attendance`.
+3. Em *Settings → Git*, confirme **Production Branch = `main`**.
+4. Em *Settings → Environment Variables*, confira que as variáveis da tabela acima existem em **Preview** também (use um banco separado, nunca o de produção).
+5. Em *Settings → Git*, mantenha **Git Fork Protection** ligada: Pull Requests de forks não rodam sem aprovação de um membro.
+6. Abra um PR de teste, veja o comentário da Vercel com a URL e confira os cabeçalhos: `curl -sI <url-de-preview> | grep -i content-security`.
+
+O pipeline do GitHub Actions continua sendo a barreira de qualidade; a Vercel só publica. Para a Vercel esperar o CI, ative em *Settings → Git* a opção de exigir *checks* ou proteja a `main` no GitHub exigindo o status do CI antes do merge.
+
 ## Publicar uma nova versão
 
 Enquanto o repositório não estiver conectado à Vercel, a publicação é feita pela CLI, de dentro da pasta do projeto:
