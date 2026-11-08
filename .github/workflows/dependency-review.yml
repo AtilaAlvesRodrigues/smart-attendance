@@ -11,6 +11,10 @@ permissions:
 jobs:
   revisar:
     name: Pacotes novos sem vulnerabilidade
+    # Exige o "Dependency graph" ligado (Settings → Code security). Enquanto estiver desligado a
+    # action falha por configuração, não por código, então o job só roda com a variável do
+    # repositório DEPENDENCY_GRAPH_ATIVO=true (Settings → Secrets and variables → Actions → Variables).
+    if: vars.DEPENDENCY_GRAPH_ATIVO == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

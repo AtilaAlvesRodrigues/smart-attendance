@@ -168,6 +168,8 @@ Depois que o deploy de *preview* estiver conectado, um job simples com `curl -sI
 - **Release Drafter** para montar o texto do `CHANGELOG` a partir dos PRs, quando o projeto passar a numerar versões.
 - **Stale** (`actions/stale`) para issues paradas, hoje são 16 abertas.
 
+> **Para a revisão de dependências rodar:** ligue o **Dependency graph** em *Settings → Code security* e crie a variável de repositório `DEPENDENCY_GRAPH_ATIVO` com o valor `true` (*Settings → Secrets and variables → Actions → Variables*). Sem isso o job fica "pulado"; com o graph desligado e o job ativo, a action falha com "Dependency review is not supported on this repository".
+
 > Em *Settings → Code security*, ative também **Dependabot alerts**, **Secret scanning** e **Push protection** (grátis em repositório público). A `dependency-review-action` só funciona com o **Dependency graph** ligado.
 
 ## Ordem sugerida
