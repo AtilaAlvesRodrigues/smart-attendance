@@ -224,6 +224,10 @@ jobs:
 
       - name: Gerar relatorio Markdown
         run: |
+          # Todo texto externo (commits, nomes de arquivo, npm audit) passa por aqui: remove caracteres
+          # de controle (inclusive \r, que o pandoc trata como quebra de linha e faria o texto sair do
+          # bloco indentado) e indenta cada linha 4 espaços. Acentos (UTF-8) são mantidos.
+          limpa() { tr -d '\000-\010\013-\037\177' | sed 's/^/    /'; }
           {
             echo "# Relatorio de Pipeline — Smart Attendance"
             echo
@@ -244,19 +248,19 @@ jobs:
             echo "| 5 | Testes Finais (Suite Completa) | PASSOU |"
             echo
             echo "## Pacotes PHP desatualizados"
-            tr -d '\r' < composer-outdated.txt | sed 's/^/    /'
+            limpa < composer-outdated.txt
             echo
             echo "## Pacotes NPM desatualizados"
-            tr -d '\r' < npm-outdated.txt | sed 's/^/    /'
+            limpa < npm-outdated.txt
             echo
             echo "## Auditoria NPM"
-            tr -d '\r' < npm-audit.txt | sed 's/^/    /'
+            limpa < npm-audit.txt
             echo
             echo "## Arquivos modificados no commit"
-            git diff-tree --no-commit-id -r --name-status HEAD | head -40 | sed 's/^/    /'
+            git diff-tree --no-commit-id -r --name-status HEAD | head -40 | limpa
             echo
             echo "## Historico recente"
-            git log --oneline -5 --no-color | sed 's/^/    /'
+            git log --oneline -5 --no-color | limpa
             echo
             echo "*Relatorio gerado automaticamente pelo GitHub Actions.*"
           } > relatorio.md
