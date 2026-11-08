@@ -218,8 +218,10 @@ jobs:
         with:
           name: relatorios-pacotes
 
-      - name: Instalar pandoc e wkhtmltopdf
-        run: sudo apt-get update -q && sudo apt-get install -y -q pandoc wkhtmltopdf
+      # wkhtmltopdf saiu dos repositórios do Ubuntu dos runners (apt dava erro 100);
+      # o WeasyPrint gera o mesmo PDF e vem no apt.
+      - name: Instalar pandoc e weasyprint
+        run: sudo apt-get update -q && sudo apt-get install -y -q pandoc weasyprint
 
       - name: Gerar relatorio Markdown
         run: |
@@ -262,10 +264,9 @@ jobs:
 
       - name: Converter para PDF
         run: |
-          pandoc relatorio.md -o relatorio-pipeline.pdf --pdf-engine=wkhtmltopdf \
-            -V papersize=a4 -V margin-top=20mm -V margin-bottom=20mm \
-            -V margin-left=25mm -V margin-right=25mm \
-            -V title="Smart Attendance — Relatorio de Pipeline" --standalone
+          printf '@page { size: A4; margin: 20mm 25mm; }\nbody { font-family: sans-serif; font-size: 11pt; }\npre { white-space: pre-wrap; font-size: 9pt; }\ntable { border-collapse: collapse; }\ntd, th { border: 1px solid #999; padding: 4px 8px; }\n' > relatorio.css
+          pandoc relatorio.md -o relatorio-pipeline.pdf --pdf-engine=weasyprint \
+            --css=relatorio.css --metadata title="Smart Attendance — Relatorio de Pipeline" --standalone
 
       - name: Publicar relatorio PDF
         uses: actions/upload-artifact@v5
