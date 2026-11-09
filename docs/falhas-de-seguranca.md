@@ -21,7 +21,7 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 | [SEC-08](#sec-08) | CSP ainda libera `onclick=` e `style=` inline | Baixa | Parcial |
 | [SEC-09](#sec-09) | Padrões inseguros no `.env.example` | Baixa | Aberta |
 | [SEC-10](#sec-10) | Tempo de sessão documentado de formas diferentes | Baixa | Aberta |
-| [SEC-11](#sec-11) | PHP em produção possivelmente sem a correção das CVE-2026-109618 e CVE-2026-109619 | Alta (não confirmada) | Aberta |
+| [SEC-11](#sec-11) | PHP em produção possivelmente sem a correção das CVE-2026-109618 e CVE-2026-109619 | Alta | **Resolvida em produção** (resta o PHP das máquinas de desenvolvimento) |
 
 ---
 
@@ -54,6 +54,19 @@ O README publica `master@admin.com` / `senha123` para a demonstração em `smart
 
 **Impacto:** alto se a demonstração e a produção compartilharem banco, segredos ou `APP_KEY`; moderado se estiverem isoladas.
 **Correção:** manter a demo num banco e numa `APP_KEY` próprios, sem dados reais; trocar a senha do Master e informá-la só por canal privado; ou publicar só os perfis Aluno e Professor; reiniciar a demo periodicamente (o README já avisa que ela pode ser reiniciada).
+
+**Como trocar a senha do Master em produção** (a conta é a de `id = 1`; o e-mail é criptografado, então não dá para filtrar por ele):
+
+1. Gere o hash localmente, com a senha nova no lugar de `SENHA_NOVA` (use 12 caracteres ou mais):
+   ```bash
+   php -r "echo password_hash('SENHA_NOVA', PASSWORD_BCRYPT, ['cost' => 12]), PHP_EOL;"
+   ```
+2. No *SQL Editor* do Supabase, confira que há um só Master e troque a senha (mantenha as aspas simples; o hash começa com `$2y$`):
+   ```sql
+   select id, created_at from laravel.usuario_masters;
+   update laravel.usuario_masters set password = '<hash gerado>' where id = 1;
+   ```
+3. Teste o login em *Entrar como Professor*. Depois remova `master@admin.com` / `senha123` do README e do `CLAUDE.md`, que são públicos; o histórico do Git continua mostrando a senha antiga, por isso a troca é o que vale.
 
 ## SEC-03
 ### `trustProxies('*')` sem `trustHosts`
@@ -119,6 +132,8 @@ O README fala em sessão de 1 hora, o `.env.example` define `SESSION_LIFETIME=30
 ## SEC-11
 ### PHP em produção possivelmente sem a correção das CVEs críticas
 
+> **Resolvida em produção** (novembro de 2026). O site publicado responde `X-Powered-By: PHP/8.5.12`, a versão corrigida da série 8.5. O runtime `vercel-php@0.9.0` depende de `@libphp/almalinux-9-v85 >=0.0.2`; a versão `0.0.4` desse pacote, publicada em 21/10/2026 (dia da divulgação), embute o PHP 8.5.12 (conferido lendo o binário), e o build de produção resolveu para ela. **Atenção:** como a dependência é aberta (`>=`), a versão vem do momento do build; depois de cada deploy, confira `curl -sI <site> \| grep -i x-powered-by` ou a rota `/dashboard/master/ambiente/php`. Falta só atualizar o PHP das máquinas de desenvolvimento (`brew upgrade php`). O texto abaixo registra a investigação.
+
 Em 21 de outubro de 2026 foram divulgadas duas vulnerabilidades **no interpretador PHP** (CVSS 9.2), que podem permitir execução remota de código, inclusive sem autenticação:
 
 | CVE | Resumo |
@@ -139,7 +154,7 @@ Versões corrigidas: **8.2.35, 8.3.36, 8.4.27 e 8.5.12**. Fonte: CERT-EU, *Secur
 
 **Impacto:** se o runtime de produção usar um PHP anterior às versões corrigidas, o sistema inteiro (dados pessoais criptografados, sessões, contas Master) fica exposto a uma falha que nenhuma proteção da aplicação impede. A exposição **não foi comprovada**: ninguém conseguiu ler a versão do PHP em produção.
 
-**Como confirmar e corrigir:**
+**Como confirmar e corrigir (feito: ver o aviso acima):**
 1. **Descobrir a versão em produção:** entre como Master e abra `/dashboard/master/ambiente/php` no site publicado. A resposta (JSON) traz `php_versao`, a primeira versão corrigida da série e `cves_corrigidas` (`true`, `false` ou `null` se a série for mais nova que as conhecidas). Só versões e flags: nenhum segredo. A rota fica disponível depois do próximo deploy de produção.
 2. Se for anterior às corrigidas: procurar uma versão mais nova do runtime; se não houver, trocar a hospedagem por uma imagem oficial do PHP (por exemplo `php:8.4` em contêiner), mantendo o banco no Supabase.
 3. Atualizar o PHP das máquinas de desenvolvimento (`brew upgrade php`, 8.5.12 ou superior).
