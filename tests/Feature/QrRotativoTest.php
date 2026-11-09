@@ -41,7 +41,9 @@ class QrRotativoTest extends TestCase
         $this->assertFalse(QrToken::validar('1-1700000000-ABCE', $token), 'token de outra aula');
         $this->assertFalse(QrToken::validar('1-1700000000-ABCD', null));
         $this->assertFalse(QrToken::validar('1-1700000000-ABCD', 'lixo'));
-        $this->assertFalse(QrToken::validar('1-1700000000-ABCD', substr($token, 0, -1) . '0'), 'assinatura alterada');
+        // troca o último caractere por um DIFERENTE (com '0' fixo, 1 em cada 16 assinaturas não mudaria nada)
+        $ultimo = substr($token, -1);
+        $this->assertFalse(QrToken::validar('1-1700000000-ABCD', substr($token, 0, -1) . ($ultimo === '0' ? '1' : '0')), 'assinatura alterada');
     }
 
     public function test_token_vale_no_slot_atual_e_no_anterior_mas_nao_depois(): void
