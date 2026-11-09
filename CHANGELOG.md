@@ -17,6 +17,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - Documentos [Falhas de segurança conhecidas](docs/falhas-de-seguranca.md), [Revisão das GitHub Actions](docs/revisao-github-actions.md) e [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md).
 
 ### Alterado
+- Vercel: deploy automático desligado nas branches de trabalho (`feat/`, `fix/`, `docs/`, `melhoria(s)/`, `chore/`, `claude/`), que subiam sem variáveis de ambiente e falhavam. A `main` continua publicando em produção.
 - Teste de assinatura do QR rotativo deixou de ser instável (falhava em 1 de cada 16 execuções).
 - Dependências npm atualizadas com `npm audit fix` (0 vulnerabilidades).
 - Pacotes Symfony atualizados (`http-foundation`, `http-kernel`, `mime`, `routing`, `yaml`): corrige os 8 avisos do `composer audit`.

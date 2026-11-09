@@ -87,6 +87,10 @@ Hoje o projeto `smart-attendance` da Vercel (conta `jooaoleonardi's projects`) *
 
 O pipeline do GitHub Actions continua sendo a barreira de qualidade; a Vercel só publica. Para a Vercel esperar o CI, ative em *Settings → Git* a opção de exigir *checks* ou proteja a `main` no GitHub exigindo o status do CI antes do merge.
 
+## Previews desligados nas branches
+
+O `vercel.json` desliga o deploy automático das branches com os prefixos do projeto (`feat/`, `fix/`, `docs/`, `melhoria/`, `melhorias/`, `chore/`, `claude/`). Motivo: as variáveis de ambiente existem só em **Production**; um preview de branch subiria sem `APP_KEY` nem banco e daria erro 500, e o PR ficaria com um check vermelho da Vercel. A `main` não está em nenhum padrão e continua publicando em produção. Para voltar a ter previews: cadastre as variáveis em *Preview* (com um banco de teste, nunca o de produção) e remova o bloco `git` do `vercel.json`. Esse bloco só vale para deploys vindos do Git; `vercel deploy` pela CLI continua funcionando.
+
 ## Publicar uma nova versão
 
 Enquanto o repositório não estiver conectado à Vercel, a publicação é feita pela CLI, de dentro da pasta do projeto:
