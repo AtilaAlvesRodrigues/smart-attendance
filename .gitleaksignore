@@ -1,0 +1,6 @@
+# Falsos positivos conferidos à mão. Cada linha é o "Fingerprint" que o gitleaks
+# imprime (commit:arquivo:regra:linha). Nunca adicione aqui um segredo real:
+# segredo real vazado se revoga e troca, não se ignora.
+
+# Senha fictícia usada só nos testes automatizados do 2FA (banco SQLite em memória)
+f37446ff4f8b695e702b34efe74dc95ca8688e26:tests/Feature/DoisFatoresTest.php:generic-api-key:42
