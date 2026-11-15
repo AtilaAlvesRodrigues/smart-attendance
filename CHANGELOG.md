@@ -5,6 +5,16 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 ## Não lançado
 
 ### Adicionado
+- **Justificativa de faltas:** o aluno escolhe a aula, explica o motivo e anexa atestado (PDF/JPG/PNG até 5 MB, disco privado `justificativas`; Supabase Storage em produção via `JUSTIFICATIVAS_DISK=s3`). O professor aprova (a falta é abonada) ou recusa, e o aluno recebe e-mail.
+- **Correção de presença:** tela "Chamadas" do professor para marcar/desmarcar presença numa aula já feita, com motivo obrigatório e histórico (`presenca_ajustes`). Coluna `presencas.origem` (`qr`, `correcao`, `justificativa`).
+- **Verificação em duas etapas (TOTP):** obrigatória para o Master (`TWO_FACTOR_MASTER_OBRIGATORIO`), opcional para professor e aluno; 8 códigos de recuperação; o Master pode remover o 2FA de um usuário.
+- **Gráficos de presença** por matéria (professor) e por turma (Master), com Chart.js 4.4.1 vendorizado.
+- **Editar e excluir** (soft delete) alunos, professores e matérias no painel do Master.
+- **Exportar presenças em Excel (.xlsx)** no relatório do professor e na Central de Presenças do Master (sem CPF nem e-mail).
+- **E-mail institucional:** exemplos de SMTP (Microsoft 365, Google Workspace, servidor próprio) no `.env.example` e botão "Enviar e-mail de teste" no Master.
+
+### Corrigido (deste pacote)
+- Índice único `presencas(aluno_id, codigo_aula)`: duas requisições simultâneas não duplicam mais a presença. A migration remove cópias exatas já existentes.
 - **QR Code que muda a cada 30 segundos.** O link da chamada leva um token assinado (HMAC) que vale na janela atual e na anterior; uma foto ou print do QR Code deixa de registrar presença em até 1 minuto. A tela do professor renova o QR sozinha e mostra a contagem regressiva.
 - **Content-Security-Policy com nonce por requisição** em todas as respostas, inclusive páginas de erro: scripts e estilos em bloco injetados deixam de executar. Novas diretivas `object-src`, `base-uri`, `form-action` e `frame-ancestors`.
 - **Dependabot**, revisão de dependências em Pull Requests e varredura de segredos (gitleaks); `timeout-minutes` nos jobs do CI. O gitleaks fica fixado por SHA e não publica os segredos encontrados.
