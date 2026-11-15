@@ -40,6 +40,10 @@ Ordem das rotas no `vercel.json`:
 | `LOG_CHANNEL` | `stderr` | Os logs aparecem no painel da Vercel |
 | `MAIL_MAILER` | `log`, ou `smtp` com as variáveis `MAIL_*` | Com `log`, o Master recebe o token na tela |
 | `CRON_SECRET` | texto aleatório longo | Protege `/cron/manter-banco-ativo` |
+| `TWO_FACTOR_MASTER_OBRIGATORIO` | `true` | Master só entra no painel com verificação em duas etapas |
+| `JUSTIFICATIVAS_DISK` | `s3` | Atestados no Supabase Storage. Sem isso, em produção o envio de anexo fica desligado (a justificativa segue só com texto), porque o disco da Vercel é somente leitura |
+| `SUPABASE_S3_ENDPOINT` / `SUPABASE_S3_REGION` / `SUPABASE_S3_BUCKET` | `https://<projeto>.supabase.co/storage/v1/s3` / região do projeto / `justificativas` | Crie o bucket **privado** `justificativas` no Supabase Storage |
+| `SUPABASE_S3_KEY` / `SUPABASE_S3_SECRET` | chaves em *Project Settings → Storage → S3 Connection* | *sensitive* |
 | `APP_CONFIG_CACHE`, `APP_EVENTS_CACHE`, `APP_PACKAGES_CACHE`, `APP_ROUTES_CACHE`, `APP_SERVICES_CACHE` | `/tmp/config.php`, `/tmp/events.php`, `/tmp/packages.php`, `/tmp/routes.php`, `/tmp/services.php` | O sistema de arquivos da função só permite escrita em `/tmp` |
 | `VIEW_COMPILED_PATH` | `/tmp` | Idem, para as views compiladas |
 

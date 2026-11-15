@@ -81,6 +81,7 @@
                 options: {
                     maintainAspectRatio: false,
                     animation: animacao,
+                    layout: { padding: { right: 12, top: 6 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: { callbacks: { label: function (ctx) { return ctx.parsed.y + '% da turma presente'; } } }
@@ -131,6 +132,7 @@
                 },
                 options: {
                     indexAxis: 'y',
+                    layout: { padding: { right: 18 } },
                     maintainAspectRatio: false,
                     animation: animacao,
                     plugins: {

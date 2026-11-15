@@ -170,6 +170,9 @@
 
 /* Diálogo de confirmação */
 .rc-dialog {
+    /* O reset do Tailwind 4 zera a margem que o navegador usa para centralizar o <dialog> */
+    margin: auto;
+    inset: 0;
     border: 1px solid color-mix(in srgb, var(--pal-white) 12%, transparent);
     border-radius: 6px;
     background: var(--pal-near-black);
