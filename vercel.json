@@ -30,5 +30,16 @@
             "path": "/cron/manter-banco-ativo",
             "schedule": "0 12 * * *"
         }
-    ]
+    ],
+    "git": {
+        "deploymentEnabled": {
+            "feat/*": false,
+            "fix/*": false,
+            "docs/*": false,
+            "melhoria/*": false,
+            "melhorias/*": false,
+            "chore/*": false,
+            "claude/*": false
+        }
+    }
 }
