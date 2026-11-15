@@ -91,4 +91,18 @@ class MasterEmailTest extends TestCase
             fn ($msg, $ctx) => ! str_contains(json_encode($ctx), 'master@inst.edu.br')
         );
     }
+
+    public function test_erro_smtp_nao_repete_o_texto_do_servidor(): void
+    {
+        $master = UsuarioMaster::factory()->create();
+        // Credencial com "@" e "/" no usuário: um filtro por expressão regular deixaria escapar
+        Mail::shouldReceive('to')->andThrow(new TransportException('535 5.7.8 auth failed for smtp://ti@inst/edu:Segr3do@smtp.inst.edu.br'));
+
+        $this->actingAs($master, 'masters')->from('/dashboard/master')->post('/dashboard/master/email/teste');
+
+        $erro = session('email_erro');
+        $this->assertStringNotContainsString('Segr3do', $erro);
+        $this->assertStringNotContainsString('auth failed', $erro, 'O texto do servidor não deve ser repetido na tela.');
+        $this->assertStringContainsString('535', $erro);
+    }
 }

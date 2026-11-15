@@ -238,7 +238,7 @@ Nas listas de **Professores**, **Alunos** e **Matérias**, o botão **Editar** a
 
 ### Servidor de e-mail
 
-Na **Visão geral**, o quadro **Servidor de e-mail** mostra por onde os e-mails estão saindo (servidor e porta, nunca usuário ou senha). **Enviar e-mail de teste** manda uma mensagem para o seu e-mail; se falhar, a tela mostra o erro do servidor. Como configurar: [Instalação → E-mail](instalacao.md#e-mail-servidor-da-instituição).
+Na **Visão geral**, o quadro **Servidor de e-mail** mostra por onde os e-mails estão saindo (servidor e porta, nunca usuário ou senha). **Enviar e-mail de teste** manda uma mensagem para o seu e-mail; se falhar, a tela mostra o código do erro (ex.: 535, usuário ou senha recusados) e o que conferir. Como configurar: [Instalação → E-mail](instalacao.md#e-mail-servidor-da-instituição).
 
 ### Verificação em duas etapas do Master
 

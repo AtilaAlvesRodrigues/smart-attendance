@@ -144,7 +144,7 @@ O formulário público de check-in tem um campo oculto, `hp_field`, que pessoas 
 - Atestados: `pdf`, `jpg`, `jpeg` ou `png` (extensão e tipo MIME), até 5 MB, gravados com nome aleatório no disco privado `justificativas`; o download passa por rota autenticada com `X-Content-Type-Options: nosniff`.
 - Toda correção de presença exige motivo e fica em `presenca_ajustes`.
 - Planilhas: só nome e RA (nunca CPF ou e-mail); todo texto é gravado como texto, e valores que começam com `=`, `+`, `-` ou `@` recebem um apóstrofo, para nenhum nome virar fórmula no Excel. O resumo do professor se limita às matérias que ele leciona hoje, e um filtro de matéria alheia recebe 403.
-- E-mail de teste: a mensagem de erro do servidor SMTP é exibida sem usuário, senha nem credenciais embutidas em URL (`MAIL_URL`). Falhas de envio vão para o log só com a classe da exceção, sem o texto do servidor (que pode conter endereços de e-mail).
+- E-mail de teste: o texto devolvido pelo servidor SMTP nunca é exibido nem gravado (pode conter credenciais ou endereços). A tela mostra só o código SMTP (ex.: 535) e uma dica do que conferir; o log guarda só a classe da exceção.
 
 ## Exclusão lógica
 
