@@ -22,11 +22,11 @@ class MasterEmailController extends BaseController
         try {
             Mail::to($master->email)->send(new EmailTesteMail($master->nome ?? 'Administrador'));
         } catch (\Throwable $e) {
-            $mensagem = self::semCredenciais($e->getMessage());
-            // No log, só a classe: o texto do servidor pode trazer endereços de e-mail
+            // No log e na tela, nunca o texto do servidor: ele pode trazer credenciais
+            // ou endereços, e nenhum filtro cobre todos os formatos.
             Log::warning('Falha no e-mail de teste', ['excecao' => $e::class]);
 
-            return back()->with('email_erro', 'Falha no envio: ' . mb_substr($mensagem, 0, 300));
+            return back()->with('email_erro', self::mensagemDeFalha($e));
         }
 
         return back()->with('email_status', 'E-mail de teste enviado para ' . $master->email . '. Confira a caixa de entrada (e o spam).');
@@ -47,25 +47,21 @@ class MasterEmailController extends BaseController
     }
 
     /**
-     * Remove da mensagem do servidor qualquer credencial de e-mail: usuário,
-     * senha e URL de cada mailer configurado, e o trecho "usuario:senha@" de
-     * qualquer URL (ex.: MAIL_URL=smtp://usuario:senha@host:587).
+     * Mensagem segura para a tela: o tipo do erro, o código SMTP (ex.: 535) e
+     * uma dica do que conferir. O texto do servidor não é repetido.
      */
-    private static function semCredenciais(string $mensagem): string
+    private static function mensagemDeFalha(\Throwable $e): string
     {
-        $mensagem = preg_replace('#([a-z][a-z0-9+.\-]*://)[^\s/@]+@#i', '$1***@', $mensagem) ?? '';
+        preg_match('/\b([45]\d\d)\b/', $e->getMessage(), $m);
+        $codigo = $m[1] ?? null;
 
-        $segredos = [config('mail.url')];
-        foreach ((array) config('mail.mailers', []) as $mailer) {
-            foreach (['username', 'password', 'url', 'secret', 'token', 'key'] as $campo) {
-                $segredos[] = is_array($mailer) ? ($mailer[$campo] ?? null) : null;
-            }
-        }
+        $dica = match (true) {
+            $codigo === '535', $codigo === '534' => 'o servidor recusou o usuário ou a senha (MAIL_USERNAME / MAIL_PASSWORD).',
+            $codigo !== null && $codigo[0] === '5' => 'o servidor recusou a mensagem; confira o remetente (MAIL_FROM_ADDRESS) e as permissões da conta.',
+            $codigo !== null => 'o servidor está temporariamente indisponível; tente de novo em alguns minutos.',
+            default => 'não foi possível conectar; confira MAIL_HOST, MAIL_PORT e MAIL_SCHEME.',
+        };
 
-        foreach (array_filter($segredos, fn ($s) => is_string($s) && strlen($s) >= 3) as $segredo) {
-            $mensagem = str_replace($segredo, '***', $mensagem);
-        }
-
-        return $mensagem;
+        return 'Falha no envio' . ($codigo ? " (código SMTP {$codigo})" : '') . ': ' . $dica;
     }
 }
