@@ -596,7 +596,7 @@ function palToggleSidebar() {
 
             <x-ui.sidebar-group
                 label="Conteúdo"
-                :open="request()->routeIs('master.materias', 'master.turma') || request()->routeIs('master.presenca')">
+                :open="request()->routeIs('master.materias', 'master.turma', 'master.graficos') || request()->routeIs('master.presenca')">
 
                 <x-ui.sidebar-item
                     href="{{ route('master.materias') }}"
@@ -609,6 +609,16 @@ function palToggleSidebar() {
                                  C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13
                                  C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13
                                  C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </x-ui.sidebar-item>
+
+                <x-ui.sidebar-item
+                    href="{{ route('master.graficos') }}"
+                    label="Gráficos"
+                    :active="request()->routeIs('master.graficos')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
                     </svg>
                 </x-ui.sidebar-item>
 

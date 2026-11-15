@@ -15,6 +15,7 @@ use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
 use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\GraficosController;
 use App\Http\Controllers\DoisFatoresController;
 use App\Http\Controllers\MasterEmailController;
 use App\Http\Controllers\JustificativaAlunoController;
@@ -162,6 +163,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
             Route::get('/{materia_id}', [GerenciarMateriaController::class, 'show'])->name('professor.gerenciar.materia');
             Route::post('/{materia_id}/notas', [GerenciarMateriaController::class, 'salvarNotas'])->name('professor.gerenciar.salvar_notas');
 
+            Route::get('/{materia_id}/graficos', [GraficosController::class, 'professor'])->whereNumber('materia_id')->name('professor.graficos');
+            Route::get('/{materia_id}/graficos.json', [GraficosController::class, 'professorJson'])->whereNumber('materia_id')->name('professor.graficos.json');
+
             // Chamadas já realizadas e correção manual de presença (com motivo e auditoria)
             Route::get('/{materia_id}/chamadas', [CorrecaoPresencaController::class, 'index'])->whereNumber('materia_id')->name('professor.chamadas');
             Route::get('/{materia_id}/chamadas/{codigo_aula}', [CorrecaoPresencaController::class, 'show'])->whereNumber('materia_id')->name('professor.chamadas.show');
@@ -182,6 +186,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
         Route::post('/{tipo}/{id}/resetar-2fa', [DoisFatoresController::class, 'resetar'])
             ->whereIn('tipo', ['aluno', 'professor', 'master'])->whereNumber('id')->name('master.resetar-2fa');
+
+        Route::get('/graficos', [GraficosController::class, 'master'])->name('master.graficos');
+        Route::get('/graficos.json', [GraficosController::class, 'masterJson'])->name('master.graficos.json');
 
         // Teste do servidor de e-mail institucional (SMTP)
         Route::post('/email/teste', [MasterEmailController::class, 'teste'])->middleware('throttle:3,1')->name('master.email.teste');

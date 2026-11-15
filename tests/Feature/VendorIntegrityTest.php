@@ -14,6 +14,7 @@ class VendorIntegrityTest extends TestCase
         'qrcode.min.js' => 'CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==',
         'jspdf.umd.min.js' => 'qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==',
         'jspdf.plugin.autotable.min.js' => '03CCNkeosDFN2zCCu4vLpu3pJfZcrL48F3yB8k87ejT+OVMwco7IH3FW02vtbGhdncS6gyYZ/duYaC/K62xQPQ==',
+        'chart.umd.js' => 'ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==',
     ];
 
     public function test_bibliotecas_locais_batem_com_o_hash_publicado(): void

@@ -115,6 +115,16 @@
         </div>
     </a>
 
+    <a href="{{ route('master.graficos') }}" class="group glass block p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline mt-8">
+        <div class="flex items-center justify-between gap-8 flex-wrap">
+            <div>
+                <h2 class="text-2xl font-black tracking-tighter pal-text mb-2">Gráficos de presença</h2>
+                <p class="text-sm pal-subtitle m-0">Frequência média de cada turma e quantos alunos estão em risco.</p>
+            </div>
+            <span class="pal-btn-outline px-6 py-3 text-sm font-bold rounded-sm whitespace-nowrap">Ver gráficos &rarr;</span>
+        </div>
+    </a>
+
     {{-- Servidor de e-mail --}}
     @php $email = \App\Http\Controllers\MasterEmailController::resumoConfiguracao(); @endphp
     <section class="rc-card mt-8" aria-labelledby="titulo-email">
