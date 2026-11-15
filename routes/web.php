@@ -15,6 +15,7 @@ use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
 use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\MasterEdicaoController;
 use App\Http\Controllers\GraficosController;
 use App\Http\Controllers\DoisFatoresController;
 use App\Http\Controllers\MasterEmailController;
@@ -183,6 +184,14 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
         // Versão do PHP em execução e se já tem a correção das CVEs críticas (SEC-11). JSON, só Master.
         Route::get('/ambiente/php', [AmbienteController::class, 'php'])->middleware('throttle:10,1')->name('master.ambiente.php');
+
+        // Editar e excluir (soft delete) alunos, professores e matérias
+        Route::get('/{tipo}/{id}/editar', [MasterEdicaoController::class, 'editar'])
+            ->whereIn('tipo', ['aluno', 'professor', 'materia'])->whereNumber('id')->name('master.editar');
+        Route::put('/{tipo}/{id}', [MasterEdicaoController::class, 'atualizar'])
+            ->whereIn('tipo', ['aluno', 'professor', 'materia'])->whereNumber('id')->name('master.atualizar');
+        Route::delete('/{tipo}/{id}', [MasterEdicaoController::class, 'excluir'])
+            ->whereIn('tipo', ['aluno', 'professor', 'materia'])->whereNumber('id')->name('master.excluir');
 
         Route::post('/{tipo}/{id}/resetar-2fa', [DoisFatoresController::class, 'resetar'])
             ->whereIn('tipo', ['aluno', 'professor', 'master'])->whereNumber('id')->name('master.resetar-2fa');
