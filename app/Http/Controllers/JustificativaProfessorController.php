@@ -46,7 +46,24 @@ class JustificativaProfessorController extends BaseController
             'comentario' => 'nullable|string|max:1000',
         ]);
 
-        DB::transaction(function () use ($justificativa, $dados, $professor) {
+        try {
+            $this->registrarDecisao($justificativa, $dados, $professor);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+            // O aluno já tinha presença nesta aula (QR ou correção simultânea): grava a decisão sem novo abono
+            $this->registrarDecisao($justificativa, $dados, $professor, abonar: false);
+        }
+
+        $justificativa->refresh()->load(['aluno', 'materia']);
+        $this->notificarAluno($justificativa);
+
+        return back()->with('status', $justificativa->status === Justificativa::STATUS_APROVADA
+            ? 'Justificativa aprovada. A falta foi abonada.'
+            : 'Justificativa recusada.');
+    }
+
+    private function registrarDecisao(Justificativa $justificativa, array $dados, $professor, bool $abonar = true): void
+    {
+        DB::transaction(function () use ($justificativa, $dados, $professor, $abonar) {
             $j = Justificativa::whereKey($justificativa->id)->lockForUpdate()->first();
 
             if (! $j->estaPendente()) {
@@ -62,17 +79,10 @@ class JustificativaProfessorController extends BaseController
                 'decidida_em'          => now(),
             ])->save();
 
-            if ($aprovar) {
+            if ($aprovar && $abonar) {
                 $this->abonar($j, $professor->id);
             }
         });
-
-        $justificativa->refresh()->load(['aluno', 'materia']);
-        $this->notificarAluno($justificativa);
-
-        return back()->with('status', $justificativa->status === Justificativa::STATUS_APROVADA
-            ? 'Justificativa aprovada. A falta foi abonada.'
-            : 'Justificativa recusada.');
     }
 
     public function anexo(Justificativa $justificativa)

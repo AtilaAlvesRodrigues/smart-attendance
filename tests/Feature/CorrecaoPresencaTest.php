@@ -141,4 +141,30 @@ class CorrecaoPresencaTest extends TestCase
             ->assertOk()
             ->assertSee('Beatriz Lima');
     }
+
+    public function test_nao_remove_a_ultima_presenca_da_aula(): void
+    {
+        [$professor, $materia] = $this->professorComMateria();
+        $unico = $this->alunoMatriculado($materia);
+        $outro = $this->alunoMatriculado($materia);
+        $codigo = $this->registrarAula($materia, $professor, [$unico]);
+
+        $this->actingAs($professor, 'professores')
+            ->postJson($this->url($materia, $codigo), ['aluno_id' => $unico->id, 'presente' => '0', 'motivo' => 'Engano'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['presente']);
+
+        $this->assertSame(1, Presenca::where('codigo_aula', $codigo)->count());
+        $this->assertSame(1, SituacaoAcademica::doAluno($materia->id, $outro->id, 40)->aulasRealizadas);
+    }
+
+    public function test_banco_impede_presenca_duplicada_na_mesma_aula(): void
+    {
+        [$professor, $materia] = $this->professorComMateria();
+        $aluno = $this->alunoMatriculado($materia);
+        $codigo = $this->registrarAula($materia, $professor, [$aluno]);
+
+        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+        $this->registrarAula($materia, $professor, [$aluno], '2026-11-10', $codigo);
+    }
 }

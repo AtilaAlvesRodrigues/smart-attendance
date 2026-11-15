@@ -162,7 +162,7 @@ class DatabaseSeeder extends Seeder
                             'data_aula' => now()->previous(\Carbon\Carbon::TUESDAY)->subWeeks($p)->format('Y-m-d'),
                             'semestre' => '2026/1',
                             'horario' => 'M', 
-                            'codigo_aula' => 'GEN' . $p,
+                            'codigo_aula' => $materia->id . '-GEN' . $p,
                         ]);
                     }
                 }

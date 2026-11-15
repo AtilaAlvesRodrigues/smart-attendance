@@ -6,6 +6,7 @@ use App\Models\Materia;
 use App\Models\Presenca;
 use App\Models\PresencaAjuste;
 use App\Support\AulasDaMateria;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
@@ -81,6 +82,21 @@ class CorrecaoPresencaController extends BaseController
         $professor = Auth::guard('professores')->user();
         $presente = (bool) $dados['presente'];
 
+        try {
+            $this->aplicarCorrecao($materia, $aula, $dados, $presente, $professor);
+        } catch (UniqueConstraintViolationException) {
+            // Outra requisição (QR, outra aba) registrou a mesma presença ao mesmo tempo: o estado pedido já vale
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'presente' => $presente]);
+        }
+
+        return back()->with('status', $presente ? 'Presença marcada.' : 'Presença removida.');
+    }
+
+    private function aplicarCorrecao(Materia $materia, object $aula, array $dados, bool $presente, $professor): void
+    {
         DB::transaction(function () use ($materia, $aula, $dados, $presente, $professor) {
             $existente = Presenca::where('materia_id', $materia->id)
                 ->where('codigo_aula', $aula->codigo_aula)
@@ -107,6 +123,19 @@ class CorrecaoPresencaController extends BaseController
                 $presencaId = $presenca->id;
                 $acao = PresencaAjuste::ACAO_MARCOU;
             } else {
+                // A aula só existe enquanto houver ao menos uma presença com o código dela.
+                // Apagar a última faria a aula sumir e mudaria as faltas da turma inteira.
+                $restantes = Presenca::where('materia_id', $materia->id)
+                    ->where('codigo_aula', $aula->codigo_aula)
+                    ->lockForUpdate()
+                    ->count();
+
+                if ($restantes <= 1) {
+                    throw ValidationException::withMessages([
+                        'presente' => 'Não é possível remover a única presença desta aula: a aula deixaria de existir para a turma.',
+                    ]);
+                }
+
                 $presencaId = $existente->id;
                 $existente->delete();
                 $acao = PresencaAjuste::ACAO_DESMARCOU;
@@ -123,12 +152,6 @@ class CorrecaoPresencaController extends BaseController
                 'autor_id'    => $professor->id,
             ]);
         });
-
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'presente' => $presente]);
-        }
-
-        return back()->with('status', $presente ? 'Presença marcada.' : 'Presença removida.');
     }
 
     private function materiaDoProfessor(int $materiaId): Materia
