@@ -36,6 +36,30 @@
             <div class="rc-card rc-kpi"><p class="rc-kpi-valor" style="color:{{ $emRisco ? '#ef4444' : 'inherit' }}">{{ $emRisco }}</p><p class="rc-kpi-rotulo">Matrículas em risco</p></div>
         </div>
 
+        @php
+            $rotulos = ['regular' => 'Em dia', 'aprovado' => 'Aprovado', 'atencao' => 'Atenção', 'reprovado' => 'Reprovado por nota', 'reprovado_falta' => 'Reprovado por falta'];
+            $totalMatriculas = array_sum($situacoes);
+        @endphp
+        @if($totalMatriculas > 0)
+            <section class="rc-card mb-6 animate-reveal pal-card-delay-2" aria-labelledby="t-situacoes">
+                <div class="rc-card-header">
+                    <h2 id="t-situacoes" class="rc-card-title">Situação de todas as matrículas</h2>
+                    <span class="rc-hint">{{ $totalMatriculas }} {{ $totalMatriculas === 1 ? 'matrícula' : 'matrículas' }}</span>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2 items-center">
+                    <div class="rc-chart-box"><canvas id="grafico-situacoes" role="img" aria-label="Gráfico de rosca com a quantidade de matrículas em cada situação"></canvas></div>
+                    <ul role="list" class="grid gap-2" style="padding:0 1.5rem 1.5rem">
+                        @foreach($rotulos as $status => $rotulo)
+                            <li class="flex justify-between gap-4 rc-hint" style="padding:0.4rem 0; border-bottom:1px solid color-mix(in srgb, var(--pal-white) 6%, transparent)">
+                                <span>{{ $rotulo }}</span>
+                                <strong style="color:var(--pal-white)">{{ $situacoes[$status] }}</strong>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </section>
+        @endif
+
         <section class="rc-card animate-reveal pal-card-delay-2" aria-labelledby="t-turmas">
             <div class="rc-card-header">
                 <h2 id="t-turmas" class="rc-card-title">Frequência média por turma</h2>
@@ -69,7 +93,7 @@
 @endsection
 
 @push('scripts')
-<script type="application/json" id="dados-graficos" @nonce>@json(['turmas' => $turmas])</script>
+<script type="application/json" id="dados-graficos" @nonce>@json(['turmas' => $turmas, 'situacoes' => $situacoes])</script>
 <script src="{{ asset('js/vendor/chart.umd.js') }}"></script>
 <script src="{{ asset('js/graficos.js') }}?v={{ filemtime(public_path('js/graficos.js')) }}"></script>
 @endpush

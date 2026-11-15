@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Justificativas de falta enviadas pelo aluno e decididas pelo professor.
- * Uma por falta (aluno + codigo_aula). O atestado fica no disco
+ * Uma por falta (aluno + matéria + codigo_aula). O atestado fica no disco
  * 'justificativas', nunca em pasta pública.
  */
 return new class extends Migration
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->timestamp('decidida_em')->nullable();
             $table->timestamps();
 
-            $table->unique(['aluno_id', 'codigo_aula']);
+            $table->unique(['aluno_id', 'materia_id', 'codigo_aula']);
             $table->index(['materia_id', 'status']);
         });
     }

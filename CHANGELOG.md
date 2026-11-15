@@ -14,7 +14,8 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - **E-mail institucional:** exemplos de SMTP (Microsoft 365, Google Workspace, servidor próprio) no `.env.example` e botão "Enviar e-mail de teste" no Master.
 
 ### Corrigido (deste pacote)
-- Índice único `presencas(aluno_id, codigo_aula)`: duas requisições simultâneas não duplicam mais a presença. A migration remove cópias exatas já existentes.
+- Índice único `presencas(aluno_id, materia_id, codigo_aula)`: duas requisições simultâneas não duplicam mais a presença. A migration remove só as cópias exatas (mesmo aluno, matéria e código); o mesmo código em matérias diferentes, comum nos dados de demonstração antigos, é mantido.
+- Registros de presença e justificativas continuam legíveis depois que o aluno, o professor ou a matéria é excluído.
 - **QR Code que muda a cada 30 segundos.** O link da chamada leva um token assinado (HMAC) que vale na janela atual e na anterior; uma foto ou print do QR Code deixa de registrar presença em até 1 minuto. A tela do professor renova o QR sozinha e mostra a contagem regressiva.
 - **Content-Security-Policy com nonce por requisição** em todas as respostas, inclusive páginas de erro: scripts e estilos em bloco injetados deixam de executar. Novas diretivas `object-src`, `base-uri`, `form-action` e `frame-ancestors`.
 - **Dependabot**, revisão de dependências em Pull Requests e varredura de segredos (gitleaks); `timeout-minutes` nos jobs do CI. O gitleaks fica fixado por SHA e não publica os segredos encontrados.

@@ -126,9 +126,9 @@ erDiagram
 | `materias` | Disciplinas | `nome` único; `total_aulas` define o limite de faltas; *soft delete* |
 | `aluno_materia` | Matrículas e notas | Uma linha por aluno por matéria, com P1, T1, T2 e P2 (0 a 10, podem ficar vazias) |
 | `materia_professor` | Quem leciona o quê | Uma matéria pode ter mais de um professor |
-| `presencas` | Presenças | Uma linha por aluno por chamada (índice único `aluno_id` + `codigo_aula`); `codigo_aula` agrupa a chamada; `origem` diz se veio do QR Code, de correção do professor ou de justificativa aprovada |
+| `presencas` | Presenças | Uma linha por aluno por chamada (índice único `aluno_id` + `materia_id` + `codigo_aula`); `codigo_aula` agrupa a chamada; `origem` diz se veio do QR Code, de correção do professor ou de justificativa aprovada |
 | `presenca_ajustes` | Histórico de correções e abonos | Nunca editado pela aplicação |
-| `justificativas` | Justificativas de falta | Uma por falta (índice único `aluno_id` + `codigo_aula`); o atestado fica no disco `justificativas`, nunca em pasta pública |
+| `justificativas` | Justificativas de falta | Uma por falta (índice único `aluno_id` + `materia_id` + `codigo_aula`); o atestado fica no disco `justificativas`, nunca em pasta pública |
 | `solicitacoes_acesso` | Pedidos públicos de cadastro | E-mail sem índice único, para permitir um novo pedido depois de uma rejeição |
 
 ## Tabelas de infraestrutura do Laravel

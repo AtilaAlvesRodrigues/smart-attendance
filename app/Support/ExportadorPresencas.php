@@ -61,7 +61,9 @@ class ExportadorPresencas
             $writer->getCurrentSheet()->setName('Presenças');
             $writer->addRow(self::linha(['Aluno', 'RA', 'Matéria', 'Data da aula', 'Horário', 'Origem', 'Registrado em'], $cabecalho));
 
-            (clone $presencas)->with(['aluno', 'materia'])->chunk(500, function ($lote) use ($writer) {
+            // Desempate por id: com vários registros no mesmo segundo, LIMIT/OFFSET
+            // sem ordem total pode repetir ou pular linhas entre os lotes
+            (clone $presencas)->with(['aluno', 'materia'])->orderByDesc('id')->chunk(500, function ($lote) use ($writer) {
                 foreach ($lote as $p) {
                     $writer->addRow(self::linha([
                         $p->aluno?->nome ?? 'Aluno removido',

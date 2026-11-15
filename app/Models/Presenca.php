@@ -46,16 +46,19 @@ class Presenca extends Model
 
     public function aluno()
     {
-        return $this->belongsTo(AlunoModel::class, 'aluno_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(AlunoModel::class, 'aluno_id')->withTrashed();
     }
 
     public function professor()
     {
-        return $this->belongsTo(ProfessorModel::class, 'professor_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(ProfessorModel::class, 'professor_id')->withTrashed();
     }
 
     public function materia()
     {
-        return $this->belongsTo(Materia::class, 'materia_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(Materia::class, 'materia_id')->withTrashed();
     }
 }

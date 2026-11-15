@@ -125,9 +125,11 @@ class CorrecaoPresencaController extends BaseController
             } else {
                 // A aula só existe enquanto houver ao menos uma presença com o código dela.
                 // Apagar a última faria a aula sumir e mudaria as faltas da turma inteira.
+                // Trava as linhas e conta em PHP: o PostgreSQL não aceita FOR UPDATE com COUNT(*)
                 $restantes = Presenca::where('materia_id', $materia->id)
                     ->where('codigo_aula', $aula->codigo_aula)
                     ->lockForUpdate()
+                    ->get(['id'])
                     ->count();
 
                 if ($restantes <= 1) {

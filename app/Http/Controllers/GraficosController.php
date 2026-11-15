@@ -34,14 +34,17 @@ class GraficosController extends BaseController
         $turmas = EstatisticasTurma::geral();
 
         return view('master.graficos', [
-            'master' => Auth::guard('masters')->user(),
-            'turmas' => $turmas,
+            'master'    => Auth::guard('masters')->user(),
+            'turmas'    => $turmas,
+            'situacoes' => EstatisticasTurma::situacoesTotais($turmas),
         ]);
     }
 
     public function masterJson()
     {
-        return response()->json(['turmas' => EstatisticasTurma::geral()]);
+        $turmas = EstatisticasTurma::geral();
+
+        return response()->json(['turmas' => $turmas, 'situacoes' => EstatisticasTurma::situacoesTotais($turmas)]);
     }
 
     private function materiaDoProfessor(int $materiaId): Materia

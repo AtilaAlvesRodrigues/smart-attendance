@@ -125,7 +125,7 @@ Route::middleware(['primeiro-acesso', 'throttle:criar-senha'])->group(function (
 
 // Autenticação em dois fatores: o desafio vem antes do login ser concluído
 Route::get('/2fa/desafio', [DoisFatoresController::class, 'desafio'])->name('dois-fatores.desafio');
-Route::post('/2fa/desafio', [DoisFatoresController::class, 'verificarDesafio'])->middleware('throttle:5,1')->name('dois-fatores.verificar');
+Route::post('/2fa/desafio', [DoisFatoresController::class, 'verificarDesafio'])->middleware('throttle:2fa-desafio')->name('dois-fatores.verificar');
 
 Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 

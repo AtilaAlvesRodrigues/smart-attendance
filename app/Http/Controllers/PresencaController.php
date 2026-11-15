@@ -167,7 +167,7 @@ class PresencaController extends Controller
             return view('aluno.presenca.erro', ['mensagem' => 'Você não está matriculado nesta disciplina.']);
         }
 
-        if (Presenca::where('aluno_id', $aluno->id)->where('codigo_aula', $codigo_aula)->exists()) {
+        if (Presenca::where('aluno_id', $aluno->id)->where('materia_id', $materia_id)->where('codigo_aula', $codigo_aula)->exists()) {
             return view('aluno.presenca.ja_registrado');
         }
 

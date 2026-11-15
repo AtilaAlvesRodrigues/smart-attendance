@@ -23,14 +23,14 @@ class JustificativaAlunoController extends BaseController
             ->where('aluno_id', $aluno->id)
             ->latest()
             ->get();
-        $jaJustificadas = $justificativas->pluck('codigo_aula')->flip();
+        $jaJustificadas = $justificativas->map(fn ($j) => $j->materia_id . '|' . $j->codigo_aula)->flip();
 
         // Faltas ainda sem justificativa, agrupadas por matéria
         $faltasPorMateria = $aluno->materias()->orderBy('nome')->get()
             ->map(fn ($materia) => [
                 'materia' => $materia,
                 'faltas'  => AulasDaMateria::faltasDoAluno($materia->id, $aluno->id)
-                    ->reject(fn ($aula) => isset($jaJustificadas[$aula->codigo_aula]))
+                    ->reject(fn ($aula) => isset($jaJustificadas[$materia->id . '|' . $aula->codigo_aula]))
                     ->values(),
             ])
             ->filter(fn ($grupo) => $grupo['faltas']->isNotEmpty())
@@ -74,7 +74,7 @@ class JustificativaAlunoController extends BaseController
             throw ValidationException::withMessages(['codigo_aula' => 'Não há falta nesta aula para justificar.']);
         }
 
-        if (Justificativa::where('aluno_id', $aluno->id)->where('codigo_aula', $falta->codigo_aula)->exists()) {
+        if (Justificativa::where('aluno_id', $aluno->id)->where('materia_id', (int) $dados['materia_id'])->where('codigo_aula', $falta->codigo_aula)->exists()) {
             throw ValidationException::withMessages(['codigo_aula' => 'Você já enviou uma justificativa para esta falta.']);
         }
 

@@ -38,12 +38,14 @@ class Justificativa extends Model
 
     public function aluno()
     {
-        return $this->belongsTo(AlunoModel::class, 'aluno_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(AlunoModel::class, 'aluno_id')->withTrashed();
     }
 
     public function materia()
     {
-        return $this->belongsTo(Materia::class, 'materia_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(Materia::class, 'materia_id')->withTrashed();
     }
 
     public function scopePendentes($query)
@@ -66,14 +68,16 @@ class Justificativa extends Model
     }
 
     /**
-     * Upload de atestado disponível? Em produção (Vercel) o disco local é
-     * somente leitura e efêmero: sem o Supabase Storage configurado, a
+     * Upload de atestado disponível? Na Vercel (produção ou preview) o disco
+     * local é somente leitura e efêmero: sem o Supabase Storage configurado, a
      * justificativa segue só com texto em vez de quebrar.
      */
     public static function anexoHabilitado(): bool
     {
         $driver = config('filesystems.disks.' . self::DISCO . '.driver');
 
-        return ! ($driver === 'local' && app()->environment('production'));
+        $naVercel = ! empty($_SERVER['VERCEL'] ?? $_ENV['VERCEL'] ?? getenv('VERCEL'));
+
+        return ! ($driver === 'local' && ($naVercel || app()->environment('production')));
     }
 }

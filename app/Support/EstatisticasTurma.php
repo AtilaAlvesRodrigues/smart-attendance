@@ -78,7 +78,7 @@ class EstatisticasTurma
     /**
      * Uma linha por turma (matéria), com 3 consultas no total.
      *
-     * @return list<array{materia_id: int, materia: string, alunos: int, aulas_realizadas: int, frequencia_media: int, em_risco: int}>
+     * @return list<array{materia_id: int, materia: string, alunos: int, aulas_realizadas: int, frequencia_media: int, em_risco: int, situacoes: array<string, int>}>
      */
     public static function geral(): array
     {
@@ -117,7 +117,27 @@ class EstatisticasTurma
                 'aulas_realizadas' => $aulas,
                 'frequencia_media' => $situacoes->isNotEmpty() ? (int) round($situacoes->avg('frequencia')) : 100,
                 'em_risco'         => $situacoes->whereIn('status', ['reprovado_falta', 'atencao'])->count(),
+                'situacoes'        => array_merge(array_fill_keys(self::STATUS, 0), $situacoes->countBy('status')->all()),
             ];
         })->values()->all();
+    }
+
+    /**
+     * Soma das situações de todas as matrículas (gráfico de rosca do Master).
+     *
+     * @param  list<array{situacoes: array<string, int>}>  $turmas  resultado de geral()
+     * @return array<string, int>
+     */
+    public static function situacoesTotais(array $turmas): array
+    {
+        $total = array_fill_keys(self::STATUS, 0);
+
+        foreach ($turmas as $turma) {
+            foreach ($turma['situacoes'] as $status => $qtd) {
+                $total[$status] += $qtd;
+            }
+        }
+
+        return $total;
     }
 }
