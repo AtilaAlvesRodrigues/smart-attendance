@@ -25,6 +25,7 @@
         }
     </script>
     
+    <link rel="stylesheet" href="{{ asset('css/recursos.css') }}?v={{ filemtime(public_path('css/recursos.css')) }}">
     @stack('styles')
     {{-- Camada de usabilidade/acessibilidade: sempre por último --}}
     <link rel="stylesheet" href="{{ asset('css/usability.css') }}?v={{ filemtime(public_path('css/usability.css')) }}">

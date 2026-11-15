@@ -14,6 +14,7 @@ use App\Http\Controllers\SolicitacaoAcessoController;
 use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
+use App\Http\Controllers\CorrecaoPresencaController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -139,6 +140,12 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
             Route::get('/relatorios', [GerenciarMateriaController::class, 'relatorios'])->name('professor.relatorios');
             Route::get('/{materia_id}', [GerenciarMateriaController::class, 'show'])->name('professor.gerenciar.materia');
             Route::post('/{materia_id}/notas', [GerenciarMateriaController::class, 'salvarNotas'])->name('professor.gerenciar.salvar_notas');
+
+            // Chamadas já realizadas e correção manual de presença (com motivo e auditoria)
+            Route::get('/{materia_id}/chamadas', [CorrecaoPresencaController::class, 'index'])->whereNumber('materia_id')->name('professor.chamadas');
+            Route::get('/{materia_id}/chamadas/{codigo_aula}', [CorrecaoPresencaController::class, 'show'])->whereNumber('materia_id')->name('professor.chamadas.show');
+            Route::post('/{materia_id}/chamadas/{codigo_aula}/presenca', [CorrecaoPresencaController::class, 'atualizar'])
+                ->whereNumber('materia_id')->middleware('throttle:60,1')->name('professor.chamadas.presenca');
         });
     });
 
