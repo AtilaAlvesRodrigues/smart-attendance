@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'            => \App\Http\Middleware\CheckRole::class,
             'auth'            => \Illuminate\Auth\Middleware\Authenticate::class,
             'primeiro-acesso' => \App\Http\Middleware\PrimeiroAcessoMiddleware::class,
+            'exigir-2fa'      => \App\Http\Middleware\ExigirDoisFatores::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -1,0 +1,199 @@
+/*
+ * Componentes das funcionalidades de nov/2026: chamadas, justificativas,
+ * 2FA, gráficos, edição no Master e exportação.
+ * Usa só as variáveis --pal-* (que já trocam no modo claro) e as cores de
+ * estado do design system: verde #22c55e, amarelo #eab308, vermelho #ef4444.
+ */
+
+.rc-card {
+    background: color-mix(in srgb, var(--pal-near-black) 78%, transparent);
+    border: 1px solid color-mix(in srgb, var(--pal-white) 10%, transparent);
+    border-radius: 4px;
+    backdrop-filter: blur(12px);
+}
+
+.rc-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--pal-white) 8%, transparent);
+}
+
+.rc-card-title {
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--pal-white);
+    margin: 0;
+}
+
+.rc-table { width: 100%; border-collapse: collapse; text-align: left; }
+.rc-table th {
+    font-size: 0.65rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--pal-gray);
+    padding: 0.85rem 1.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--pal-white) 8%, transparent);
+    white-space: nowrap;
+}
+.rc-table td {
+    padding: 0.9rem 1.5rem;
+    color: var(--pal-light-gray);
+    border-bottom: 1px solid color-mix(in srgb, var(--pal-white) 5%, transparent);
+    vertical-align: middle;
+}
+.rc-table tbody tr { transition: background 0.2s; }
+.rc-table tbody tr:hover { background: color-mix(in srgb, var(--pal-white) 4%, transparent); }
+.rc-table .rc-strong { color: var(--pal-white); font-weight: 700; }
+.rc-table .rc-meta { color: var(--pal-gray); font-size: 0.8rem; font-family: ui-monospace, monospace; }
+
+/* Chips de estado */
+.rc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+.rc-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.rc-chip-ok      { color: #16a34a; background: rgba(34, 197, 94, 0.12);  border-color: rgba(34, 197, 94, 0.3); }
+.rc-chip-alerta  { color: #ca8a04; background: rgba(234, 179, 8, 0.12);  border-color: rgba(234, 179, 8, 0.3); }
+.rc-chip-erro    { color: #dc2626; background: rgba(239, 68, 68, 0.12);  border-color: rgba(239, 68, 68, 0.3); }
+.rc-chip-neutro  { color: var(--pal-light-gray); background: color-mix(in srgb, var(--pal-white) 6%, transparent); border-color: color-mix(in srgb, var(--pal-white) 12%, transparent); }
+:root:not(.light-mode) .rc-chip-ok     { color: #4ade80; }
+:root:not(.light-mode) .rc-chip-alerta { color: #facc15; }
+:root:not(.light-mode) .rc-chip-erro   { color: #f87171; }
+
+/* Botões (sólidos no hover, conforme .cursorrules §8) */
+.rc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0.55rem 1.1rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.rc-btn:focus-visible { outline: 2px solid var(--pal-white); outline-offset: 2px; }
+.rc-btn-confirmar { background: #22c55e; color: #052e16; }
+.rc-btn-confirmar:hover { background: #16a34a; color: #ffffff; }
+.rc-btn-perigo { background: transparent; color: #ef4444; border-color: rgba(239, 68, 68, 0.45); }
+.rc-btn-perigo:hover { background: #ef4444; color: #ffffff; }
+.rc-btn-neutro { background: transparent; color: var(--pal-white); border-color: color-mix(in srgb, var(--pal-white) 25%, transparent); }
+.rc-btn-neutro:hover { background: var(--pal-white); color: var(--pal-black); }
+.rc-btn-escuro { background: var(--pal-white); color: var(--pal-black); }
+.rc-btn-escuro:hover { background: var(--pal-off-white); }
+.rc-btn-sm { min-height: 32px; padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+.rc-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+/* Interruptor presente/ausente */
+.rc-switch { position: relative; display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+.rc-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.rc-switch-track {
+    width: 44px; height: 24px; border-radius: 999px; position: relative; flex-shrink: 0;
+    background: color-mix(in srgb, var(--pal-white) 15%, transparent);
+    transition: background 0.2s;
+}
+.rc-switch-track::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--pal-white); transition: transform 0.2s;
+}
+.rc-switch input:checked + .rc-switch-track { background: #22c55e; }
+.rc-switch input:checked + .rc-switch-track::after { transform: translateX(20px); background: #ffffff; }
+.rc-switch input:focus-visible + .rc-switch-track { outline: 2px solid var(--pal-white); outline-offset: 2px; }
+
+/* Campos */
+.rc-field { display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-input, .rc-select, .rc-textarea {
+    width: 100%;
+    background: var(--pal-black);
+    color: var(--pal-white);
+    border: 1px solid color-mix(in srgb, var(--pal-white) 14%, transparent);
+    border-radius: 4px;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.rc-input:focus, .rc-select:focus, .rc-textarea:focus {
+    outline: none;
+    border-color: var(--pal-white);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pal-white) 12%, transparent);
+}
+.rc-textarea { min-height: 110px; resize: vertical; }
+.rc-hint { font-size: 0.78rem; color: var(--pal-gray); }
+
+/* Avisos */
+.rc-alert {
+    padding: 0.85rem 1rem;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    border: 1px solid;
+    margin-bottom: 1.25rem;
+}
+.rc-alert-ok    { background: rgba(34, 197, 94, 0.08);  border-color: rgba(34, 197, 94, 0.3);  color: var(--pal-white); }
+.rc-alert-erro  { background: rgba(239, 68, 68, 0.08);  border-color: rgba(239, 68, 68, 0.3);  color: var(--pal-white); }
+.rc-alert-info  { background: color-mix(in srgb, var(--pal-white) 5%, transparent); border-color: color-mix(in srgb, var(--pal-white) 15%, transparent); color: var(--pal-light-gray); }
+
+/* Grade de aulas */
+.rc-aulas { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); padding: 1.5rem; }
+.rc-aula {
+    display: flex; flex-direction: column; gap: 0.35rem;
+    padding: 1rem 1.1rem; border-radius: 4px; text-decoration: none;
+    border: 1px solid color-mix(in srgb, var(--pal-white) 10%, transparent);
+    background: color-mix(in srgb, var(--pal-white) 3%, transparent);
+    transition: all 0.2s;
+}
+.rc-aula:hover, .rc-aula:focus-visible { border-color: var(--pal-white); transform: translateY(-2px); outline: none; }
+.rc-aula-data { font-weight: 900; font-size: 1.15rem; color: var(--pal-white); letter-spacing: -0.02em; }
+.rc-aula-meta { font-size: 0.78rem; color: var(--pal-gray); }
+
+/* Barra de frequência */
+.rc-bar { height: 4px; border-radius: 2px; overflow: hidden; background: color-mix(in srgb, var(--pal-white) 8%, transparent); }
+.rc-bar > span { display: block; height: 100%; border-radius: 2px; }
+
+/* Diálogo de confirmação */
+.rc-dialog {
+    /* O reset do Tailwind 4 zera a margem que o navegador usa para centralizar o <dialog> */
+    margin: auto;
+    inset: 0;
+    border: 1px solid color-mix(in srgb, var(--pal-white) 12%, transparent);
+    border-radius: 6px;
+    background: var(--pal-near-black);
+    color: var(--pal-white);
+    padding: 1.75rem;
+    max-width: min(440px, calc(100vw - 32px));
+    width: 100%;
+}
+.rc-dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); }
+
+/* Gráficos */
+.rc-chart-box { position: relative; height: 280px; padding: 1rem 1.25rem 1.25rem; }
+.rc-kpis { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.rc-kpi { padding: 1.25rem; text-align: center; }
+.rc-kpi-valor { font-size: 2rem; font-weight: 900; letter-spacing: -0.04em; color: var(--pal-white); line-height: 1; }
+.rc-kpi-rotulo { margin-top: 0.5rem; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--pal-gray); }
+
+.rc-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+@media (max-width: 640px) {
+    .rc-table th, .rc-table td { padding: 0.75rem 1rem; }
+    .rc-card-header { padding: 1rem; }
+    .rc-aulas { padding: 1rem; grid-template-columns: 1fr 1fr; }
+}

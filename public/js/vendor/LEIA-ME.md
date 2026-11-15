@@ -7,5 +7,6 @@ Cópias **sem alteração** dos arquivos publicados na cdnjs, servidas pelo pró
 | `qrcode.min.js` | qrcodejs | 1.0.0 | MIT | `CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==` |
 | `jspdf.umd.min.js` | jsPDF | 2.5.1 | MIT | `qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==` |
 | `jspdf.plugin.autotable.min.js` | jsPDF-AutoTable | 3.5.28 | MIT | `03CCNkeosDFN2zCCu4vLpu3pJfZcrL48F3yB8k87ejT+OVMwco7IH3FW02vtbGhdncS6gyYZ/duYaC/K62xQPQ==` |
+| `chart.umd.js` | Chart.js | 4.4.1 | MIT | `ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==` |
 
 O teste `VendorIntegrityTest` falha se algum arquivo for alterado. Para atualizar uma biblioteca: baixe a nova versão da cdnjs, confira o hash em `https://api.cdnjs.com/libraries/<nome>/<versão>?fields=sri` e atualize esta tabela e o teste.

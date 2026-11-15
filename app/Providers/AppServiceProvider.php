@@ -73,6 +73,18 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(5)->by('evento|' . $chave($request, 'token', 'email')),
             Limit::perMinute(300)->by('evento-ip|' . $request->ip()),
         ]);
+        // Desafio 2FA: o limite é por login pendente (guard + id), não por IP, para
+        // não travar quem entra pela mesma rede; o teto por IP segura abuso em massa
+        RateLimiter::for('2fa-desafio', function (Request $request) {
+            $pendente = $request->session()->get('2fa.pendente');
+            $chave = is_array($pendente) ? ($pendente['guard'] ?? '') . '|' . ($pendente['id'] ?? '') : 'sem-login|' . $request->ip();
+
+            return [
+                Limit::perMinute(5)->by('2fa|' . $chave),
+                Limit::perMinute(300)->by('2fa-ip|' . $request->ip()),
+            ];
+        });
+
         RateLimiter::for('evento-formulario', fn (Request $request) => Limit::perMinute(300)->by($request->ip()));
     }
 }

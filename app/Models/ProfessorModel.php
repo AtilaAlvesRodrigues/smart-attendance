@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
 use App\Traits\HasBlindIndex;
+use App\Traits\TemDoisFatores;
 
 
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,7 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ProfessorModel extends Authenticatable
 {
-    use HasFactory, HasBlindIndex, SoftDeletes;
+    use HasFactory, HasBlindIndex, SoftDeletes, TemDoisFatores;
 
     /**
      * Define which fields have blind indexes for searching.

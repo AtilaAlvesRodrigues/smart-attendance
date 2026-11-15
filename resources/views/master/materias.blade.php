@@ -46,6 +46,9 @@
         </nav>
 
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
+            @if(session('status'))
+                <div class="rc-alert rc-alert-ok" role="status">{{ session('status') }}</div>
+            @endif
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
                 <h2 class="text-4xl font-black tracking-tighter pal-title">Grade Curricular</h2>
@@ -98,6 +101,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-right">
                                     <a href="{{ route('master.turma', $materia) }}" onclick="event.stopPropagation()" class="inline-flex items-center px-3 py-2 rounded-sm text-sm font-bold whitespace-nowrap border border-white/20 pal-text hover:bg-white/10">Gerenciar turma</a>
+                                    <a href="{{ route('master.editar', ['materia', $materia->id]) }}" onclick="event.stopPropagation()" class="rc-btn rc-btn-neutro rc-btn-sm" style="margin-left:0.4rem" aria-label="Editar {{ $materia->nome }}">Editar</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -270,6 +274,7 @@
                     </td>
                     <td class="py-4 px-6 text-right">
                         <a href="{{ url('/dashboard/master/materias') }}/${Number(materia.id)}/turma" onclick="event.stopPropagation()" class="inline-flex items-center px-3 py-2 rounded-sm text-sm font-bold whitespace-nowrap border border-white/20 pal-text hover:bg-white/10">Gerenciar turma</a>
+                        <a href="{{ url('/dashboard/master/materia') }}/${Number(materia.id)}/editar" onclick="event.stopPropagation()" class="rc-btn rc-btn-neutro rc-btn-sm" style="margin-left:0.4rem" aria-label="Editar ${esc(materia.nome)}">Editar</a>
                     </td>
                 </tr>
             `);

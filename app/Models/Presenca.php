@@ -17,10 +17,15 @@ use Illuminate\Database\Eloquent\Model;
  * - semestre: ex: "1/2026" — calculado automaticamente no momento do registro.
  * - horario: 'M' (Matutino), 'V' (Vespertino) ou 'N' (Noturno).
  * - data_aula: data em que a aula ocorreu (derivada do timestamp do QR Code).
+ * - origem: 'qr', 'correcao' (professor marcou) ou 'justificativa' (falta abonada).
  */
 class Presenca extends Model
 {
     use HasFactory;
+
+    public const ORIGEM_QR = 'qr';
+    public const ORIGEM_CORRECAO = 'correcao';
+    public const ORIGEM_JUSTIFICATIVA = 'justificativa';
 
     protected $table = 'presencas';
 
@@ -32,20 +37,28 @@ class Presenca extends Model
         'semestre',
         'horario',
         'codigo_aula',
+        'origem',
+    ];
+
+    protected $attributes = [
+        'origem' => self::ORIGEM_QR,
     ];
 
     public function aluno()
     {
-        return $this->belongsTo(AlunoModel::class, 'aluno_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(AlunoModel::class, 'aluno_id')->withTrashed();
     }
 
     public function professor()
     {
-        return $this->belongsTo(ProfessorModel::class, 'professor_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(ProfessorModel::class, 'professor_id')->withTrashed();
     }
 
     public function materia()
     {
-        return $this->belongsTo(Materia::class, 'materia_id');
+        // Inclui cadastros excluídos (soft delete): o histórico continua legível
+        return $this->belongsTo(Materia::class, 'materia_id')->withTrashed();
     }
 }

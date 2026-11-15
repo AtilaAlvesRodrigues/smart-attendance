@@ -73,7 +73,9 @@ As principais, com os valores do [`.env.example`](../.env.example):
 | `DB_SEARCH_PATH` | Schema do banco, padrão `public`; em produção, `laravel` |
 | `DB_SSLMODE` | `prefer` localmente, `require` em produção |
 | `SESSION_DRIVER` / `CACHE_STORE` | `database`: sessões e códigos de chamada ficam no banco |
-| `MAIL_*` | Envio dos e-mails de primeiro acesso e recuperação de senha |
+| `MAIL_*` | Envio dos e-mails de primeiro acesso, recuperação de senha e decisão das justificativas |
+| `TWO_FACTOR_MASTER_OBRIGATORIO` | `true` (padrão) obriga o Master a usar verificação em duas etapas; `false` só em desenvolvimento |
+| `JUSTIFICATIVAS_DISK` | `local` (pasta privada `storage/app/private/justificativas`) ou `s3` (Supabase Storage, com as variáveis `SUPABASE_S3_*`) |
 | `CRON_SECRET` | Só em produção: protege a rota da tarefa diária |
 
 ## Testar pelo celular
@@ -103,28 +105,30 @@ cloudflared tunnel --url http://localhost:8000
 
 Use o endereço `https://...trycloudflare.com` que aparecer. Coloque-o em `APP_URL` e rode `php artisan config:clear`. O endereço muda a cada vez que o túnel é reiniciado.
 
-## E-mail (Gmail)
+## E-mail (servidor da instituição)
 
 Sem SMTP, deixe `MAIL_MAILER=log`: os e-mails vão para `storage/logs/laravel.log`, e o Master vê na tela o token de primeiro acesso de quem cadastrar.
 
-Para enviar de verdade pelo Gmail:
+Para enviar pelo servidor da instituição, escolha o bloco que corresponde ao seu e-mail no [`.env.example`](../.env.example), copie para o `.env` e preencha:
 
-1. Ative a verificação em duas etapas da conta Google.
-2. Crie uma senha de app em https://myaccount.google.com/apppasswords.
-3. Configure o `.env`:
+| Servidor | `MAIL_HOST` | `MAIL_PORT` | Observação |
+|---|---|---|---|
+| Microsoft 365 / Outlook | `smtp.office365.com` | `587` | O administrador do Microsoft 365 precisa habilitar **SMTP AUTH** na conta remetente |
+| Google Workspace / Gmail | `smtp.gmail.com` | `587` | Exige verificação em duas etapas e uma **senha de app** (https://myaccount.google.com/apppasswords) |
+| Servidor próprio (Postfix, Exchange local) | o que o TI informar | o que o TI informar | Relay interno sem autenticação: deixe `MAIL_USERNAME` e `MAIL_PASSWORD` vazios |
 
 ```env
 MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
+MAIL_HOST=smtp.office365.com
 MAIL_PORT=587
-MAIL_SCHEME=smtp
-MAIL_USERNAME=seu@gmail.com
-MAIL_PASSWORD=senha_de_app_sem_espacos
-MAIL_FROM_ADDRESS="seu@gmail.com"
+MAIL_SCHEME=smtp          # porta 587 negocia TLS; use smtps com a porta 465
+MAIL_USERNAME=nao-responda@suainstituicao.edu.br
+MAIL_PASSWORD=
+MAIL_FROM_ADDRESS="nao-responda@suainstituicao.edu.br"
 MAIL_FROM_NAME="Smart Attendance"
 ```
 
-4. Rode `php artisan config:clear`.
+Rode `php artisan config:clear` e, no painel do Master, clique em **Enviar e-mail de teste**. Se falhar, a tela mostra a resposta do servidor (sem a senha).
 
 > [!IMPORTANT]
 > Nunca faça commit do `.env`. Ele já está no `.gitignore`; o repositório só guarda o `.env.example`, com valores de exemplo.

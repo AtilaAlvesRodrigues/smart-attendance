@@ -14,6 +14,14 @@ use App\Http\Controllers\SolicitacaoAcessoController;
 use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
+use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\ExportacaoController;
+use App\Http\Controllers\MasterEdicaoController;
+use App\Http\Controllers\GraficosController;
+use App\Http\Controllers\DoisFatoresController;
+use App\Http\Controllers\MasterEmailController;
+use App\Http\Controllers\JustificativaAlunoController;
+use App\Http\Controllers\JustificativaProfessorController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -115,17 +123,34 @@ Route::middleware(['primeiro-acesso', 'throttle:criar-senha'])->group(function (
     Route::post('/criar-senha', [CriarSenhaController::class, 'store'])->name('criar-senha.store');
 });
 
+// Autenticação em dois fatores: o desafio vem antes do login ser concluído
+Route::get('/2fa/desafio', [DoisFatoresController::class, 'desafio'])->name('dois-fatores.desafio');
+Route::post('/2fa/desafio', [DoisFatoresController::class, 'verificarDesafio'])->middleware('throttle:2fa-desafio')->name('dois-fatores.verificar');
+
 Route::middleware(['auth:professores,alunos,masters'])->group(function () {
+
+    Route::get('/2fa/configurar', [DoisFatoresController::class, 'configurar'])->name('dois-fatores.configurar');
+    Route::post('/2fa/confirmar', [DoisFatoresController::class, 'confirmar'])->middleware('throttle:10,1')->name('dois-fatores.confirmar');
+    Route::post('/2fa/desativar', [DoisFatoresController::class, 'desativar'])->middleware('throttle:5,1')->name('dois-fatores.desativar');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
 
     Route::middleware(['auth:alunos', 'role:aluno'])->group(function () {
         Route::get('/dashboard/aluno', [DashboardController::class, 'alunoIndex'])->name('dashboard.aluno');
+
+        // Justificativa de faltas
+        Route::get('/aluno/justificativas', [JustificativaAlunoController::class, 'index'])->name('aluno.justificativas');
+        Route::post('/aluno/justificativas', [JustificativaAlunoController::class, 'store'])->middleware('throttle:10,1')->name('aluno.justificativas.store');
+        Route::get('/aluno/justificativas/{justificativa}/anexo', [JustificativaAlunoController::class, 'anexo'])->name('aluno.justificativas.anexo');
     });
 
     Route::middleware(['auth:professores', 'role:professor'])->prefix('professor')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'professorIndex'])->name('dashboard.professor');
+
+        Route::get('/justificativas', [JustificativaProfessorController::class, 'index'])->name('professor.justificativas');
+        Route::post('/justificativas/{justificativa}/decidir', [JustificativaProfessorController::class, 'decidir'])->middleware('throttle:60,1')->name('professor.justificativas.decidir');
+        Route::get('/justificativas/{justificativa}/anexo', [JustificativaProfessorController::class, 'anexo'])->name('professor.justificativas.anexo');
 
         Route::prefix('presenca')->group(function () {
             Route::get('/', [PresencaController::class, 'index'])->name('professor.presenca.index');
@@ -137,12 +162,22 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::prefix('gerenciar')->group(function () {
             Route::get('/', [GerenciarMateriaController::class, 'index'])->name('professor.gerenciar.index');
             Route::get('/relatorios', [GerenciarMateriaController::class, 'relatorios'])->name('professor.relatorios');
+            Route::get('/relatorios/exportar', [ExportacaoController::class, 'professor'])->middleware('throttle:10,1')->name('professor.relatorios.exportar');
             Route::get('/{materia_id}', [GerenciarMateriaController::class, 'show'])->name('professor.gerenciar.materia');
             Route::post('/{materia_id}/notas', [GerenciarMateriaController::class, 'salvarNotas'])->name('professor.gerenciar.salvar_notas');
+
+            Route::get('/{materia_id}/graficos', [GraficosController::class, 'professor'])->whereNumber('materia_id')->name('professor.graficos');
+            Route::get('/{materia_id}/graficos.json', [GraficosController::class, 'professorJson'])->whereNumber('materia_id')->name('professor.graficos.json');
+
+            // Chamadas já realizadas e correção manual de presença (com motivo e auditoria)
+            Route::get('/{materia_id}/chamadas', [CorrecaoPresencaController::class, 'index'])->whereNumber('materia_id')->name('professor.chamadas');
+            Route::get('/{materia_id}/chamadas/{codigo_aula}', [CorrecaoPresencaController::class, 'show'])->whereNumber('materia_id')->name('professor.chamadas.show');
+            Route::post('/{materia_id}/chamadas/{codigo_aula}/presenca', [CorrecaoPresencaController::class, 'atualizar'])
+                ->whereNumber('materia_id')->middleware('throttle:60,1')->name('professor.chamadas.presenca');
         });
     });
 
-    Route::middleware(['auth:masters', 'role:master'])->prefix('dashboard/master')->group(function () {
+    Route::middleware(['auth:masters', 'role:master', 'exigir-2fa'])->prefix('dashboard/master')->group(function () {
          
         Route::get('/', [DashboardController::class, 'masterIndex'])->name('dashboard.master');
 
@@ -152,10 +187,28 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         // Versão do PHP em execução e se já tem a correção das CVEs críticas (SEC-11). JSON, só Master.
         Route::get('/ambiente/php', [AmbienteController::class, 'php'])->middleware('throttle:10,1')->name('master.ambiente.php');
 
+        // Editar e excluir (soft delete) alunos, professores e matérias
+        Route::get('/{tipo}/{id}/editar', [MasterEdicaoController::class, 'editar'])
+            ->whereIn('tipo', ['aluno', 'professor', 'materia'])->whereNumber('id')->name('master.editar');
+        Route::put('/{tipo}/{id}', [MasterEdicaoController::class, 'atualizar'])
+            ->whereIn('tipo', ['aluno', 'professor', 'materia'])->whereNumber('id')->name('master.atualizar');
+        Route::delete('/{tipo}/{id}', [MasterEdicaoController::class, 'excluir'])
+            ->whereIn('tipo', ['aluno', 'professor', 'materia'])->whereNumber('id')->name('master.excluir');
+
+        Route::post('/{tipo}/{id}/resetar-2fa', [DoisFatoresController::class, 'resetar'])
+            ->whereIn('tipo', ['aluno', 'professor', 'master'])->whereNumber('id')->name('master.resetar-2fa');
+
+        Route::get('/graficos', [GraficosController::class, 'master'])->name('master.graficos');
+        Route::get('/graficos.json', [GraficosController::class, 'masterJson'])->name('master.graficos.json');
+
+        // Teste do servidor de e-mail institucional (SMTP)
+        Route::post('/email/teste', [MasterEmailController::class, 'teste'])->middleware('throttle:3,1')->name('master.email.teste');
+
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');
         Route::get('/materias', [DashboardController::class, 'masterMaterias'])->name('master.materias');
         Route::get('/presenca', [DashboardController::class, 'masterPresenca'])->name('master.presenca');
+        Route::get('/presenca/exportar', [ExportacaoController::class, 'master'])->middleware('throttle:10,1')->name('master.presenca.exportar');
         Route::get('/cadastrar', fn () => view('master.cadastrar'))->name('master.cadastrar');
         Route::post('/cadastrar/aluno', [MasterCadastroController::class, 'cadastrarAluno'])->name('master.cadastrar.aluno');
         Route::post('/cadastrar/professor', [MasterCadastroController::class, 'cadastrarProfessor'])->name('master.cadastrar.professor');

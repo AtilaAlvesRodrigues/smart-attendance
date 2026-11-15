@@ -50,6 +50,19 @@ As respostas em JSON só devolvem o necessário: a lista de presentes do profess
 - Mensagens de erro de login são genéricas e não dizem se o usuário existe.
 - **Esqueci minha senha** responde sempre a mesma mensagem, inclusive quando o envio de e-mail falha, para não revelar quem tem conta.
 
+## Verificação em duas etapas (2FA)
+
+Código TOTP de 6 números (RFC 6238) gerado por app autenticador, com a biblioteca `pragmarx/google2fa`.
+
+- **Obrigatória para o Master** (`TWO_FACTOR_MASTER_OBRIGATORIO=true`, padrão): o middleware `exigir-2fa` leva à configuração antes de abrir o painel. Opcional para professor e aluno.
+- Depois da senha correta, **nada é autenticado** até o código: só o guard, o id e o destino ficam na sessão por 5 minutos (`App\Support\LoginPendente`). O cookie de "permanecer conectado" só é emitido depois do segundo fator.
+- O fluxo de token (primeiro acesso / esqueci a senha) também passa pelo desafio: redefinir a senha pelo e-mail não substitui o segundo fator.
+- Cada código vale **uma vez**: o timestep do último código aceito fica gravado, e a verificação relê o usuário com lock da linha, então duas requisições simultâneas com o mesmo código não passam as duas.
+- Segredo e códigos de recuperação (8, uso único, guardados como hash SHA-256) ficam criptografados no banco e fora de qualquer serialização.
+- O rótulo do QR usa o nome, nunca o e-mail.
+- Ativar e desativar exigem a senha atual (uma sessão roubada não consegue prender o dono fora da conta); com o 2FA ativo, não é possível trocar o segredo sem desativar antes.
+- Limites: 5 tentativas por minuto por login pendente no desafio (teto de 300 por IP).
+
 ## Limite de tentativas
 
 Os limites são contados **por pessoa** (o usuário ou o e-mail informado, junto com o IP), com um teto bem mais alto por IP. Numa instituição, todos os celulares do Wi-Fi saem pelo mesmo IP: limitar só por IP barraria a turma inteira depois das primeiras pessoas. Os limites ficam em [`AppServiceProvider`](../app/Providers/AppServiceProvider.php).
@@ -124,6 +137,14 @@ O formulário público de check-in tem um campo oculto, `hp_field`, que pessoas 
 - O QR Code leva também um **token que muda a cada 30 segundos** (`?t={janela}.{assinatura}`): HMAC-SHA256 do código da aula e da janela, com a `APP_KEY` ([`QrToken`](../app/Support/QrToken.php)). O servidor aceita a janela atual e a anterior, então uma foto do QR Code deixa de valer em no máximo 60 segundos. A tela do professor busca o token novo em `/professor/presenca/token/{código}`, só para o dono da chamada.
 - A confirmação exige código válido, token válido, aluno matriculado na matéria e nenhum registro anterior na mesma chamada.
 - O código nunca aparece em página pública: a página inicial mostra só o nome e a sala da aula em andamento.
+
+## Justificativas, correções e exportação
+
+- Professores só veem, decidem e baixam anexos de justificativas das **próprias matérias**; o aluno só baixa o próprio anexo (403 nos outros casos).
+- Atestados: `pdf`, `jpg`, `jpeg` ou `png` (extensão e tipo MIME), até 5 MB, gravados com nome aleatório no disco privado `justificativas`; o download passa por rota autenticada com `X-Content-Type-Options: nosniff`.
+- Toda correção de presença exige motivo e fica em `presenca_ajustes`.
+- Planilhas: só nome e RA (nunca CPF ou e-mail); todo texto é gravado como texto, e valores que começam com `=`, `+`, `-` ou `@` recebem um apóstrofo, para nenhum nome virar fórmula no Excel. O resumo do professor se limita às matérias que ele leciona hoje, e um filtro de matéria alheia recebe 403.
+- E-mail de teste: a mensagem de erro do servidor SMTP é exibida sem usuário, senha nem credenciais embutidas em URL (`MAIL_URL`). Falhas de envio vão para o log só com a classe da exceção, sem o texto do servidor (que pode conter endereços de e-mail).
 
 ## Exclusão lógica
 

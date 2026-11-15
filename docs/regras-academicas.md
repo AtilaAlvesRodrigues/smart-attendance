@@ -14,7 +14,7 @@ Assim, as três telas mostram sempre os mesmos números. Ao mudar uma regra, mud
 |---|---|
 | Aulas previstas | `materias.total_aulas`, informado no cadastro da matéria |
 | Aulas realizadas | Quantidade de chamadas diferentes (`codigo_aula`) já feitas na matéria |
-| Presenças | Registros do aluno na matéria |
+| Presenças | Registros do aluno na matéria, de qualquer origem: QR Code, correção do professor ou falta abonada por justificativa |
 | Faltas | Aulas realizadas − presenças |
 | Limite de faltas | 25% das aulas previstas, arredondado para baixo |
 | Faltas restantes | Limite − faltas |
@@ -63,3 +63,11 @@ Cada situação vem com uma explicação curta no painel:
 | Aprovado | "Média final 8,3 e frequência suficiente." |
 | Reprovado por nota | "Média final 4,0, abaixo de 5,0." |
 | Reprovado por falta | "Você passou do limite de 10 faltas." |
+
+## Faltas abonadas e correções
+
+Uma falta **abonada** (justificativa aprovada pelo professor) e uma presença **marcada pelo professor** viram registros comuns na tabela `presencas`, só com outra origem (`justificativa` ou `correcao`). Por isso entram na conta como presença em todas as telas, sem regra extra no `SituacaoAcademica`.
+
+- Desmarcar uma presença apaga o registro, e a falta volta a contar.
+- A única presença de uma aula não pode ser removida: a aula só existe enquanto houver ao menos uma presença com o código dela, e apagá-la mudaria as *aulas realizadas* da turma inteira.
+- Toda alteração fica em `presenca_ajustes` (quem, quando, o quê e por quê).

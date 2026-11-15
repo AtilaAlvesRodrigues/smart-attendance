@@ -115,6 +115,43 @@
         </div>
     </a>
 
+    <a href="{{ route('master.graficos') }}" class="group glass block p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 no-underline mt-8">
+        <div class="flex items-center justify-between gap-8 flex-wrap">
+            <div>
+                <h2 class="text-2xl font-black tracking-tighter pal-text mb-2">Gráficos de presença</h2>
+                <p class="text-sm pal-subtitle m-0">Frequência média de cada turma e quantos alunos estão em risco.</p>
+            </div>
+            <span class="pal-btn-outline px-6 py-3 text-sm font-bold rounded-sm whitespace-nowrap">Ver gráficos &rarr;</span>
+        </div>
+    </a>
+
+    {{-- Servidor de e-mail --}}
+    @php $email = \App\Http\Controllers\MasterEmailController::resumoConfiguracao(); @endphp
+    <section class="rc-card mt-8" aria-labelledby="titulo-email">
+        <div class="rc-card-header">
+            <div>
+                <h2 id="titulo-email" class="rc-card-title">Servidor de e-mail</h2>
+                <p class="rc-hint" style="margin:0.25rem 0 0">
+                    @if($email['real'])
+                        Enviando por <strong style="color:var(--pal-white)">{{ $email['host'] ?? $email['mailer'] }}</strong>@if($email['porta']), porta {{ $email['porta'] }}@endif, como {{ $email['remetente'] }}.
+                    @else
+                        Os e-mails estão só sendo registrados no log ({{ $email['mailer'] }}) e não saem do sistema. Configure o SMTP da instituição no ambiente (variáveis MAIL_*).
+                    @endif
+                </p>
+            </div>
+            <form method="POST" action="{{ route('master.email.teste') }}">
+                @csrf
+                <button type="submit" class="rc-btn rc-btn-neutro">Enviar e-mail de teste</button>
+            </form>
+        </div>
+        @if(session('email_status'))
+            <div class="rc-alert rc-alert-ok" role="status" style="margin:1rem 1.5rem">{{ session('email_status') }}</div>
+        @endif
+        @if(session('email_erro'))
+            <div class="rc-alert rc-alert-erro" role="alert" style="margin:1rem 1.5rem">{{ session('email_erro') }}</div>
+        @endif
+    </section>
+
 </main>
 
 @push('scripts')

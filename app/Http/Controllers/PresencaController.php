@@ -167,7 +167,7 @@ class PresencaController extends Controller
             return view('aluno.presenca.erro', ['mensagem' => 'Você não está matriculado nesta disciplina.']);
         }
 
-        if (Presenca::where('aluno_id', $aluno->id)->where('codigo_aula', $codigo_aula)->exists()) {
+        if (Presenca::where('aluno_id', $aluno->id)->where('materia_id', $materia_id)->where('codigo_aula', $codigo_aula)->exists()) {
             return view('aluno.presenca.ja_registrado');
         }
 
@@ -194,15 +194,20 @@ class PresencaController extends Controller
 
         // Cria o registro de presença. O campo codigo_aula garante idempotência:
         // a verificação acima já bloqueou duplicatas para este aluno + código.
-        $presenca = Presenca::create([
-            'aluno_id' => $aluno->id,
-            'professor_id' => $professor_id,
-            'materia_id' => $materia_id,
-            'data_aula' => $data_aula,
-            'semestre' => $semestre,
-            'horario' => $horario,
-            'codigo_aula' => $codigo_aula,
-        ]);
+        // O índice único (aluno_id, codigo_aula) fecha a corrida de dois cliques simultâneos.
+        try {
+            $presenca = Presenca::create([
+                'aluno_id' => $aluno->id,
+                'professor_id' => $professor_id,
+                'materia_id' => $materia_id,
+                'data_aula' => $data_aula,
+                'semestre' => $semestre,
+                'horario' => $horario,
+                'codigo_aula' => $codigo_aula,
+            ]);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+            return view('aluno.presenca.ja_registrado');
+        }
 
         $materia = Materia::find($materia_id);
 

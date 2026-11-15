@@ -55,7 +55,11 @@ class DashboardController extends BaseController
 
         $hasActiveEvento = $professor && Cache::has("professor_evento_{$professor->id}");
 
-        return view('professor.home', compact('professor', 'activeMateria', 'activeCode', 'hasActiveEvento'));
+        $justificativasPendentes = $professor
+            ? \App\Models\Justificativa::pendentes()->whereIn('materia_id', $professor->materias->pluck('id'))->count()
+            : 0;
+
+        return view('professor.home', compact('professor', 'activeMateria', 'activeCode', 'hasActiveEvento', 'justificativasPendentes'));
     }
 
     /**
@@ -158,7 +162,20 @@ class DashboardController extends BaseController
      */
     public function masterPresenca(Request $request)
     {
-        $query = Presenca::with(['aluno', 'aluno.materias', 'materia', 'professor']);
+        $presencas = self::filtrarPresencasMaster($request)
+            ->with(['aluno', 'aluno.materias', 'materia', 'professor'])
+            ->paginate(20);
+
+        return view('master.presenca', compact('presencas'));
+    }
+
+    /**
+     * Presenças da Central do Master com os filtros da tela. Usado pela
+     * listagem e pela exportação em planilha.
+     */
+    public static function filtrarPresencasMaster(Request $request): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = Presenca::query();
 
         if ($request->filled('professor')) {
             $query->whereHas('professor', function ($q) use ($request) {
@@ -184,9 +201,7 @@ class DashboardController extends BaseController
             });
         }
 
-        $presencas = $query->orderBy('created_at', 'desc')->paginate(20);
-
-        return view('master.presenca', compact('presencas'));
+        return $query->orderBy('created_at', 'desc');
     }
 
     public function index()

@@ -155,6 +155,22 @@
                 </a>
             </div>
 
+            <div class="pal-dashboard-card pal-card-muted pal-card-delay-2">
+                <div class="pal-icon-box" style="width:40px; height:40px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;" aria-hidden="true">
+                    <svg width="18" height="18" fill="none" stroke="#888" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <h3 class="pal-text font-black" style="font-size:1.1rem; margin-bottom:0.4rem;">Justificativas de falta</h3>
+                <p class="pal-subtitle" style="margin-bottom:1.25rem;">
+                    @if($justificativasPendentes > 0)
+                        <strong class="pal-text">{{ $justificativasPendentes }} {{ $justificativasPendentes === 1 ? 'aguarda' : 'aguardam' }} sua análise.</strong>
+                    @else
+                        Nenhuma aguardando análise.
+                    @endif
+                    Aprove para abonar a falta.
+                </p>
+                <a href="{{ route('professor.justificativas') }}" class="pal-dashboard-btn pal-dashboard-btn-ghost">Analisar</a>
+            </div>
+
             <div class="pal-dashboard-card pal-card-muted pal-card-delay-3">
                 <div class="pal-icon-box" style="width:40px; height:40px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;" aria-hidden="true">
                     <svg width="18" height="18" fill="none" stroke="#888" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-3-3 3 3 0 013 3z"/></svg>

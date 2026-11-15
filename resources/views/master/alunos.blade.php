@@ -46,6 +46,9 @@
         </nav>
 
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
+            @if(session('status'))
+                <div class="rc-alert rc-alert-ok" role="status">{{ session('status') }}</div>
+            @endif
             
             <div class="mb-12 animate-reveal [animation-delay:200ms]">
                 <h2 class="text-4xl font-black tracking-tighter pal-title">Base de Discentes</h2>
@@ -83,9 +86,7 @@
                                     </span>
                                 </td>
                                 <td class="py-4 px-6 text-right">
-                                    <button type="button" class="text-white/70 group-hover:text-white transition-colors" aria-label="Ver detalhes">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                    </button>
+                                    <a href="{{ route('master.editar', ['aluno', $aluno->id]) }}" onclick="event.stopPropagation()" class="rc-btn rc-btn-neutro rc-btn-sm" aria-label="Editar {{ $aluno->nome }}">Editar</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -245,9 +246,7 @@
                         </span>
                     </td>
                     <td class="py-4 px-6 text-right">
-                        <button type="button" class="text-white/70 group-hover:text-white transition-colors" aria-label="Ver detalhes">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
+                        <a href="{{ url('/dashboard/master/aluno') }}/${Number(aluno.id)}/editar" onclick="event.stopPropagation()" class="rc-btn rc-btn-neutro rc-btn-sm" aria-label="Editar ${esc(aluno.nome)}">Editar</a>
                     </td>
                 </tr>
             `);

@@ -77,6 +77,10 @@
                 <p class="pal-eyebrow" style="margin-bottom:0.55rem">{{ $materia->nome }}</p>
                 <h2 class="pal-title">Gerenciamento de Turma</h2>
                 <p class="pal-subtitle font-medium italic">Sala: {{ $materia->sala }} · {{ $alunos->count() }} {{ $alunos->count() === 1 ? 'aluno matriculado' : 'alunos matriculados' }}</p>
+                <nav class="flex flex-wrap gap-3 mt-5" aria-label="Ações da turma">
+                    <a href="{{ route('professor.chamadas', $materia->id) }}" class="rc-btn rc-btn-neutro">Chamadas e correções</a>
+                    <a href="{{ route('professor.graficos', $materia->id) }}" class="rc-btn rc-btn-neutro">Gráficos de presença</a>
+                </nav>
             </div>
 
             {{-- Cards de resumo --}}

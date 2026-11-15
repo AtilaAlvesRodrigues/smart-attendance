@@ -47,6 +47,30 @@ return [
             'report' => false,
         ],
 
+        // Atestados das justificativas de falta. Nunca público: o download passa
+        // por rota autenticada. Em produção use o Supabase Storage (compatível
+        // com S3): JUSTIFICATIVAS_DISK=s3 + variáveis SUPABASE_S3_*.
+        'justificativas' => env('JUSTIFICATIVAS_DISK', 'local') === 's3'
+            ? [
+                'driver' => 's3',
+                'key' => env('SUPABASE_S3_KEY'),
+                'secret' => env('SUPABASE_S3_SECRET'),
+                'region' => env('SUPABASE_S3_REGION', 'us-east-1'),
+                'bucket' => env('SUPABASE_S3_BUCKET', 'justificativas'),
+                'endpoint' => env('SUPABASE_S3_ENDPOINT'),
+                'use_path_style_endpoint' => true,
+                'visibility' => 'private',
+                'throw' => true,
+                'report' => true,
+            ]
+            : [
+                'driver' => 'local',
+                'root' => storage_path('app/private/justificativas'),
+                'serve' => false,
+                'throw' => true,
+                'report' => false,
+            ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

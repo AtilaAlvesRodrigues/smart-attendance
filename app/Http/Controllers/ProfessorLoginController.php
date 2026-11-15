@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Models\ProfessorModel;
 use App\Models\UsuarioMaster;
+use App\Support\LoginPendente;
 use Illuminate\Routing\Controller as BaseController;
 
 class ProfessorLoginController extends BaseController
@@ -56,6 +57,11 @@ class ProfessorLoginController extends BaseController
                 $professor->save();
             }
 
+            if ($professor->temDoisFatores()) {
+                LoginPendente::iniciar($request, 'professores', $professor->id, $remember, route('dashboard.professor'));
+                return redirect()->route('dois-fatores.desafio');
+            }
+
             Auth::guard('professores')->login($professor, $remember);
             $request->session()->regenerate();
             session(['login_time' => time()]);
@@ -82,6 +88,11 @@ class ProfessorLoginController extends BaseController
             if (!is_null($master->remember_token)) {
                 $master->remember_token = null;
                 $master->save();
+            }
+
+            if ($master->temDoisFatores()) {
+                LoginPendente::iniciar($request, 'masters', $master->id, $remember, route('dashboard.master'));
+                return redirect()->route('dois-fatores.desafio');
             }
 
             Auth::guard('masters')->login($master, $remember);

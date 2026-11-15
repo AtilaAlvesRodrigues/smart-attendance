@@ -16,6 +16,9 @@ erDiagram
     professores ||--o{ presencas : "abriu a chamada"
     materias ||--o{ presencas : "da aula"
     usuario_masters |o--o{ solicitacoes_acesso : "aprovou ou rejeitou"
+    alunos ||--o{ justificativas : "justifica"
+    materias ||--o{ justificativas : "da aula"
+    materias ||--o{ presenca_ajustes : "historico"
 
     alunos {
         bigint id PK
@@ -75,6 +78,30 @@ erDiagram
         string semestre "ex.: 2/2026"
         string horario "M, V ou N"
         string codigo_aula "identifica a chamada"
+        string origem "qr, correcao ou justificativa"
+    }
+    presenca_ajustes {
+        bigint id PK
+        bigint presenca_id "sem FK: a presença pode ter sido apagada"
+        bigint materia_id FK
+        bigint aluno_id FK
+        string codigo_aula
+        string acao "marcou, desmarcou ou abonou"
+        text motivo
+        string autor_tipo
+        bigint autor_id
+    }
+    justificativas {
+        bigint id PK
+        bigint aluno_id FK
+        bigint materia_id FK
+        string codigo_aula
+        date data_aula
+        text motivo
+        string anexo_path "caminho no disco privado"
+        string status "pendente, aprovada, recusada"
+        text comentario_professor
+        bigint decidida_por
     }
     solicitacoes_acesso {
         bigint id PK
@@ -93,13 +120,15 @@ erDiagram
 
 | Tabela | Conteúdo | Observações |
 |---|---|---|
-| `alunos` | Alunos | `ra`, `cpf` e `email` criptografados, cada um com blind index único; *soft delete* |
+| `alunos` | Alunos | `ra`, `cpf` e `email` criptografados, cada um com blind index único; *soft delete*; colunas `two_factor_*` (também em `professores` e `usuario_masters`) para a verificação em duas etapas, com segredo e códigos de recuperação criptografados |
 | `professores` | Professores | `cpf` e `email` criptografados, com blind index único; *soft delete* |
 | `usuario_masters` | Administradores | `nome` e `email` criptografados; *soft delete* |
 | `materias` | Disciplinas | `nome` único; `total_aulas` define o limite de faltas; *soft delete* |
 | `aluno_materia` | Matrículas e notas | Uma linha por aluno por matéria, com P1, T1, T2 e P2 (0 a 10, podem ficar vazias) |
 | `materia_professor` | Quem leciona o quê | Uma matéria pode ter mais de um professor |
-| `presencas` | Presenças | Uma linha por aluno por chamada; `codigo_aula` agrupa a chamada |
+| `presencas` | Presenças | Uma linha por aluno por chamada (índice único `aluno_id` + `materia_id` + `codigo_aula`); `codigo_aula` agrupa a chamada; `origem` diz se veio do QR Code, de correção do professor ou de justificativa aprovada |
+| `presenca_ajustes` | Histórico de correções e abonos | Nunca editado pela aplicação |
+| `justificativas` | Justificativas de falta | Uma por falta (índice único `aluno_id` + `materia_id` + `codigo_aula`); o atestado fica no disco `justificativas`, nunca em pasta pública |
 | `solicitacoes_acesso` | Pedidos públicos de cadastro | E-mail sem índice único, para permitir um novo pedido depois de uma rejeição |
 
 ## Tabelas de infraestrutura do Laravel

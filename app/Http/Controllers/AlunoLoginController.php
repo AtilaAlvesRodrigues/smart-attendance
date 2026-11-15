@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Models\AlunoModel;
+use App\Support\LoginPendente;
 use Illuminate\Routing\Controller as BaseController;
 
 class AlunoLoginController extends BaseController
@@ -56,17 +57,22 @@ class AlunoLoginController extends BaseController
                 $aluno->save();
             }
 
+            $pendingCode = session()->pull('pending_attendance_code');
+            $pendingToken = session()->pull('pending_attendance_token');
+            $destino = $pendingCode
+                ? route('presenca.confirmar', ['codigo_aula' => $pendingCode, 't' => $pendingToken])
+                : route('dashboard.aluno');
+
+            if ($aluno->temDoisFatores()) {
+                LoginPendente::iniciar($request, 'alunos', $aluno->id, $remember, $destino);
+                return redirect()->route('dois-fatores.desafio');
+            }
+
             Auth::guard('alunos')->login($aluno, $remember);
             $request->session()->regenerate();
             session(['login_time' => time()]);
 
-            $pendingCode = session()->pull('pending_attendance_code');
-            $pendingToken = session()->pull('pending_attendance_token');
-            if ($pendingCode) {
-                return redirect()->route('presenca.confirmar', ['codigo_aula' => $pendingCode, 't' => $pendingToken]);
-            }
-
-            return redirect()->route('dashboard.aluno');
+            return redirect()->to($destino);
         }
 
         Log::warning('Login failed (aluno)', [
