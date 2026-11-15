@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -66,20 +67,39 @@ trait TemDoisFatores
 
         $codigo = trim($codigo);
 
-        if (preg_match('/^\d{6}$/', str_replace(' ', '', $codigo))) {
-            // Só aceita código de uma janela posterior à do último aceito (sem reuso)
-            $timestep = self::timestepAceito($this->two_factor_secret, $codigo, $this->two_factor_ultimo_timestep);
+        // Lê e grava sob lock da linha: duas requisições simultâneas com o
+        // mesmo código não podem passar as duas (cada código vale uma vez)
+        return DB::transaction(function () use ($codigo) {
+            $atual = static::whereKey($this->getKey())->lockForUpdate()->first();
 
-            if ($timestep === null) {
+            if (! $atual || ! $atual->temDoisFatores()) {
                 return false;
             }
 
-            $this->forceFill(['two_factor_ultimo_timestep' => $timestep])->save();
+            $aceito = preg_match('/^\d{6}$/', str_replace(' ', '', $codigo))
+                ? $atual->consumirCodigoTotp($codigo)
+                : $atual->consumirCodigoRecuperacao($codigo);
 
-            return true;
+            if ($aceito) {
+                $this->setRawAttributes($atual->getAttributes(), true);
+            }
+
+            return $aceito;
+        });
+    }
+
+    /** Só aceita código de uma janela posterior à do último aceito (sem reuso). */
+    private function consumirCodigoTotp(string $codigo): bool
+    {
+        $timestep = self::timestepAceito($this->two_factor_secret, $codigo, $this->two_factor_ultimo_timestep);
+
+        if ($timestep === null) {
+            return false;
         }
 
-        return $this->consumirCodigoRecuperacao($codigo);
+        $this->forceFill(['two_factor_ultimo_timestep' => $timestep])->save();
+
+        return true;
     }
 
     /** @return list<string> códigos em texto puro, mostrados uma única vez */

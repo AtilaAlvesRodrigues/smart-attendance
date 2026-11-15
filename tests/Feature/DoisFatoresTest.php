@@ -251,4 +251,20 @@ class DoisFatoresTest extends TestCase
         $this->post('/2fa/desafio', ['codigo' => $codigo])->assertSessionHasErrors('codigo');
         $this->assertFalse(auth('professores')->check());
     }
+
+    public function test_codigo_nao_vale_duas_vezes_em_requisicoes_simultaneas(): void
+    {
+        [$professor, $segredo, $codigos] = $this->professorCom2fa();
+        $codigo = $this->g2fa->getCurrentOtp($segredo);
+
+        // Duas requisições carregaram o usuário antes de qualquer uma gravar
+        $req1 = ProfessorModel::find($professor->id);
+        $req2 = ProfessorModel::find($professor->id);
+
+        $this->assertTrue($req1->verificarCodigoDoisFatores($codigo));
+        $this->assertFalse($req2->verificarCodigoDoisFatores($codigo));
+
+        $this->assertTrue($req1->verificarCodigoDoisFatores($codigos[1]));
+        $this->assertFalse($req2->verificarCodigoDoisFatores($codigos[1]));
+    }
 }
