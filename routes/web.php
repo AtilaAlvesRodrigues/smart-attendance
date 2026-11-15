@@ -15,6 +15,7 @@ use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
 use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\MasterEmailController;
 use App\Http\Controllers\JustificativaAlunoController;
 use App\Http\Controllers\JustificativaProfessorController;
 use Illuminate\Support\Facades\Route;
@@ -169,6 +170,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
         // Versão do PHP em execução e se já tem a correção das CVEs críticas (SEC-11). JSON, só Master.
         Route::get('/ambiente/php', [AmbienteController::class, 'php'])->middleware('throttle:10,1')->name('master.ambiente.php');
+
+        // Teste do servidor de e-mail institucional (SMTP)
+        Route::post('/email/teste', [MasterEmailController::class, 'teste'])->middleware('throttle:3,1')->name('master.email.teste');
 
         Route::get('/professores', [DashboardController::class, 'masterProfessores'])->name('master.professores');
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');
