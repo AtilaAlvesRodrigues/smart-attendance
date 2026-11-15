@@ -104,7 +104,7 @@ class ExportacaoTest extends TestCase
         $this->registrarAula($outraMateria, $outro, [$this->alunoMatriculado($outraMateria, ['nome' => 'Aluno Alheio'])]);
 
         $abas = $this->lerPlanilha($this->actingAs($professor, 'professores')
-            ->get("/professor/gerenciar/relatorios/exportar?materia_id={$outraMateria->id}"));
+            ->get('/professor/gerenciar/relatorios/exportar'));
 
         $this->assertStringNotContainsString('Aluno Alheio', json_encode($abas));
     }
@@ -129,5 +129,62 @@ class ExportacaoTest extends TestCase
 
         $this->actingAs($aluno, 'alunos')->get('/dashboard/master/presenca/exportar')->assertRedirect();
         $this->actingAs($aluno, 'alunos')->get('/professor/gerenciar/relatorios/exportar')->assertRedirect();
+    }
+
+    public function test_nome_com_formula_vira_texto_na_planilha(): void
+    {
+        [$professor, $materia] = $this->professorComMateria();
+        $aluno = $this->alunoMatriculado($materia, ['nome' => '=HYPERLINK("http://x.test","clique")']);
+        $this->registrarAula($materia, $professor, [$aluno]);
+
+        $arquivo = tempnam(sys_get_temp_dir(), 'xlsx');
+        file_put_contents($arquivo, $this->actingAs($professor, 'professores')
+            ->get('/professor/gerenciar/relatorios/exportar')->streamedContent());
+
+        $zip = new \ZipArchive();
+        $zip->open($arquivo);
+        $xml = '';
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            if (str_starts_with($zip->getNameIndex($i), 'xl/worksheets/')) {
+                $xml .= $zip->getFromIndex($i);
+            }
+        }
+        $zip->close();
+        unlink($arquivo);
+
+        $this->assertStringNotContainsString('<f>', $xml, 'Nenhuma célula pode virar fórmula.');
+        $this->assertStringContainsString("'=HYPERLINK", html_entity_decode($xml));
+    }
+
+    public function test_resumo_so_das_materias_atuais_do_professor(): void
+    {
+        [$professor, $atual] = $this->professorComMateria();
+        $antiga = \App\Models\Materia::factory()->create(['nome' => 'Materia Antiga']);
+        $this->registrarAula($atual, $professor, [$this->alunoMatriculado($atual)]);
+        // Presença dada quando ainda lecionava a matéria antiga (não está mais em materia_professor)
+        $this->registrarAula($antiga, $professor, [$this->alunoMatriculado($antiga, ['nome' => 'Colega Da Antiga'])]);
+
+        $abas = $this->lerPlanilha($this->actingAs($professor, 'professores')->get('/professor/gerenciar/relatorios/exportar'));
+
+        $this->assertNotContains('Materia Antiga', array_column($abas['Resumo'], 2));
+    }
+
+    public function test_filtro_de_materia_alheia_403(): void
+    {
+        [$professor] = $this->professorComMateria();
+        [, $outra] = $this->professorComMateria();
+
+        $this->actingAs($professor, 'professores')
+            ->get("/professor/gerenciar/relatorios/exportar?materia_id={$outra->id}")
+            ->assertStatus(403);
+    }
+
+    public function test_data_invalida_na_exportacao_422(): void
+    {
+        [$professor] = $this->professorComMateria();
+
+        $this->actingAs($professor, 'professores')
+            ->getJson('/professor/gerenciar/relatorios/exportar?data_inicio=ontem')
+            ->assertStatus(422);
     }
 }

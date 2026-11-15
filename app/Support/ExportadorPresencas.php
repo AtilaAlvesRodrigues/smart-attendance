@@ -6,6 +6,8 @@ use App\Models\Materia;
 use App\Models\Presenca;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use OpenSpout\Common\Entity\Cell\NumericCell;
+use OpenSpout\Common\Entity\Cell\StringCell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Options;
@@ -33,10 +35,18 @@ class ExportadorPresencas
 
     private const HORARIO = ['M' => 'Matutino', 'V' => 'Vespertino', 'N' => 'Noturno'];
 
-    public static function baixar(Builder $presencas, string $prefixo = 'presencas'): StreamedResponse
+    /**
+     * @param  list<int>|null  $materiasPermitidas  matérias que quem exporta pode ver hoje
+     *                                              (o resumo nunca vai além delas); null = todas (Master)
+     */
+    public static function baixar(Builder $presencas, string $prefixo = 'presencas', ?array $materiasPermitidas = null): StreamedResponse
     {
         $nome = $prefixo . '-' . now()->format('Y-m-d') . '.xlsx';
         $materiaIds = (clone $presencas)->reorder()->distinct()->pluck('materia_id');
+
+        if ($materiasPermitidas !== null) {
+            $materiaIds = $materiaIds->intersect($materiasPermitidas)->values();
+        }
 
         return response()->streamDownload(function () use ($presencas, $materiaIds) {
             $opcoes = new Options();
@@ -49,11 +59,11 @@ class ExportadorPresencas
             $cabecalho = (new Style())->setFontBold();
 
             $writer->getCurrentSheet()->setName('Presenças');
-            $writer->addRow(Row::fromValues(['Aluno', 'RA', 'Matéria', 'Data da aula', 'Horário', 'Origem', 'Registrado em'], $cabecalho));
+            $writer->addRow(self::linha(['Aluno', 'RA', 'Matéria', 'Data da aula', 'Horário', 'Origem', 'Registrado em'], $cabecalho));
 
             (clone $presencas)->with(['aluno', 'materia'])->chunk(500, function ($lote) use ($writer) {
                 foreach ($lote as $p) {
-                    $writer->addRow(Row::fromValues([
+                    $writer->addRow(self::linha([
                         $p->aluno?->nome ?? 'Aluno removido',
                         (string) ($p->aluno?->ra ?? ''),
                         $p->materia?->nome ?? '',
@@ -66,14 +76,35 @@ class ExportadorPresencas
             });
 
             $writer->addNewSheetAndMakeItCurrent()->setName('Resumo');
-            $writer->addRow(Row::fromValues(['Aluno', 'RA', 'Matéria', 'Presenças', 'Faltas', 'Limite de faltas', 'Frequência (%)', 'Situação'], $cabecalho));
+            $writer->addRow(self::linha(['Aluno', 'RA', 'Matéria', 'Presenças', 'Faltas', 'Limite de faltas', 'Frequência (%)', 'Situação'], $cabecalho));
 
             foreach (self::resumo($materiaIds->all()) as $linha) {
-                $writer->addRow(Row::fromValues($linha));
+                $writer->addRow(self::linha($linha));
             }
 
             $writer->close();
         }, $nome, ['Content-Type' => self::CONTENT_TYPE]);
+    }
+
+    /**
+     * Linha com tipos explícitos: texto sempre como texto (nunca fórmula) e
+     * números como número. Nomes vêm de formulários (inclusive o público de
+     * solicitação de acesso), então "=HYPERLINK(...)" não pode virar fórmula.
+     */
+    private static function linha(array $valores, ?Style $estilo = null): Row
+    {
+        return new Row(array_map(
+            fn ($v) => is_int($v) || is_float($v)
+                ? new NumericCell($v, $estilo)
+                : new StringCell(self::neutralizar((string) $v), $estilo),
+            $valores,
+        ));
+    }
+
+    /** Prefixa com apóstrofo o texto que o Excel/Sheets interpretaria como fórmula. */
+    private static function neutralizar(string $valor): string
+    {
+        return preg_match('/^[=+\-@\t\r]/', $valor) ? "'" . $valor : $valor;
     }
 
     /** @return iterable<list<mixed>> */
