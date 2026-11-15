@@ -124,7 +124,7 @@
 
         <nav class="flex flex-wrap gap-3" style="margin-bottom:1.5rem" aria-label="Atalhos">
             <a href="{{ route('aluno.justificativas') }}" class="rc-btn rc-btn-neutro">Justificar uma falta</a>
-            {{-- atalhos-aluno --}}
+            <a href="{{ route('dois-fatores.configurar') }}" class="rc-btn rc-btn-neutro">Segurança da conta</a>
         </nav>
 
         {{-- Matérias --}}

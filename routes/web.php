@@ -15,6 +15,7 @@ use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
 use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\DoisFatoresController;
 use App\Http\Controllers\MasterEmailController;
 use App\Http\Controllers\JustificativaAlunoController;
 use App\Http\Controllers\JustificativaProfessorController;
@@ -119,7 +120,15 @@ Route::middleware(['primeiro-acesso', 'throttle:criar-senha'])->group(function (
     Route::post('/criar-senha', [CriarSenhaController::class, 'store'])->name('criar-senha.store');
 });
 
+// Autenticação em dois fatores: o desafio vem antes do login ser concluído
+Route::get('/2fa/desafio', [DoisFatoresController::class, 'desafio'])->name('dois-fatores.desafio');
+Route::post('/2fa/desafio', [DoisFatoresController::class, 'verificarDesafio'])->middleware('throttle:5,1')->name('dois-fatores.verificar');
+
 Route::middleware(['auth:professores,alunos,masters'])->group(function () {
+
+    Route::get('/2fa/configurar', [DoisFatoresController::class, 'configurar'])->name('dois-fatores.configurar');
+    Route::post('/2fa/confirmar', [DoisFatoresController::class, 'confirmar'])->middleware('throttle:10,1')->name('dois-fatores.confirmar');
+    Route::post('/2fa/desativar', [DoisFatoresController::class, 'desativar'])->middleware('throttle:5,1')->name('dois-fatores.desativar');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
@@ -161,7 +170,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         });
     });
 
-    Route::middleware(['auth:masters', 'role:master'])->prefix('dashboard/master')->group(function () {
+    Route::middleware(['auth:masters', 'role:master', 'exigir-2fa'])->prefix('dashboard/master')->group(function () {
          
         Route::get('/', [DashboardController::class, 'masterIndex'])->name('dashboard.master');
 
@@ -170,6 +179,9 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
         // Versão do PHP em execução e se já tem a correção das CVEs críticas (SEC-11). JSON, só Master.
         Route::get('/ambiente/php', [AmbienteController::class, 'php'])->middleware('throttle:10,1')->name('master.ambiente.php');
+
+        Route::post('/{tipo}/{id}/resetar-2fa', [DoisFatoresController::class, 'resetar'])
+            ->whereIn('tipo', ['aluno', 'professor', 'master'])->whereNumber('id')->name('master.resetar-2fa');
 
         // Teste do servidor de e-mail institucional (SMTP)
         Route::post('/email/teste', [MasterEmailController::class, 'teste'])->middleware('throttle:3,1')->name('master.email.teste');
