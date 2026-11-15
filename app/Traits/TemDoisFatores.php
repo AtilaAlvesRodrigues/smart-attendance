@@ -21,6 +21,7 @@ trait TemDoisFatores
             'two_factor_secret'         => 'encrypted',
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at'   => 'datetime',
+            'two_factor_ultimo_timestep'=> 'integer',
         ]);
         $this->hidden = array_values(array_unique(array_merge($this->hidden, [
             'two_factor_secret',
@@ -41,13 +42,16 @@ trait TemDoisFatores
     /** Ativa o 2FA com o segredo mostrado na configuração, se o código bater. */
     public function confirmarDoisFatores(string $segredo, string $codigo): bool
     {
-        if (! self::codigoTotpValido($segredo, $codigo)) {
+        $timestep = self::timestepAceito($segredo, $codigo, null);
+
+        if ($timestep === null) {
             return false;
         }
 
         $this->forceFill([
-            'two_factor_secret'       => $segredo,
-            'two_factor_confirmed_at' => now(),
+            'two_factor_secret'          => $segredo,
+            'two_factor_confirmed_at'    => now(),
+            'two_factor_ultimo_timestep' => $timestep,
         ])->save();
 
         return true;
@@ -63,7 +67,16 @@ trait TemDoisFatores
         $codigo = trim($codigo);
 
         if (preg_match('/^\d{6}$/', str_replace(' ', '', $codigo))) {
-            return self::codigoTotpValido($this->two_factor_secret, $codigo);
+            // Só aceita código de uma janela posterior à do último aceito (sem reuso)
+            $timestep = self::timestepAceito($this->two_factor_secret, $codigo, $this->two_factor_ultimo_timestep);
+
+            if ($timestep === null) {
+                return false;
+            }
+
+            $this->forceFill(['two_factor_ultimo_timestep' => $timestep])->save();
+
+            return true;
         }
 
         return $this->consumirCodigoRecuperacao($codigo);
@@ -89,6 +102,7 @@ trait TemDoisFatores
             'two_factor_secret'         => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at'   => null,
+            'two_factor_ultimo_timestep'=> null,
         ])->save();
     }
 
@@ -114,11 +128,20 @@ trait TemDoisFatores
         return false;
     }
 
-    private static function codigoTotpValido(string $segredo, string $codigo): bool
+    /**
+     * Timestep (janela de 30 s) do código, se ele for válido (±1 janela) e mais
+     * novo que $ultimo. Null se inválido ou já usado.
+     */
+    private static function timestepAceito(string $segredo, string $codigo, ?int $ultimo): ?int
     {
         $codigo = str_replace(' ', '', $codigo);
 
-        return preg_match('/^\d{6}$/', $codigo) === 1
-            && (new Google2FA())->verifyKey($segredo, $codigo, 1);
+        if (preg_match('/^\d{6}$/', $codigo) !== 1) {
+            return null;
+        }
+
+        $resultado = (new Google2FA())->verifyKeyNewer($segredo, $codigo, $ultimo ?? 0, 1);
+
+        return is_int($resultado) ? $resultado : null;
     }
 }

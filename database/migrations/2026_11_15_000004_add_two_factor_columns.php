@@ -19,6 +19,8 @@ return new class extends Migration
                 $table->text('two_factor_secret')->nullable();
                 $table->text('two_factor_recovery_codes')->nullable();
                 $table->timestamp('two_factor_confirmed_at')->nullable();
+                // Janela (timestep de 30 s) do último código aceito: impede reusar o mesmo código
+                $table->unsignedBigInteger('two_factor_ultimo_timestep')->nullable();
             });
         }
     }
@@ -27,7 +29,7 @@ return new class extends Migration
     {
         foreach ($this->tabelas as $tabela) {
             Schema::table($tabela, function (Blueprint $table) {
-                $table->dropColumn(['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at']);
+                $table->dropColumn(['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'two_factor_ultimo_timestep']);
             });
         }
     }

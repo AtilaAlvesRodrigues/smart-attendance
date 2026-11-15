@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\AlunoModel;
 use App\Models\ProfessorModel;
 use App\Models\UsuarioMaster;
+use App\Support\LoginPendente;
 use Illuminate\Routing\Controller as BaseController;
 
 class CriarSenhaController extends BaseController
@@ -62,16 +63,23 @@ class CriarSenhaController extends BaseController
         }
 
         session()->forget(['pending_password_creation', 'pending_password_role']);
+
+        $pendingCode = session()->pull('pending_attendance_code');
+        $pendingToken = session()->pull('pending_attendance_token');
+        $destino = ($pendingCode && $guard === 'alunos')
+            ? route('presenca.confirmar', ['codigo_aula' => $pendingCode, 't' => $pendingToken])
+            : route($redirect);
+
+        // Redefinir a senha pelo e-mail não substitui o segundo fator
+        if (method_exists($user, 'temDoisFatores') && $user->temDoisFatores()) {
+            LoginPendente::iniciar($request, $guard, $user->id, false, $destino);
+            return redirect()->route('dois-fatores.desafio');
+        }
+
         Auth::guard($guard)->login($user);
         $request->session()->regenerate();
         session(['login_time' => time()]);
 
-        $pendingCode = session()->pull('pending_attendance_code');
-        $pendingToken = session()->pull('pending_attendance_token');
-        if ($pendingCode && $guard === 'alunos') {
-            return redirect()->route('presenca.confirmar', ['codigo_aula' => $pendingCode, 't' => $pendingToken]);
-        }
-
-        return redirect()->route($redirect);
+        return redirect()->to($destino);
     }
 }

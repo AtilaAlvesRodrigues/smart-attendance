@@ -219,4 +219,36 @@ class DoisFatoresTest extends TestCase
         $this->assertStringNotContainsString($segredo, $bruto);
         $this->assertArrayNotHasKey('two_factor_secret', $professor->fresh()->toArray());
     }
+
+    public function test_redefinir_senha_por_token_nao_pula_o_2fa(): void
+    {
+        [$professor, $segredo] = $this->professorCom2fa();
+        $professor->forceFill(['remember_token' => 'token-recuperacao-123456'])->save();
+
+        // Token do e-mail de recuperação usado no campo de senha
+        $this->post('/login/professor', ['cpf_email' => 'prof2fa@teste.com', 'password' => 'token-recuperacao-123456'])
+            ->assertRedirect(route('criar-senha.show'));
+
+        $this->post('/criar-senha', ['senha' => 'nova-senha-123', 'senha_confirmacao' => 'nova-senha-123'])
+            ->assertRedirect(route('dois-fatores.desafio'));
+        $this->assertFalse(auth('professores')->check());
+
+        $this->post('/2fa/desafio', ['codigo' => $this->g2fa->getCurrentOtp($segredo)])
+            ->assertRedirect(route('dashboard.professor'));
+        $this->assertTrue(auth('professores')->check());
+    }
+
+    public function test_mesmo_codigo_nao_vale_duas_vezes(): void
+    {
+        [, $segredo] = $this->professorCom2fa();
+        $codigo = $this->g2fa->getCurrentOtp($segredo);
+
+        $this->loginProfessor();
+        $this->post('/2fa/desafio', ['codigo' => $codigo])->assertRedirect(route('dashboard.professor'));
+
+        auth('professores')->logout();
+        $this->loginProfessor();
+        $this->post('/2fa/desafio', ['codigo' => $codigo])->assertSessionHasErrors('codigo');
+        $this->assertFalse(auth('professores')->check());
+    }
 }
