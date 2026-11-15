@@ -15,6 +15,7 @@ use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
 use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\ExportacaoController;
 use App\Http\Controllers\MasterEdicaoController;
 use App\Http\Controllers\GraficosController;
 use App\Http\Controllers\DoisFatoresController;
@@ -161,6 +162,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::prefix('gerenciar')->group(function () {
             Route::get('/', [GerenciarMateriaController::class, 'index'])->name('professor.gerenciar.index');
             Route::get('/relatorios', [GerenciarMateriaController::class, 'relatorios'])->name('professor.relatorios');
+            Route::get('/relatorios/exportar', [ExportacaoController::class, 'professor'])->middleware('throttle:10,1')->name('professor.relatorios.exportar');
             Route::get('/{materia_id}', [GerenciarMateriaController::class, 'show'])->name('professor.gerenciar.materia');
             Route::post('/{materia_id}/notas', [GerenciarMateriaController::class, 'salvarNotas'])->name('professor.gerenciar.salvar_notas');
 
@@ -206,6 +208,7 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
         Route::get('/alunos', [DashboardController::class, 'masterAlunos'])->name('master.alunos');
         Route::get('/materias', [DashboardController::class, 'masterMaterias'])->name('master.materias');
         Route::get('/presenca', [DashboardController::class, 'masterPresenca'])->name('master.presenca');
+        Route::get('/presenca/exportar', [ExportacaoController::class, 'master'])->middleware('throttle:10,1')->name('master.presenca.exportar');
         Route::get('/cadastrar', fn () => view('master.cadastrar'))->name('master.cadastrar');
         Route::post('/cadastrar/aluno', [MasterCadastroController::class, 'cadastrarAluno'])->name('master.cadastrar.aluno');
         Route::post('/cadastrar/professor', [MasterCadastroController::class, 'cadastrarProfessor'])->name('master.cadastrar.professor');

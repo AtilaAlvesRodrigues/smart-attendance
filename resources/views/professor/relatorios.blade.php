@@ -4,6 +4,9 @@
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
 @section('nav-left')
+    <a href="{{ route('professor.relatorios.exportar', request()->only(['materia_id', 'data_inicio', 'data_fim'])) }}" class="pal-nav-btn pal-nav-btn-ghost no-print" title="Baixar as presenças filtradas em Excel (.xlsx)">
+        ⬇ Exportar planilha
+    </a>
     <button onclick="window.print()" class="pal-nav-btn pal-nav-btn-solid no-print">
         📄 Gerar PDF
     </button>

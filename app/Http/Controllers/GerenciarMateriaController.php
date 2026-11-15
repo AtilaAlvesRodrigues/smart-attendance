@@ -54,8 +54,20 @@ class GerenciarMateriaController extends BaseController
         $professor = Auth::guard('professores')->user();
         $materias = $professor->materias;
 
-        $query = Presenca::where('professor_id', $professor->id)
-            ->with(['aluno', 'materia']);
+        $presencas = self::filtrarRelatorioProfessor($request, $professor)
+            ->with(['aluno', 'materia'])
+            ->paginate(20);
+
+        return view('professor.relatorios', compact('professor', 'materias', 'presencas'));
+    }
+
+    /**
+     * Presenças do relatório do professor com os filtros da tela (matéria e
+     * período). Usado pela listagem e pela exportação em planilha.
+     */
+    public static function filtrarRelatorioProfessor(Request $request, $professor): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = Presenca::where('professor_id', $professor->id);
 
         if ($request->filled('materia_id')) {
             $query->where('materia_id', $request->materia_id);
@@ -72,9 +84,7 @@ class GerenciarMateriaController extends BaseController
             $query->whereDate('created_at', '<=', $request->data_fim);
         }
 
-        $presencas = $query->orderBy('created_at', 'desc')->paginate(20);
-
-        return view('professor.relatorios', compact('professor', 'materias', 'presencas'));
+        return $query->orderBy('created_at', 'desc');
     }
 
     public function salvarNotas(Request $request, $materia_id)

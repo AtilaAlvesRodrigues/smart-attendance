@@ -67,9 +67,12 @@
                         <p class="pal-subtitle" style="margin:2px 0 0; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:800;">Central de Frequência</p>
                     </div>
                 </div>
-                <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-sm text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex items-center gap-2">
-                    📄 Gerar PDF
-                </button>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('master.presenca.exportar', request()->only(['professor', 'materia', 'aluno'])) }}" class="rc-btn rc-btn-neutro rc-btn-sm" title="Baixar as presenças em Excel (.xlsx)">⬇ Exportar planilha</a>
+                    <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-sm text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                        📄 Gerar PDF
+                    </button>
+                </div>
             </div>
         </div>
 
