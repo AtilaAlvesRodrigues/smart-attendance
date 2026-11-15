@@ -15,6 +15,8 @@ use App\Http\Controllers\EsqueciSenhaController;
 use App\Http\Controllers\MasterCadastroController;
 use App\Http\Controllers\MasterTurmaController;
 use App\Http\Controllers\CorrecaoPresencaController;
+use App\Http\Controllers\JustificativaAlunoController;
+use App\Http\Controllers\JustificativaProfessorController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -123,10 +125,19 @@ Route::middleware(['auth:professores,alunos,masters'])->group(function () {
 
     Route::middleware(['auth:alunos', 'role:aluno'])->group(function () {
         Route::get('/dashboard/aluno', [DashboardController::class, 'alunoIndex'])->name('dashboard.aluno');
+
+        // Justificativa de faltas
+        Route::get('/aluno/justificativas', [JustificativaAlunoController::class, 'index'])->name('aluno.justificativas');
+        Route::post('/aluno/justificativas', [JustificativaAlunoController::class, 'store'])->middleware('throttle:10,1')->name('aluno.justificativas.store');
+        Route::get('/aluno/justificativas/{justificativa}/anexo', [JustificativaAlunoController::class, 'anexo'])->name('aluno.justificativas.anexo');
     });
 
     Route::middleware(['auth:professores', 'role:professor'])->prefix('professor')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'professorIndex'])->name('dashboard.professor');
+
+        Route::get('/justificativas', [JustificativaProfessorController::class, 'index'])->name('professor.justificativas');
+        Route::post('/justificativas/{justificativa}/decidir', [JustificativaProfessorController::class, 'decidir'])->middleware('throttle:60,1')->name('professor.justificativas.decidir');
+        Route::get('/justificativas/{justificativa}/anexo', [JustificativaProfessorController::class, 'anexo'])->name('professor.justificativas.anexo');
 
         Route::prefix('presenca')->group(function () {
             Route::get('/', [PresencaController::class, 'index'])->name('professor.presenca.index');

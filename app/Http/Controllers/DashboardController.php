@@ -55,7 +55,11 @@ class DashboardController extends BaseController
 
         $hasActiveEvento = $professor && Cache::has("professor_evento_{$professor->id}");
 
-        return view('professor.home', compact('professor', 'activeMateria', 'activeCode', 'hasActiveEvento'));
+        $justificativasPendentes = $professor
+            ? \App\Models\Justificativa::pendentes()->whereIn('materia_id', $professor->materias->pluck('id'))->count()
+            : 0;
+
+        return view('professor.home', compact('professor', 'activeMateria', 'activeCode', 'hasActiveEvento', 'justificativasPendentes'));
     }
 
     /**

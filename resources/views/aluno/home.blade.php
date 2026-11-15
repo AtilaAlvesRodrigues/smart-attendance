@@ -122,6 +122,11 @@
         </div>
         @endif
 
+        <nav class="flex flex-wrap gap-3" style="margin-bottom:1.5rem" aria-label="Atalhos">
+            <a href="{{ route('aluno.justificativas') }}" class="rc-btn rc-btn-neutro">Justificar uma falta</a>
+            {{-- atalhos-aluno --}}
+        </nav>
+
         {{-- Matérias --}}
         <section aria-labelledby="titulo-materias">
             <h2 id="titulo-materias" class="sa-secao-titulo">Minhas matérias</h2>
