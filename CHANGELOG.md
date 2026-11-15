@@ -14,6 +14,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - **E-mail institucional:** exemplos de SMTP (Microsoft 365, Google Workspace, servidor próprio) no `.env.example` e botão "Enviar e-mail de teste" no Master.
 
 ### Corrigido (deste pacote)
+- `laravel/framework` atualizado para a 12.72.0: corrige o alerta CVE-2026-128083 (baixo) que fazia o `composer audit` do CI falhar.
 - Índice único `presencas(aluno_id, materia_id, codigo_aula)`: duas requisições simultâneas não duplicam mais a presença. A migration remove só as cópias exatas (mesmo aluno, matéria e código); o mesmo código em matérias diferentes, comum nos dados de demonstração antigos, é mantido.
 - Registros de presença e justificativas continuam legíveis depois que o aluno, o professor ou a matéria é excluído.
 - **QR Code que muda a cada 30 segundos.** O link da chamada leva um token assinado (HMAC) que vale na janela atual e na anterior; uma foto ou print do QR Code deixa de registrar presença em até 1 minuto. A tela do professor renova o QR sozinha e mostra a contagem regressiva.
