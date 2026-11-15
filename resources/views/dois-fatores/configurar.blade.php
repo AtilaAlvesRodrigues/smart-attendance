@@ -92,9 +92,14 @@
                             @csrf
                             <label for="codigo" class="rc-strong" style="display:block; color:var(--pal-white); font-weight:800; margin:0 0 0.75rem">3. Digite o código de 6 números que aparece no app</label>
                             @error('codigo')<div class="login-error" role="alert" style="margin-bottom:0.75rem">{{ $message }}</div>@enderror
-                            <div class="flex flex-wrap gap-3">
+                            @error('senha')<div class="login-error" role="alert" style="margin-bottom:0.75rem">{{ $message }}</div>@enderror
+                            <div class="flex flex-wrap gap-3 items-end">
                                 <input id="codigo" name="codigo" class="rc-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required
-                                    style="max-width:200px; font-size:1.3rem; letter-spacing:0.3em; text-align:center; font-weight:800" placeholder="000000">
+                                    style="max-width:200px; font-size:1.3rem; letter-spacing:0.3em; text-align:center; font-weight:800" placeholder="000000" aria-label="Código de 6 números do app">
+                                <div class="rc-field" style="flex:1; min-width:200px">
+                                    <label for="senha-ativar" class="rc-hint">Sua senha atual, para confirmar</label>
+                                    <input id="senha-ativar" name="senha" type="password" class="rc-input" autocomplete="current-password" required>
+                                </div>
                                 <button type="submit" class="rc-btn rc-btn-confirmar">Ativar verificação</button>
                             </div>
                         </form>

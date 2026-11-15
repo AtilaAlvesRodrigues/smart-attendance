@@ -158,17 +158,17 @@ class DoisFatoresTest extends TestCase
 
     public function test_configurar_exige_codigo_valido_para_ativar(): void
     {
-        $professor = ProfessorModel::factory()->create(['remember_token' => null]);
+        $professor = ProfessorModel::factory()->create(['remember_token' => null, 'password' => Hash::make('senha-atual-1')]);
         $this->actingAs($professor, 'professores');
 
         $this->get('/2fa/configurar')->assertOk()->assertSee('otpauth://', false);
         $segredo = session('2fa.segredo_novo');
         $this->assertNotEmpty($segredo);
 
-        $this->post('/2fa/confirmar', ['codigo' => '123456'])->assertSessionHasErrors('codigo');
+        $this->post('/2fa/confirmar', ['codigo' => '123456', 'senha' => 'senha-atual-1'])->assertSessionHasErrors('codigo');
         $this->assertFalse($professor->fresh()->temDoisFatores());
 
-        $this->post('/2fa/confirmar', ['codigo' => $this->g2fa->getCurrentOtp($segredo)])
+        $this->post('/2fa/confirmar', ['codigo' => $this->g2fa->getCurrentOtp($segredo), 'senha' => 'senha-atual-1'])
             ->assertRedirect(route('dois-fatores.configurar'))
             ->assertSessionHas('codigos_recuperacao');
 
@@ -266,5 +266,31 @@ class DoisFatoresTest extends TestCase
 
         $this->assertTrue($req1->verificarCodigoDoisFatores($codigos[1]));
         $this->assertFalse($req2->verificarCodigoDoisFatores($codigos[1]));
+    }
+
+    public function test_ativar_2fa_exige_a_senha_atual(): void
+    {
+        $professor = ProfessorModel::factory()->create(['remember_token' => null, 'password' => Hash::make('senha-atual-1')]);
+        $this->actingAs($professor, 'professores');
+        $this->get('/2fa/configurar');
+        $codigo = $this->g2fa->getCurrentOtp(session('2fa.segredo_novo'));
+
+        $this->post('/2fa/confirmar', ['codigo' => $codigo])->assertSessionHasErrors('senha');
+        $this->post('/2fa/confirmar', ['codigo' => $codigo, 'senha' => 'errada'])->assertSessionHasErrors('senha');
+
+        $this->assertFalse($professor->fresh()->temDoisFatores());
+    }
+
+    public function test_confirmar_nao_substitui_2fa_ja_ativo(): void
+    {
+        [$professor, $segredoOriginal] = $this->professorCom2fa();
+        $this->actingAs($professor, 'professores');
+        $outro = $this->g2fa->generateSecretKey();
+        session(['2fa.segredo_novo' => $outro]);
+
+        $this->post('/2fa/confirmar', ['codigo' => $this->g2fa->getCurrentOtp($outro), 'senha' => 'senha-forte-123'])
+            ->assertStatus(409);
+
+        $this->assertSame($segredoOriginal, $professor->fresh()->two_factor_secret);
     }
 }

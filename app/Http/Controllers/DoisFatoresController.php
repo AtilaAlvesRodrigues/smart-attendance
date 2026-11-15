@@ -83,7 +83,19 @@ class DoisFatoresController extends BaseController
     public function confirmar(Request $request)
     {
         [, $usuario] = $this->usuarioLogado();
-        $request->validate(['codigo' => 'required|string|max:10']);
+
+        // Com o 2FA já ativo, trocar o segredo exige desativar antes (com senha)
+        abort_if($usuario->temDoisFatores(), 409, 'A verificação em duas etapas já está ativa.');
+
+        $request->validate([
+            'codigo' => 'required|string|max:10',
+            'senha'  => 'required|string|max:255',
+        ], ['senha.required' => 'Informe sua senha para ativar.']);
+
+        // Reautenticação: uma sessão roubada não consegue prender o dono fora da conta
+        if (! Hash::check($request->input('senha'), $usuario->password)) {
+            throw ValidationException::withMessages(['senha' => 'Senha incorreta.']);
+        }
 
         $segredo = $request->session()->get('2fa.segredo_novo');
 

@@ -232,4 +232,20 @@ class JustificativaTest extends TestCase
         $this->assertSame(Justificativa::STATUS_RECUSADA, $j->fresh()->status);
         $this->assertFalse(Presenca::where('aluno_id', $faltou->id)->exists());
     }
+
+    public function test_falha_no_email_da_decisao_nao_grava_endereco_no_log(): void
+    {
+        [$professor, $materia, , $faltou, $codigo] = $this->cenario();
+        $j = $this->criarPendente($faltou, $materia, $codigo);
+        \Illuminate\Support\Facades\Log::spy();
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('550 recipient ' . $faltou->email . ' rejected'));
+
+        $this->actingAs($professor, 'professores')
+            ->post("/professor/justificativas/{$j->id}/decidir", ['decisao' => 'recusar'])
+            ->assertRedirect();
+
+        \Illuminate\Support\Facades\Log::shouldHaveReceived('warning')->withArgs(
+            fn ($msg, $ctx) => ! str_contains(json_encode($ctx), $faltou->email)
+        );
+    }
 }

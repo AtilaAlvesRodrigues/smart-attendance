@@ -135,9 +135,10 @@ class JustificativaProfessorController extends BaseController
         try {
             Mail::to($j->aluno->email)->send(new JustificativaDecididaMail($j));
         } catch (\Throwable $e) {
+            // Só a classe da exceção: o texto do servidor de e-mail pode trazer o endereço do aluno
             Log::warning('Falha ao enviar e-mail de decisão da justificativa', [
                 'justificativa_id' => $j->id,
-                'erro'             => $e->getMessage(),
+                'excecao'          => $e::class,
             ]);
         }
     }

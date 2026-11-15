@@ -60,7 +60,8 @@ Código TOTP de 6 números (RFC 6238) gerado por app autenticador, com a bibliot
 - Cada código vale **uma vez**: o timestep do último código aceito fica gravado, e a verificação relê o usuário com lock da linha, então duas requisições simultâneas com o mesmo código não passam as duas.
 - Segredo e códigos de recuperação (8, uso único, guardados como hash SHA-256) ficam criptografados no banco e fora de qualquer serialização.
 - O rótulo do QR usa o nome, nunca o e-mail.
-- Limites: 5 tentativas por minuto no desafio; desativar exige a senha atual.
+- Ativar e desativar exigem a senha atual (uma sessão roubada não consegue prender o dono fora da conta); com o 2FA ativo, não é possível trocar o segredo sem desativar antes.
+- Limites: 5 tentativas por minuto por login pendente no desafio (teto de 300 por IP).
 
 ## Limite de tentativas
 
@@ -143,7 +144,7 @@ O formulário público de check-in tem um campo oculto, `hp_field`, que pessoas 
 - Atestados: `pdf`, `jpg`, `jpeg` ou `png` (extensão e tipo MIME), até 5 MB, gravados com nome aleatório no disco privado `justificativas`; o download passa por rota autenticada com `X-Content-Type-Options: nosniff`.
 - Toda correção de presença exige motivo e fica em `presenca_ajustes`.
 - Planilhas: só nome e RA (nunca CPF ou e-mail); todo texto é gravado como texto, e valores que começam com `=`, `+`, `-` ou `@` recebem um apóstrofo, para nenhum nome virar fórmula no Excel. O resumo do professor se limita às matérias que ele leciona hoje, e um filtro de matéria alheia recebe 403.
-- E-mail de teste: a mensagem de erro do servidor SMTP é exibida sem usuário nem senha.
+- E-mail de teste: a mensagem de erro do servidor SMTP é exibida sem usuário, senha nem credenciais embutidas em URL (`MAIL_URL`). Falhas de envio vão para o log só com a classe da exceção, sem o texto do servidor (que pode conter endereços de e-mail).
 
 ## Exclusão lógica
 

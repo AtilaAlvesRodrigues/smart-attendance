@@ -99,7 +99,7 @@ A justificativa aparece em **Enviadas** como *Em análise*. Quando o professor d
 Em **Segurança da conta** você pode ativar a verificação em duas etapas: além da senha, o login pede um código de 6 números que muda a cada 30 segundos num app do celular (Google Authenticator, Microsoft Authenticator ou Authy).
 
 1. Escaneie o QR Code com o app (ou digite a chave mostrada).
-2. Digite o código que aparece no app e clique em **Ativar verificação**.
+2. Digite o código que aparece no app e a sua senha atual, e clique em **Ativar verificação**.
 3. **Guarde os 8 códigos de recuperação.** Eles não aparecem de novo. Se perder o celular, use um deles no lugar do código do app; cada um vale uma vez.
 
 Para desativar, informe sua senha na mesma tela.

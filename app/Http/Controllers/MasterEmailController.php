@@ -23,7 +23,8 @@ class MasterEmailController extends BaseController
             Mail::to($master->email)->send(new EmailTesteMail($master->nome ?? 'Administrador'));
         } catch (\Throwable $e) {
             $mensagem = self::semCredenciais($e->getMessage());
-            Log::warning('Falha no e-mail de teste', ['erro' => $mensagem]);
+            // No log, só a classe: o texto do servidor pode trazer endereços de e-mail
+            Log::warning('Falha no e-mail de teste', ['excecao' => $e::class]);
 
             return back()->with('email_erro', 'Falha no envio: ' . mb_substr($mensagem, 0, 300));
         }
@@ -45,10 +46,24 @@ class MasterEmailController extends BaseController
         ];
     }
 
+    /**
+     * Remove da mensagem do servidor qualquer credencial de e-mail: usuário,
+     * senha e URL de cada mailer configurado, e o trecho "usuario:senha@" de
+     * qualquer URL (ex.: MAIL_URL=smtp://usuario:senha@host:587).
+     */
     private static function semCredenciais(string $mensagem): string
     {
-        foreach (array_filter([config('mail.mailers.smtp.password'), config('mail.mailers.smtp.username')]) as $segredo) {
-            $mensagem = str_replace((string) $segredo, '***', $mensagem);
+        $mensagem = preg_replace('#([a-z][a-z0-9+.\-]*://)[^\s/@]+@#i', '$1***@', $mensagem) ?? '';
+
+        $segredos = [config('mail.url')];
+        foreach ((array) config('mail.mailers', []) as $mailer) {
+            foreach (['username', 'password', 'url', 'secret', 'token', 'key'] as $campo) {
+                $segredos[] = is_array($mailer) ? ($mailer[$campo] ?? null) : null;
+            }
+        }
+
+        foreach (array_filter($segredos, fn ($s) => is_string($s) && strlen($s) >= 3) as $segredo) {
+            $mensagem = str_replace($segredo, '***', $mensagem);
         }
 
         return $mensagem;
