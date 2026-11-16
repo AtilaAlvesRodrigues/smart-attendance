@@ -38,6 +38,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - Nas views, todo `<script>` e `<style>` em bloco agora usa `@nonce`.
 
 ### Documentação
+- [Relatório das novas funcionalidades](docs/relatorios/relatorio-novas-funcionalidades-2026-11.md) (md e PDF), para apresentação: o que foi entregue, o que não rodou e o que falta. SEC-07 (2FA) marcada como resolvida.
 - Repositório reorganizado: README reescrito, pasta `docs/` com manual do usuário, arquitetura, banco de dados, regras acadêmicas, segurança, instalação, deploy, testes e design.
 - Guia de contribuição, este histórico e modelos de issue e de Pull Request.
 - Relatório de bugs movido da raiz para `docs/relatorios/`.

@@ -288,6 +288,7 @@ smart-attendance/
 | [Revisão das GitHub Actions](docs/revisao-github-actions.md) | Análise do pipeline e novas actions sugeridas |
 | [Revisão do projeto](docs/relatorios/revisao-do-projeto-2026-11.md) | Relatório técnico: pontos fortes, riscos e dívida técnica |
 | [Relatório de modificações](docs/relatorios/relatorio-de-modificacoes-2026-11.md) | Tudo o que mudou na rodada de novembro de 2026: PRs, testes, falhas e pendências ([PDF](docs/relatorios/relatorio-de-modificacoes-2026-11.pdf)) |
+| [Relatório das novas funcionalidades](docs/relatorios/relatorio-novas-funcionalidades-2026-11.md) | As 7 funcionalidades de 15/11/2026: o que foi entregue, o que não rodou e o que falta ([PDF](docs/relatorios/relatorio-novas-funcionalidades-2026-11.pdf)) |
 | [Design e acessibilidade](docs/design-e-acessibilidade.md) | Identidade visual, padrões de interface e acessibilidade |
 | [Como contribuir](CONTRIBUTING.md) | Fluxo de branches, commits e Pull Requests |
 | [Histórico de mudanças](CHANGELOG.md) | O que mudou em cada versão |
