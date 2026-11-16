@@ -169,5 +169,3 @@ A lista completa de falhas abertas, com gravidade e correção, está em [Falhas
 |---|---|---|
 | O link do QR pode ser repassado ao vivo | Um aluno presente manda o link do momento a um colega ausente, que confirma em até 60 s ([SEC-05](falhas-de-seguranca.md#sec-05)) | Confirmação por localização ou rede da instituição |
 | A CSP ainda libera `onclick=` e `style=` inline | Um HTML injetado ainda poderia executar JavaScript por atributo de evento ([SEC-08](falhas-de-seguranca.md#sec-08)) | Migrar os atributos para scripts e classes e remover as exceções `*-attr` |
-| Sem autenticação em dois fatores | Uma senha vazada dá acesso à conta | 2FA para professores e administradores |
-| O professor não corrige presenças | Um erro de registro não pode ser desfeito pela interface | Tela de correção, com registro de quem alterou |

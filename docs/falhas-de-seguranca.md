@@ -17,7 +17,7 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 | [SEC-04](#sec-04) | Scripts de CDN sem Subresource Integrity | Média | **Resolvida** |
 | [SEC-05](#sec-05) | Link da chamada pode ser repassado ao vivo a quem está fora da sala | Média | Parcial |
 | [SEC-06](#sec-06) | Dependências npm com 6 avisos (2 críticos, só no build/dev) | Média | **Resolvida** |
-| [SEC-07](#sec-07) | Sem autenticação em dois fatores | Média | Aberta |
+| [SEC-07](#sec-07) | Sem autenticação em dois fatores | Média | **Resolvida** (2FA por app autenticador, PR #64) |
 | [SEC-08](#sec-08) | CSP ainda libera `onclick=` e `style=` inline | Baixa | Parcial |
 | [SEC-09](#sec-09) | Padrões inseguros no `.env.example` | Baixa | Aberta |
 | [SEC-10](#sec-10) | Tempo de sessão documentado de formas diferentes | Baixa | Aberta |
@@ -105,6 +105,8 @@ Desde a rotação do QR Code (token que muda a cada 30 segundos), uma **foto ou 
 
 ## SEC-07
 ### Sem autenticação em dois fatores
+
+> **Resolvida** em 15/11/2026 (PR #64): verificação em duas etapas por app autenticador (TOTP), com 8 códigos de recuperação, para alunos, professores e Master. É obrigatória para o Master por padrão (`TWO_FACTOR_MASTER_OBRIGATORIO`), e durante a avaliação foi deixada opcional em produção. Detalhes em [Segurança](seguranca.md#verificação-em-duas-etapas-2fa). O texto abaixo registra o que foi encontrado.
 
 Uma senha vazada dá acesso total à conta, inclusive de professores e do Master. Já listado em [Segurança](seguranca.md#limitações-conhecidas).
 **Correção:** 2FA (TOTP) para Master e professores.
