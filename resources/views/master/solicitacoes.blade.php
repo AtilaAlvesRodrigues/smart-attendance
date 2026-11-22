@@ -83,7 +83,7 @@
 
             {{-- Ações --}}
             @if ($s->status === 'pendente')
-            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
+            <div class="solicitacao-acoes" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; min-width: 0;">
                 <form method="POST" action="{{ route('master.solicitacoes.aprovar', $s->id) }}">
                     @csrf
                     <button type="submit" style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;"
@@ -92,10 +92,10 @@
                         Aprovar
                     </button>
                 </form>
-                <form method="POST" action="{{ route('master.solicitacoes.rejeitar', $s->id) }}" style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+                <form method="POST" action="{{ route('master.solicitacoes.rejeitar', $s->id) }}" style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; min-width:0; max-width:100%;">
                     @csrf
                     <input type="text" name="motivo" placeholder="Motivo (opcional)"
-                        style="font-size:12px; padding:6px 12px; border-radius:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#ccc; width:200px;"
+                        style="font-size:12px; padding:6px 12px; border-radius:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#ccc; width:200px; max-width:100%;"
                         maxlength="255">
                     <button type="submit" style="background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.25); padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; width:100%;"
                         onmouseover="this.style.background='rgba(239,68,68,0.2)'"

@@ -123,9 +123,9 @@
 
             {{-- Tabela Container --}}
             <div class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
-                <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <div class="px-5 sm:px-8 py-6 border-b border-white/10 flex flex-wrap gap-3 justify-between items-center bg-white/5">
                     <h3 class="text-xl font-black italic tracking-tighter pal-text">📋 Alunos Matriculados</h3>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <span class="px-3 py-1 bg-white/10 rounded-sm text-xs font-black uppercase tracking-widest pal-text-muted" style="opacity: 0.6">
                             Previstas: {{ $totalAulas }}
                         </span>
@@ -136,10 +136,10 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse rc-tabela-cartoes">
                         <thead>
                             <tr class="pal-subtitle font-black uppercase tracking-[0.2em] border-b border-white/10" style="font-size:0.65rem">
-                                <th class="py-3 px-3">Aluno</th>
+                                <th class="py-3 px-3" data-sem-rotulo>Aluno</th>
                                 <th class="py-3 px-3 text-center">Presenças</th>
                                 <th class="py-3 px-3 text-center">Faltas</th>
                                 <th class="py-3 px-3 text-center">1ª Prova</th>

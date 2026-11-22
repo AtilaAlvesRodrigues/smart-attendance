@@ -56,9 +56,9 @@
         <div class="blob-2"></div>
 
         <!-- Sub-header: Painel de Chamadas + PDF -->
-        <div class="no-print" style="padding: 1.5rem 2rem 0;">
-            <div class="glass max-w-7xl mx-auto flex justify-between items-center p-4 rounded-sm border border-white/10">
-                <div class="flex items-center gap-3">
+        <div class="no-print px-4 sm:px-8 pt-6">
+            <div class="glass max-w-7xl mx-auto flex flex-wrap gap-3 justify-between items-center p-4 rounded-sm border border-white/10">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 rounded-sm flex items-center justify-center shadow-lg transition-transform hover:scale-105" style="background:var(--pal-primary); box-shadow:0 10px 20px rgba(255,165,60,0.3); color:#fff;">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                     </div>
@@ -161,10 +161,10 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse rc-tabela-cartoes">
                         <thead>
                             <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
-                                <th class="py-4 px-6">Data / Hora</th>
+                                <th class="py-4 px-6" data-sem-rotulo>Data / Hora</th>
                                 <th class="py-4 px-6">Aluno (RA)</th>
                                 <th class="py-4 px-6">Disciplina</th>
                                 <th class="py-4 px-6">Professor (CPF)</th>

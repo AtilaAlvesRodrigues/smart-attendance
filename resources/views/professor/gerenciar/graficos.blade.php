@@ -85,8 +85,8 @@
                 <p class="rc-hint" style="padding:1.5rem">Ninguém em risco por enquanto.</p>
             @else
                 <div class="overflow-x-auto">
-                    <table class="rc-table">
-                        <thead><tr><th scope="col">Aluno</th><th scope="col">Faltas</th><th scope="col">Frequência</th><th scope="col">Situação</th></tr></thead>
+                    <table class="rc-table rc-tabela-cartoes">
+                        <thead><tr><th scope="col" data-sem-rotulo>Aluno</th><th scope="col">Faltas</th><th scope="col">Frequência</th><th scope="col">Situação</th></tr></thead>
                         <tbody>
                             @foreach($dados['em_risco'] as $a)
                                 <tr>

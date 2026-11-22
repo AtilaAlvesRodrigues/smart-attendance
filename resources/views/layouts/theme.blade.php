@@ -117,6 +117,7 @@
     @include('partials.auto_logout')
     @include('partials.session_timer')
 
+    <script src="{{ asset('js/tabela-cartoes.js') }}?v={{ filemtime(public_path('js/tabela-cartoes.js')) }}" defer></script>
     @stack('scripts')
 </body>
 </html>

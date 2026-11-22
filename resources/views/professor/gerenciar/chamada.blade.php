@@ -37,10 +37,10 @@
 
         <section class="rc-card animate-reveal pal-card-delay-1" aria-label="Alunos da chamada">
             <div class="overflow-x-auto">
-                <table class="rc-table">
+                <table class="rc-table rc-tabela-cartoes">
                     <thead>
                         <tr>
-                            <th scope="col">Aluno</th>
+                            <th scope="col" data-sem-rotulo>Aluno</th>
                             <th scope="col">Situação</th>
                             <th scope="col">Corrigir</th>
                         </tr>
@@ -64,7 +64,7 @@
                                         <span class="rc-chip rc-chip-ok">Presente</span>
                                     @endif
                                 </td>
-                                <td style="min-width:320px">
+                                <td class="rc-celula-correcao">
                                     <form method="POST" action="{{ route('professor.chamadas.presenca', [$materia->id, $aula->codigo_aula]) }}" class="flex flex-wrap items-center gap-3">
                                         @csrf
                                         <input type="hidden" name="aluno_id" value="{{ $aluno->id }}">

@@ -50,6 +50,7 @@
 .rc-table tbody tr { transition: background 0.2s; }
 .rc-table tbody tr:hover { background: color-mix(in srgb, var(--pal-white) 4%, transparent); }
 .rc-table .rc-strong { color: var(--pal-white); font-weight: 700; }
+.rc-table td.rc-celula-correcao { min-width: 320px; }
 .rc-table .rc-meta { color: var(--pal-gray); font-size: 0.8rem; font-family: ui-monospace, monospace; }
 
 /* Chips de estado */
@@ -195,5 +196,50 @@
 @media (max-width: 640px) {
     .rc-table th, .rc-table td { padding: 0.75rem 1rem; }
     .rc-card-header { padding: 1rem; }
-    .rc-aulas { padding: 1rem; grid-template-columns: 1fr 1fr; }
+    .rc-aulas { padding: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rc-aula { padding: 0.85rem; min-width: 0; }
+    .rc-aula-data { font-size: 1rem; }
+}
+
+/* Tabela em cartões no celular: cada linha vira um bloco e cada célula mostra o
+   nome da coluna (data-rotulo, preenchido por js/tabela-cartoes.js). Assim nenhuma
+   coluna (como "Ações") fica escondida fora da tela. */
+@media (max-width: 640px) {
+    table.rc-tabela-cartoes,
+    table.rc-tabela-cartoes tbody { display: block; width: 100%; }
+    table.rc-tabela-cartoes thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    table.rc-tabela-cartoes tr {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        padding: 1rem 1.1rem;
+        border-bottom: 1px solid color-mix(in srgb, var(--pal-white) 8%, transparent);
+    }
+    table.rc-tabela-cartoes td {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0 !important;
+        border: 0 !important;
+        text-align: left !important;
+        min-width: 0 !important;
+        overflow-wrap: anywhere;
+    }
+    table.rc-tabela-cartoes td[data-rotulo]::before {
+        content: attr(data-rotulo);
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--pal-gray);
+    }
+    table.rc-tabela-cartoes td:first-child { display: block; }
+    table.rc-tabela-cartoes td.rc-celula-correcao > form { width: 100%; }
+    /* Última coluna sem rótulo = ações: botões alinhados à esquerda, com espaço para o dedo */
+    table.rc-tabela-cartoes td:last-child:not([data-rotulo]) { justify-content: flex-start; padding-top: 0.35rem !important; }
+    table.rc-tabela-cartoes td:last-child:not([data-rotulo]) > * { margin-left: 0 !important; }
+    table.rc-tabela-cartoes td:last-child:not([data-rotulo]) a,
+    table.rc-tabela-cartoes td:last-child:not([data-rotulo]) button { min-height: 40px; }
 }

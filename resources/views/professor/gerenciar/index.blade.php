@@ -47,7 +47,7 @@
                                     </svg>
                                 </div>
                                 <span class="px-3 py-1 bg-white/5 rounded-sm text-[10px] font-black pal-subtitle group-hover:pal-text transition-colors uppercase tracking-widest border border-white/5">
-                                    {{ $materia->alunos_count }} alunos
+                                    {{ $materia->alunos_count }} {{ $materia->alunos_count === 1 ? 'aluno' : 'alunos' }}
                                 </span>
                             </div>
 

@@ -88,8 +88,8 @@
                 <p class="rc-hint" style="padding:1.5rem">Nenhuma justificativa enviada ainda.</p>
             @else
                 <div class="overflow-x-auto">
-                    <table class="rc-table">
-                        <thead><tr><th scope="col">Aula</th><th scope="col">Situação</th><th scope="col">Resposta do professor</th></tr></thead>
+                    <table class="rc-table rc-tabela-cartoes">
+                        <thead><tr><th scope="col" data-sem-rotulo>Aula</th><th scope="col">Situação</th><th scope="col">Resposta do professor</th></tr></thead>
                         <tbody>
                             @foreach($justificativas as $j)
                                 <tr>

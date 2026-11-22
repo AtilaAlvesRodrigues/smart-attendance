@@ -96,6 +96,11 @@
     flex: 1;
 }
 
+/* Nome curto só aparece na barra de baixo do celular */
+.pal-sidebar-label-curto {
+    display: none;
+}
+
 .pal-sidebar-badge {
     display: inline-flex;
     align-items: center;
@@ -344,14 +349,40 @@ html.sidebar-collapsed #pal-sidebar-reopen {
         border-top-color: rgba(0, 0, 0, 0.07);
     }
 
+    /* Barra rolável na horizontal: cada item com largura própria, sem sobrepor */
     .pal-sidebar-inner {
         flex-direction: row;
-        padding: 0 0.5rem;
-        gap: 0;
+        padding: 0 0.25rem;
+        gap: 0.15rem;
         align-items: center;
-        justify-content: space-around;
+        justify-content: flex-start;
         width: 100%;
         overflow-x: auto;
+        overflow-y: hidden;
+        position: relative;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pal-sidebar-inner::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Indica que há mais itens para o lado */
+    #pal-sidebar[data-mais-direita="true"] .pal-sidebar-inner {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+                mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+    }
+
+    #pal-sidebar[data-mais-esquerda="true"] .pal-sidebar-inner {
+        -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent);
+                mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent);
+    }
+
+    #pal-sidebar[data-mais-esquerda="true"][data-mais-direita="true"] .pal-sidebar-inner {
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+                mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
     }
 
     .pal-sidebar-top-bar,
@@ -361,21 +392,28 @@ html.sidebar-collapsed #pal-sidebar-reopen {
         display: none;
     }
 
+    /* Grupos do Master (Usuários, Conteúdo) viram itens soltos na barra */
+    .pal-sidebar-group {
+        display: contents;
+    }
+
     /* Mobile: reset any collapsed padding override */
     html.sidebar-collapsed .pal-has-sidebar .pal-page {
         padding-left: 0;
     }
 
     .pal-sidebar-item {
+        flex: 0 0 auto;
         flex-direction: column;
-        gap: 0.2rem;
-        padding: 0.4rem 0.75rem;
-        font-size: 0.58rem;
+        gap: 0.25rem;
+        padding: 0.45rem 0.4rem;
         border: none;
-        border-radius: 6px;
-        min-width: 48px;
+        border-radius: 8px;
+        min-width: 64px;
+        height: 52px;
         align-items: center;
         justify-content: center;
+        scroll-snap-align: start;
     }
 
     .pal-sidebar-icon {
@@ -384,9 +422,20 @@ html.sidebar-collapsed #pal-sidebar-reopen {
     }
 
     .pal-sidebar-label {
-        font-size: 0.58rem;
+        flex: none;
+        overflow: visible;
+        font-size: 0.66rem;
         font-weight: 600;
-        letter-spacing: 0.02em;
+        line-height: 1;
+        letter-spacing: 0.01em;
+    }
+
+    .pal-sidebar-label-longo {
+        display: none;
+    }
+
+    .pal-sidebar-label-curto {
+        display: inline;
     }
 
     /* Remove desktop offset, add bottom padding instead */
@@ -408,6 +457,27 @@ html.sidebar-collapsed #pal-sidebar-reopen {
         document.documentElement.classList.add('sidebar-collapsed');
     }
 })();
+
+// Celular: a barra de baixo rola na horizontal; mostra o item ativo e indica se há mais itens
+document.addEventListener('DOMContentLoaded', function () {
+    var barra = document.getElementById('pal-sidebar');
+    var trilho = barra && barra.querySelector('.pal-sidebar-inner');
+    if (!trilho) return;
+
+    function marcarBordas() {
+        var resto = trilho.scrollWidth - trilho.clientWidth - trilho.scrollLeft;
+        barra.dataset.maisDireita = resto > 4 ? 'true' : 'false';
+        barra.dataset.maisEsquerda = trilho.scrollLeft > 4 ? 'true' : 'false';
+    }
+
+    var ativo = trilho.querySelector('.pal-sidebar-item--active');
+    if (ativo && trilho.scrollWidth > trilho.clientWidth) {
+        trilho.scrollLeft = ativo.offsetLeft - (trilho.clientWidth - ativo.offsetWidth) / 2;
+    }
+    marcarBordas();
+    trilho.addEventListener('scroll', marcarBordas, { passive: true });
+    window.addEventListener('resize', marcarBordas);
+});
 
 function palToggleSidebar() {
     var isCollapsed = document.documentElement.classList.toggle('sidebar-collapsed');
@@ -466,6 +536,7 @@ function palToggleSidebar() {
             <x-ui.sidebar-item
                 href="{{ route('professor.presenca.index') }}"
                 label="Presença / QR"
+                curto="QR Code"
                 :active="request()->routeIs('professor.presenca.*')">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -479,6 +550,7 @@ function palToggleSidebar() {
             <x-ui.sidebar-item
                 href="{{ route('professor.gerenciar.index') }}"
                 label="Minhas Turmas"
+                curto="Turmas"
                 :active="request()->routeIs('professor.gerenciar.*')"
                 :badge="$sidebarCounts['minhas_materias'] ?? null">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -517,6 +589,7 @@ function palToggleSidebar() {
             <x-ui.sidebar-item
                 href="{{ route('professor.evento.presenca') }}"
                 label="Evento / Palestra"
+                curto="Evento"
                 :active="request()->routeIs('professor.evento.*')">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -532,6 +605,7 @@ function palToggleSidebar() {
             <x-ui.sidebar-item
                 href="{{ route('dashboard.master') }}"
                 label="Visão Geral"
+                curto="Início"
                 :active="request()->routeIs('dashboard.master')">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -625,6 +699,7 @@ function palToggleSidebar() {
                 <x-ui.sidebar-item
                     href="{{ route('master.presenca') }}"
                     label="Central de Presença"
+                curto="Frequência"
                     :active="request()->routeIs('master.presenca')">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -641,6 +716,7 @@ function palToggleSidebar() {
         <x-ui.sidebar-item
             href="{{ route('dois-fatores.configurar') }}"
             label="Segurança da conta"
+                curto="Segurança"
             :active="request()->routeIs('dois-fatores.*')">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

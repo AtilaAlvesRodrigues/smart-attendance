@@ -93,7 +93,7 @@
                                 <div class="absolute -top-12 -right-12 w-32 h-32 bg-green-500/20 blur-3xl"></div>
                             @endif
 
-                            <div class="flex justify-between items-start mb-6">
+                            <div class="flex flex-wrap-reverse justify-between items-start gap-3 mb-6">
                                 <div>
                                     <h3 class="text-2xl font-black pal-text tracking-tight leading-tight group-hover:text-indigo-400 transition-colors">{{ $materia->nome }}</h3>
                                     <div class="mt-3 flex items-center gap-2">
@@ -104,7 +104,7 @@
                                 </div>
                                 
                                 @if($materia->active_code)
-                                    <div class="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
+                                    <div class="shrink-0 flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
                                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                                         <span class="text-[9px] font-black text-green-400 tracking-widest uppercase">Ativo</span>
                                     </div>
