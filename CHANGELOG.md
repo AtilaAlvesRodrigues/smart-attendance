@@ -14,6 +14,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - **E-mail institucional:** exemplos de SMTP (Microsoft 365, Google Workspace, servidor próprio) no `.env.example` e botão "Enviar e-mail de teste" no Master.
 
 ### Corrigido (deste pacote)
+- **Erro 500 com muitos acessos simultâneos:** no pooler do Supabase em modo sessão, o 16º acesso ao mesmo tempo falhava (`EMAXCONNSESSION`; 25 de 40 requisições simultâneas deram 500 no teste de carga de 22/11/2026). Suporte ao modo transação (`DB_PORT=6543` com `DB_EMULATE_PREPARES=true`).
 - Atestados das justificativas guardados no banco (tabela `justificativa_anexos`), para o anexo funcionar na Vercel; limite de 4 MB, abaixo do limite de 4,5 MB por requisição da Vercel.
 - Duplo clique ao enviar justificativa não dá mais erro 500 nem deixa arquivo solto.
 - Com 2FA ativo, a senha certa sozinha não apaga mais o token de primeiro acesso: ele só deixa de valer depois do código.
