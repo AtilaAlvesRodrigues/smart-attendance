@@ -71,7 +71,7 @@
                         <div class="rc-field">
                             <label for="anexo" class="login-label">Atestado ou comprovante (opcional)</label>
                             <input id="anexo" name="anexo" type="file" class="rc-input" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" aria-describedby="anexo-dica">
-                            <span id="anexo-dica" class="rc-hint">PDF, JPG ou PNG, até 5 MB. Só você e o professor da matéria podem ver o arquivo.</span>
+                            <span id="anexo-dica" class="rc-hint">PDF, JPG ou PNG, até 4 MB. Só você e o professor da matéria podem ver o arquivo.</span>
                         </div>
                     @else
                         <div class="rc-alert rc-alert-info" style="margin:0">O envio de anexos está temporariamente indisponível. Envie a justificativa com o texto e entregue o atestado ao professor.</div>

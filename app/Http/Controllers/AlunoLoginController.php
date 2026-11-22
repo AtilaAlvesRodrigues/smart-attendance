@@ -51,21 +51,22 @@ class AlunoLoginController extends BaseController
             Auth::guard('professores')->logout();
             Auth::guard('masters')->logout();
 
-            // Invalidar token pendente se o usuário logou com senha normal
-            if (!is_null($aluno->remember_token)) {
-                $aluno->remember_token = null;
-                $aluno->save();
-            }
-
             $pendingCode = session()->pull('pending_attendance_code');
             $pendingToken = session()->pull('pending_attendance_token');
             $destino = $pendingCode
                 ? route('presenca.confirmar', ['codigo_aula' => $pendingCode, 't' => $pendingToken])
                 : route('dashboard.aluno');
 
+            // Com 2FA, o token de primeiro acesso só é apagado depois do código (LoginPendente::concluir)
             if ($aluno->temDoisFatores()) {
                 LoginPendente::iniciar($request, 'alunos', $aluno->id, $remember, $destino);
                 return redirect()->route('dois-fatores.desafio');
+            }
+
+            // Sem 2FA: invalidar token pendente se o usuário logou com senha normal
+            if (!is_null($aluno->remember_token)) {
+                $aluno->remember_token = null;
+                $aluno->save();
             }
 
             Auth::guard('alunos')->login($aluno, $remember);

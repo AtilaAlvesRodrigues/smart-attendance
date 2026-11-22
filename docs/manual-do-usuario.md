@@ -89,7 +89,7 @@ No painel, clique em **Justificar uma falta**.
 
 1. Escolha a aula em que você faltou. A lista mostra só as aulas em que você não tem presença.
 2. Escreva o motivo, com pelo menos 10 caracteres.
-3. Se tiver, anexe o atestado ou comprovante (PDF, JPG ou PNG, até 5 MB). Só você e o professor da matéria veem o arquivo.
+3. Se tiver, anexe o atestado ou comprovante (PDF, JPG ou PNG, até 4 MB). Só você e o professor da matéria veem o arquivo.
 4. Clique em **Enviar justificativa**.
 
 A justificativa aparece em **Enviadas** como *Em análise*. Quando o professor decidir, você recebe um e-mail. Se for aprovada, a falta é **abonada** e deixa de contar na frequência. É uma justificativa por falta; se ela for recusada, fale com o professor.
@@ -148,7 +148,7 @@ Um aluno estava na aula, mas a presença não registrou? Ou alguém registrou e 
 2. Escolha a aula. A tela mostra cada aluno com a situação: *Presente*, *Falta*, *Presente (corrigido)* ou *Falta abonada*.
 3. Mude a chave do aluno, escreva o **motivo** (obrigatório) e clique em **Salvar**.
 
-Toda correção fica no **Histórico de correções** da aula, com data e motivo. Não é possível remover a única presença de uma aula: sem nenhuma presença, a aula deixaria de existir e as faltas da turma inteira mudariam.
+Toda correção fica no **Histórico de correções** da aula, com data e motivo. Se a presença desmarcada era uma falta abonada, a justificativa do aluno passa a aparecer como *Recusada*, com o seu motivo. Não é possível remover a única presença de uma aula: sem nenhuma presença, a aula deixaria de existir e as faltas da turma inteira mudariam.
 
 ### Justificativas de falta
 

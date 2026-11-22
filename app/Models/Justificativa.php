@@ -74,6 +74,10 @@ class Justificativa extends Model
      */
     public static function anexoHabilitado(): bool
     {
+        if (\App\Support\AnexosJustificativa::noBanco()) {
+            return true;
+        }
+
         $driver = config('filesystems.disks.' . self::DISCO . '.driver');
 
         $naVercel = ! empty($_SERVER['VERCEL'] ?? $_ENV['VERCEL'] ?? getenv('VERCEL'));

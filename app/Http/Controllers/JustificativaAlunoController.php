@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Justificativa;
+use App\Support\AnexosJustificativa;
 use App\Support\AulasDaMateria;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -25,11 +27,14 @@ class JustificativaAlunoController extends BaseController
             ->get();
         $jaJustificadas = $justificativas->map(fn ($j) => $j->materia_id . '|' . $j->codigo_aula)->flip();
 
-        // Faltas ainda sem justificativa, agrupadas por matéria
-        $faltasPorMateria = $aluno->materias()->orderBy('nome')->get()
+        // Faltas ainda sem justificativa, agrupadas por matéria (2 consultas, não 2 por matéria)
+        $materias = $aluno->materias()->orderBy('nome')->get();
+        $faltas = AulasDaMateria::faltasDoAlunoPorMateria($aluno->id, $materias->pluck('id'));
+
+        $faltasPorMateria = $materias
             ->map(fn ($materia) => [
                 'materia' => $materia,
-                'faltas'  => AulasDaMateria::faltasDoAluno($materia->id, $aluno->id)
+                'faltas'  => ($faltas[$materia->id] ?? collect())
                     ->reject(fn ($aula) => isset($jaJustificadas[$materia->id . '|' . $aula->codigo_aula]))
                     ->values(),
             ])
@@ -54,13 +59,13 @@ class JustificativaAlunoController extends BaseController
             'codigo_aula' => 'required|string|max:100',
             'motivo'      => 'required|string|min:10|max:2000',
             'anexo'       => $anexoHabilitado
-                ? 'nullable|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120'
+                ? 'nullable|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:' . AnexosJustificativa::LIMITE_KB
                 : 'prohibited',
         ], [
             'motivo.min'     => 'Explique o motivo com pelo menos 10 caracteres.',
             'anexo.mimes'    => 'O atestado precisa ser PDF, JPG ou PNG.',
             'anexo.mimetypes'=> 'O atestado precisa ser PDF, JPG ou PNG.',
-            'anexo.max'      => 'O atestado pode ter no máximo 5 MB.',
+            'anexo.max'      => 'O atestado pode ter no máximo 4 MB.',
         ]);
 
         if (! $aluno->materias()->where('materias.id', $dados['materia_id'])->exists()) {
@@ -79,21 +84,32 @@ class JustificativaAlunoController extends BaseController
         }
 
         $anexo = $request->file('anexo');
-        $caminho = $anexo
-            ? Storage::disk(Justificativa::DISCO)->putFile(now()->format('Y/m'), $anexo)
-            : null;
+        $arquivo = $anexo ? AnexosJustificativa::prepararNoDisco($anexo) : null;
 
-        Justificativa::create([
-            'aluno_id'    => $aluno->id,
-            'materia_id'  => (int) $dados['materia_id'],
-            'codigo_aula' => $falta->codigo_aula,
-            'data_aula'   => $falta->data_aula,
-            'motivo'      => $dados['motivo'],
-            'anexo_path'  => $caminho,
-            'anexo_nome'  => $anexo ? mb_substr($anexo->getClientOriginalName(), 0, 200) : null,
-            'anexo_mime'  => $anexo?->getMimeType(),
-            'status'      => Justificativa::STATUS_PENDENTE,
-        ]);
+        try {
+            DB::transaction(function () use ($aluno, $dados, $falta, $anexo, $arquivo) {
+                $justificativa = Justificativa::create([
+                    'aluno_id'    => $aluno->id,
+                    'materia_id'  => (int) $dados['materia_id'],
+                    'codigo_aula' => $falta->codigo_aula,
+                    'data_aula'   => $falta->data_aula,
+                    'motivo'      => $dados['motivo'],
+                    'anexo_path'  => $arquivo['path'] ?? null,
+                    'anexo_nome'  => $arquivo['nome'] ?? null,
+                    'anexo_mime'  => $arquivo['mime'] ?? null,
+                    'status'      => Justificativa::STATUS_PENDENTE,
+                ]);
+
+                if ($anexo) {
+                    AnexosJustificativa::guardarNoBanco($justificativa, $anexo);
+                }
+            });
+        } catch (UniqueConstraintViolationException) {
+            // Duplo clique ou duas abas: a outra requisição já gravou esta justificativa
+            AnexosJustificativa::descartar($arquivo['path'] ?? null);
+
+            throw ValidationException::withMessages(['codigo_aula' => 'Você já enviou uma justificativa para esta falta.']);
+        }
 
         return redirect()->route('aluno.justificativas')
             ->with('status', 'Justificativa enviada. Você recebe um e-mail quando o professor decidir.');
@@ -108,14 +124,6 @@ class JustificativaAlunoController extends BaseController
 
     public static function baixarAnexo(Justificativa $justificativa)
     {
-        abort_unless($justificativa->anexo_path, 404);
-
-        $disco = Storage::disk(Justificativa::DISCO);
-        abort_unless($disco->exists($justificativa->anexo_path), 404);
-
-        return $disco->download($justificativa->anexo_path, $justificativa->anexo_nome ?: 'atestado', [
-            'Content-Type'           => $justificativa->anexo_mime ?: 'application/octet-stream',
-            'X-Content-Type-Options' => 'nosniff',
-        ]);
+        return AnexosJustificativa::resposta($justificativa);
     }
 }

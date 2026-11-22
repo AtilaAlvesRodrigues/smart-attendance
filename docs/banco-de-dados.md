@@ -128,6 +128,7 @@ erDiagram
 | `materia_professor` | Quem leciona o quê | Uma matéria pode ter mais de um professor |
 | `presencas` | Presenças | Uma linha por aluno por chamada (índice único `aluno_id` + `materia_id` + `codigo_aula`); `codigo_aula` agrupa a chamada; `origem` diz se veio do QR Code, de correção do professor ou de justificativa aprovada |
 | `presenca_ajustes` | Histórico de correções e abonos | Nunca editado pela aplicação |
+| `justificativa_anexos` | Atestados guardados no banco (`JUSTIFICATIVAS_DISK=banco`) | Conteúdo criptografado com a `APP_KEY` e tamanho; uma linha por justificativa, apagada junto com ela |
 | `justificativas` | Justificativas de falta | Uma por falta (índice único `aluno_id` + `materia_id` + `codigo_aula`); o atestado fica no disco `justificativas`, nunca em pasta pública |
 | `solicitacoes_acesso` | Pedidos públicos de cadastro | E-mail sem índice único, para permitir um novo pedido depois de uma rejeição |
 

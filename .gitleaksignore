@@ -4,3 +4,7 @@
 
 # Senha fictícia usada só nos testes automatizados do 2FA (banco SQLite em memória)
 f37446ff4f8b695e702b34efe74dc95ca8688e26:tests/Feature/DoisFatoresTest.php:generic-api-key:42
+
+# Mesma senha fictícia em testes de PendenciasMenoresTest (depois trocada por variável)
+0010295ec0b4470a25fca39b62fbe33113abaf6f:tests/Feature/PendenciasMenoresTest.php:generic-api-key:33
+0010295ec0b4470a25fca39b62fbe33113abaf6f:tests/Feature/PendenciasMenoresTest.php:generic-api-key:48

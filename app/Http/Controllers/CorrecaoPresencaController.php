@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Justificativa;
 use App\Models\Materia;
 use App\Models\Presenca;
 use App\Models\PresencaAjuste;
@@ -51,12 +52,16 @@ class CorrecaoPresencaController extends BaseController
             ->latest('created_at')
             ->get();
 
+        $alunos = $materia->alunos()->orderBy('nome')->get();
+
         return view('professor.gerenciar.chamada', [
             'professor' => Auth::guard('professores')->user(),
             'materia'   => $materia,
             'aula'      => $aula,
-            'alunos'    => $materia->alunos()->orderBy('nome')->get(),
+            'alunos'    => $alunos,
             'presencas' => $presencas,
+            // Só quem continua matriculado entra no "X de Y presentes"
+            'presentes' => $presencas->keys()->intersect($alunos->pluck('id'))->count(),
             'ajustes'   => $ajustes,
         ]);
     }
@@ -139,6 +144,22 @@ class CorrecaoPresencaController extends BaseController
                 }
 
                 $presencaId = $existente->id;
+
+                // Era um abono: a justificativa aprovada deixa de valer, com o motivo do professor
+                if ($existente->origem === Presenca::ORIGEM_JUSTIFICATIVA) {
+                    Justificativa::where('aluno_id', $dados['aluno_id'])
+                        ->where('materia_id', $materia->id)
+                        ->where('codigo_aula', $aula->codigo_aula)
+                        ->where('status', Justificativa::STATUS_APROVADA)
+                        ->update([
+                            'status'               => Justificativa::STATUS_RECUSADA,
+                            'comentario_professor' => mb_substr('Abono removido pelo professor: ' . $dados['motivo'], 0, 1000),
+                            'decidida_por'         => $professor->id,
+                            'decidida_em'          => now(),
+                            'updated_at'           => now(),
+                        ]);
+                }
+
                 $existente->delete();
                 $acao = PresencaAjuste::ACAO_DESMARCOU;
             }
