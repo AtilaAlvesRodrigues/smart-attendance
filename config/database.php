@@ -96,6 +96,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => env('DB_SEARCH_PATH', 'public'),
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Pooler do Supabase em modo transação (porta 6543): a conexão do
+            // servidor muda entre transações, então os prepared statements são
+            // emulados no PHP. Veja docs/deploy.md.
+            'options' => filter_var(env('DB_EMULATE_PREPARES', false), FILTER_VALIDATE_BOOLEAN)
+                ? [PDO::ATTR_EMULATE_PREPARES => true]
+                : [],
         ],
 
         'sqlsrv' => [

@@ -28,7 +28,8 @@ Ordem das rotas no `vercel.json`:
 | `APP_ENV` / `APP_DEBUG` | `production` / `false` | Erros sem detalhes internos |
 | `APP_LOCALE` | `pt_BR` | |
 | `DB_CONNECTION` | `pgsql` | |
-| `DB_HOST` / `DB_PORT` | `aws-0-<região>.pooler.supabase.com` / `5432` | *Session pooler* do Supabase: a Vercel não tem IPv6, e o endereço direto do banco é só IPv6 |
+| `DB_HOST` / `DB_PORT` | `aws-0-<região>.pooler.supabase.com` / `6543` | Pooler do Supabase em **modo transação** (a Vercel não tem IPv6, e o endereço direto do banco é só IPv6). No modo sessão (porta `5432`), cada requisição prende uma das 15 vagas do plano gratuito do começo ao fim, e o 16º acesso simultâneo recebia erro 500 (`EMAXCONNSESSION`, medido em 22/11/2026: 15 de 40 requisições simultâneas passaram) |
+| `DB_EMULATE_PREPARES` | `true` | Obrigatório com a porta `6543`: no modo transação a conexão do servidor muda entre transações, então os *prepared statements* são emulados no PHP. O `search_path` vem do papel `smart_app` (`alter role ... set search_path = laravel`), que vale em qualquer conexão |
 | `DB_DATABASE` | `postgres` | |
 | `DB_USERNAME` | `<usuário>.<id-do-projeto>` | Usuário exclusivo da aplicação, no formato do pooler |
 | `DB_PASSWORD` | senha desse usuário | *sensitive* |
