@@ -17,9 +17,9 @@ Das sete demandas do quadro, seis estão entregues e em produção. A sétima, o
 | Commits (sem merges) | 23 |
 | Arquivos alterados | 101 (60 novos, 41 modificados) |
 | Linhas | +7.676 / −374 (inclui a biblioteca Chart.js e o PDF deste relatório) |
-| Testes automatizados | 238 → **345** (todos passando em SQLite e PostgreSQL 17) |
+| Testes automatizados | 238 → **359** (todos passando em SQLite e PostgreSQL 17) |
 | Problemas achados nas revisões | 17: 16 corrigidos antes da publicação e 1 aceito com justificativa (seção 16) |
-| Migrations novas | 6, aplicadas no banco de produção sem perda de dados |
+| Migrations novas | 7, aplicadas no banco de produção sem perda de dados |
 | Deploys de produção | 2: pela CLI em 15/11 e pelo deploy automático do fork em 22/11, ambos `Ready` e sem erros nos logs |
 
 ### As sete demandas
@@ -387,4 +387,38 @@ As pendências de código dos relatórios da entrega foram resolvidas no PR #67,
 **Revisões nesta etapa:** a revisão automática pediu criptografia do atestado guardado no banco (feita) e leitura em partes no download (não feita: com o limite de 4 MB, o arquivo cabe em memória; o download informa o `Content-Length`). A varredura de segredos acusou duas senhas fictícias nos testes novos, trocadas por variável e registradas no `.gitleaksignore`.
 
 **Testes novos:** `AnexoNoBancoTest` (7) e `PendenciasMenoresTest` (5); total de 345, todos passando em SQLite e PostgreSQL 17.
+
+---
+
+## 17. Preparação para o uso ao vivo (22 de novembro de 2026)
+
+Antes do teste com alunos, professores e avaliadores, uma auditoria em produção encontrou três problemas. Dois foram resolvidos; um depende da equipe.
+
+### 17.1 Erro 500 com muitos acessos simultâneos (resolvido)
+
+| Teste de carga | Antes (pooler em modo sessão) | Depois (modo transação) |
+|---|---|---|
+| 3 ondas de 40 acessos simultâneos | **15 de 40** em cada onda; 25 com erro 500 | **40 de 40** em todas as ondas |
+| 1 onda de 80 acessos simultâneos | não testado | **80 de 80**, tempo médio de 2,2 s |
+
+**Causa** (logs do pooler do Supabase): `(EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15`. No modo sessão, cada requisição prendia uma das 15 vagas do plano gratuito do começo ao fim. Numa chamada com a turma inteira escaneando o QR ao mesmo tempo, quem chegasse depois do 15º recebia erro.
+
+**Correção** (PR #71): pooler em modo transação (`DB_PORT=6543`) com *prepared statements* emulados no PHP (`DB_EMULATE_PREPARES=true`). A suíte inteira passa em PostgreSQL com a emulação ligada. A troca foi feita em duas etapas (emulação primeiro, na porta antiga; depois a porta), com a volta para 5432 pronta caso desse erro.
+
+### 17.2 Aviso de baixa frequência por e-mail (card #10, entregue)
+
+PR #69: quando uma matéria entra em *Atenção* por faltas ou frequência, o aluno recebe um e-mail com a mesma explicação do painel. Verificação diária pelo cron da Vercel às 19h (Brasília), no máximo um aviso por matéria a cada 7 dias. Migration `2026_11_22_000002_create_avisos_frequencia_table` aplicada em produção (lote 4). Enquanto o e-mail não estiver configurado (card #47), os avisos vão para o log.
+
+### 17.3 Senha do Master publicada (pendente, com a equipe)
+
+Conferido no banco de produção: **as 28 contas (1 Master, 6 professores e 21 alunos) usam a senha `senha123`**, e o README publicava o acesso de Master. Qualquer aluno poderia entrar como Master e excluir cadastros ou ver dados pessoais. O PR #70 tirou a credencial do README, mas ela continua no histórico do Git: **a senha do Master em produção precisa ser trocada antes da avaliação** (passo a passo na SEC-02 de `docs/falhas-de-seguranca.md`).
+
+### 17.4 O que a equipe precisa fazer antes da avaliação
+
+| Item | Por quê |
+|---|---|
+| Trocar a senha do Master em produção | Senha pública; qualquer pessoa vira administrador |
+| Configurar o Gmail (card #47) | Sem ele, "Esqueci minha senha", o primeiro acesso por e-mail e o aviso de frequência não chegam a ninguém |
+| Fazer um backup do banco (`pg_dump`) | O plano gratuito do Supabase não tem backup para baixar |
+| Teste manual com celular real | Uma chamada, uma justificativa com atestado, uma correção e uma exportação |
 
