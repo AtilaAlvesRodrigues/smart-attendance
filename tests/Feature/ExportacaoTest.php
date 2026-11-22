@@ -187,4 +187,47 @@ class ExportacaoTest extends TestCase
             ->getJson('/professor/gerenciar/relatorios/exportar?data_inicio=ontem')
             ->assertStatus(422);
     }
+
+    /** Duas matérias com uma presença cada; devolve [master, matéria A, matéria B]. */
+    private function centralComDuasMaterias(): array
+    {
+        [$p1, $a] = $this->professorComMateria();
+        [$p2, $b] = $this->professorComMateria();
+        $a->update(['nome' => 'Algoritmos QA', 'sala' => 'LAB-07']);
+        $b->update(['nome' => 'Redes QA', 'sala' => 'SALA-12']);
+        $this->registrarAula($a, $p1, [$this->alunoMatriculado($a, ['nome' => 'Aluno Do Lab', 'email' => 'lab@aluno.test'])]);
+        $this->registrarAula($b, $p2, [$this->alunoMatriculado($b, ['nome' => 'Aluno Da Sala'])]);
+
+        return [UsuarioMaster::factory()->create(), $a, $b];
+    }
+
+    public function test_exportacao_da_central_filtra_a_materia_pela_sala_como_a_busca(): void
+    {
+        [$master] = $this->centralComDuasMaterias();
+
+        $busca = $this->actingAs($master, 'masters')->getJson('/dashboard/master/search/presencas?materia=LAB-07')->json();
+        $this->assertSame(['Aluno Do Lab'], array_column($busca, 'aluno_nome'));
+
+        $abas = $this->lerPlanilha($this->actingAs($master, 'masters')->get('/dashboard/master/presenca/exportar?materia=LAB-07'));
+        $this->assertSame(['Aluno Do Lab'], array_slice(array_column($abas['Presenças'], 0), 1));
+    }
+
+    public function test_exportacao_da_central_encontra_o_aluno_pelo_email_como_a_busca(): void
+    {
+        [$master] = $this->centralComDuasMaterias();
+
+        $abas = $this->lerPlanilha($this->actingAs($master, 'masters')->get('/dashboard/master/presenca/exportar?aluno=lab@aluno.test'));
+
+        $this->assertSame(['Aluno Do Lab'], array_slice(array_column($abas['Presenças'], 0), 1));
+    }
+
+    public function test_central_tem_link_de_exportar_que_acompanha_os_filtros(): void
+    {
+        $master = UsuarioMaster::factory()->create();
+
+        $this->actingAs($master, 'masters')->get('/dashboard/master/presenca')
+            ->assertOk()
+            ->assertSee('id="exportar-planilha"', false)
+            ->assertSee('data-base="' . route('master.presenca.exportar') . '"', false);
+    }
 }
