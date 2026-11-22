@@ -12,7 +12,7 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 | ID | Falha | Gravidade | Situação |
 |---|---|---|---|
 | [SEC-01](#sec-01) | Dependências PHP com 8 avisos de segurança (Symfony) | Alta | **Resolvida** |
-| [SEC-02](#sec-02) | Conta Master da demonstração com senha pública | Alta | Aberta |
+| [SEC-02](#sec-02) | Conta Master da demonstração com senha pública | Alta | Aberta (credencial retirada do README; falta trocar a senha em produção) |
 | [SEC-03](#sec-03) | `trustProxies('*')` sem `trustHosts` | Média | **Resolvida** |
 | [SEC-04](#sec-04) | Scripts de CDN sem Subresource Integrity | Média | **Resolvida** |
 | [SEC-05](#sec-05) | Link da chamada pode ser repassado ao vivo a quem está fora da sala | Média | Parcial |
@@ -49,6 +49,8 @@ Registro das falhas e fraquezas de segurança **identificadas e ainda abertas** 
 
 ## SEC-02
 ### Conta Master da demonstração com senha pública
+
+> **Situação em 22/11/2026:** conferido no banco de produção que as 28 contas (1 Master, 6 professores e 21 alunos) usam `senha123`. A credencial do Master saiu do README e do `CLAUDE.md`, mas continua no histórico do Git: **a senha do Master em produção precisa ser trocada** (passo a passo abaixo) antes de alunos e avaliadores usarem o sistema.
 
 O README publica `master@admin.com` / `senha123` para a demonstração em `smart-attendance-nine-alpha.vercel.app`. Qualquer pessoa entra como administrador e vê o painel inteiro, inclusive o relatório de segurança e o cadastro de usuários. Os dados são fictícios, mas a mesma senha fraca vale para os três perfis.
 

@@ -64,7 +64,8 @@ A demonstração está publicada em **https://smart-attendance-nine-alpha.vercel
 |---|---|---|---|
 | Aluno | Entrar como Aluno | `aluno.teste@site.com` (ou RA `100000000`) | `senha123` |
 | Professor | Entrar como Professor | `professor@teste.com` | `senha123` |
-| Master (administração) | Entrar como Professor | `master@admin.com` | `senha123` |
+
+O acesso de **Master** (administração) não é público: a equipe informa a senha por canal privado a quem for avaliar.
 
 > [!NOTE]
 > Os dados da demonstração são fictícios e podem ser reiniciados a qualquer momento. Não cadastre dados reais. Na demo, o envio de e-mail está desligado: ao cadastrar alguém, o Master recebe na tela o token de primeiro acesso.
