@@ -1,7 +1,7 @@
 # Relatório das novas funcionalidades · Smart Attendance
 
-**Período:** 15 e 16 de novembro de 2026  
-**Base:** commit `88185c8` (merge do PR #61), branch `main` · **Resultado:** commit `44e9758` (merge do PR #65)  
+**Período:** 15 a 22 de novembro de 2026 (entrega em 15/11, pendências resolvidas em 22/11)  
+**Base:** commit `88185c8` (merge do PR #61), branch `main` · **Resultado:** commit `d2e6392` (merge do PR #67)  
 **Repositório oficial:** `AtilaAlvesRodrigues/smart-attendance` · **Fork de deploy:** `jooaoleonardi/smart-attendance`  
 **Produção:** `https://smart-attendance-nine-alpha.vercel.app`
 
@@ -9,18 +9,18 @@
 
 ## 1. Resumo
 
-Das sete demandas do quadro, cinco foram entregues e estão em produção, uma funciona com uma limitação e uma tem o código pronto, mas depende de dados da instituição para ser configurada.
+Das sete demandas do quadro, seis estão entregues e em produção. A sétima, o envio de e-mails pelo servidor da instituição, tem o código pronto e espera só a conta de e-mail (Gmail) e a senha de app, que precisam ser cadastradas por quem tem a conta.
 
 | Indicador | Valor |
 |---|---|
-| Pull Requests | 2 mergeados (#64 e #65) |
-| Commits (sem merges) | 19 |
-| Arquivos alterados | 93 (54 novos, 39 modificados) |
-| Linhas | +6.786 / −370 (inclui a biblioteca Chart.js copiada para o projeto) |
-| Testes automatizados | 238 → **333** (todos passando em SQLite e PostgreSQL 17) |
-| Problemas achados nas revisões | 15, todos corrigidos antes da publicação |
-| Migrations novas | 5, aplicadas no banco de produção sem perda de dados |
-| Deploy de produção | 1, pela CLI da Vercel, `Ready` e sem erros nos logs |
+| Pull Requests | 4 mergeados: #64 e #65 (entrega), #66 (este relatório) e #67 (pendências) |
+| Commits (sem merges) | 23 |
+| Arquivos alterados | 101 (60 novos, 41 modificados) |
+| Linhas | +7.676 / −374 (inclui a biblioteca Chart.js e o PDF deste relatório) |
+| Testes automatizados | 238 → **345** (todos passando em SQLite e PostgreSQL 17) |
+| Problemas achados nas revisões | 17: 16 corrigidos antes da publicação e 1 aceito com justificativa (seção 16) |
+| Migrations novas | 6, aplicadas no banco de produção sem perda de dados |
+| Deploys de produção | 2: pela CLI em 15/11 e pelo deploy automático do fork em 22/11, ambos `Ready` e sem erros nos logs |
 
 ### As sete demandas
 
@@ -31,10 +31,10 @@ Das sete demandas do quadro, cinco foram entregues e estão em produção, uma f
 | #12 | Criar dashboard com gráficos de presença por turma | **Feito**, em produção |
 | #45 | Editar e excluir cadastros no painel do Master | **Feito**, em produção |
 | #46 | Exportar relatórios de presença em planilha | **Feito**, em produção |
-| #43 | Permitir justificativa de faltas | **Parcial**: funciona, mas o envio de atestado está desligado até configurar o armazenamento |
+| #43 | Permitir justificativa de faltas | **Feito**, em produção, com atestado guardado no banco (desde 22/11) |
 | #47 | Configurar o envio de e-mails pelo servidor da instituição | **Código pronto, não configurado**: faltam os dados do SMTP da instituição |
 
-Os cinco cards feitos foram fechados no GitHub e movidos para *Concluído* no quadro; #43 e #47 estão em *Em andamento*.
+Os seis cards feitos foram fechados no GitHub e movidos para *Concluído* no quadro; o #47 está em *Em andamento*.
 
 ---
 
@@ -48,14 +48,16 @@ A decisão central foi tratar **falta abonada** e **presença corrigida** como r
 
 **Solução:**
 
-- O aluno abre *Justificar uma falta*, escolhe a aula (a lista mostra só as aulas em que ele faltou), escreve o motivo (mínimo de 10 caracteres) e pode anexar um atestado em PDF, JPG ou PNG de até 5 MB.
+- O aluno abre *Justificar uma falta*, escolhe a aula (a lista mostra só as aulas em que ele faltou), escreve o motivo (mínimo de 10 caracteres) e pode anexar um atestado em PDF, JPG ou PNG de até 4 MB (a Vercel recusa requisições acima de 4,5 MB).
 - O professor da matéria vê as pendentes em *Justificativas* (o painel mostra quantas aguardam), abre o atestado e **aprova** ou **recusa**, com comentário opcional.
 - Aprovada, a falta vira presença com origem `justificativa` e deixa de contar. O aluno recebe a decisão por e-mail.
-- Uma justificativa por falta. Só o próprio aluno e o professor da matéria baixam o anexo, que é salvo com nome aleatório, fora da pasta pública.
+- Uma justificativa por falta. Só o próprio aluno e o professor da matéria baixam o anexo.
+- Em produção, o atestado fica no próprio banco (tabela `justificativa_anexos`, `JUSTIFICATIVAS_DISK=banco`), **criptografado com a `APP_KEY`**, porque é dado pessoal sensível. Em desenvolvimento, fica numa pasta privada.
+- Se o professor desmarcar depois uma presença abonada, a justificativa passa a *Recusada*, com o motivo dele.
 
 **Arquivos:** `JustificativaAlunoController` e `JustificativaProfessorController` (novos), modelo `Justificativa`, e-mail `JustificativaDecididaMail`, telas `aluno/justificativas` e `professor/justificativas`, disco `justificativas` em `config/filesystems.php`.
 
-**Limite conhecido:** na Vercel o disco é somente leitura. Sem o Supabase Storage configurado, o envio de anexo fica desligado e a tela avisa; a justificativa segue só com texto (seção 12).
+**Resolvido em 22/11:** na Vercel o disco é somente leitura, e até essa data o envio de anexo ficava desligado. Com o atestado guardado no banco, o anexo passou a funcionar em produção sem depender de serviço externo (seção 16).
 
 ### 2.2 Correção de presença pelo professor (card #44)
 
@@ -145,6 +147,7 @@ A decisão central foi tratar **falta abonada** e **presença corrigida** como r
 | `2026_11_15_000003_create_justificativas_table` | Tabela `justificativas`, com índice único por aluno, matéria e aula |
 | `2026_11_15_000004_add_two_factor_columns` | 4 colunas de 2FA em `alunos`, `professores` e `usuario_masters` |
 | `2026_11_15_000005_add_unique_aluno_aula_to_presencas_table` | Índice único `presencas(aluno_id, materia_id, codigo_aula)` |
+| `2026_11_22_000001_create_justificativa_anexos_table` | Tabela `justificativa_anexos`: atestado criptografado e tamanho, uma linha por justificativa (aplicada em 22/11, lote 3) |
 
 **Aplicação em produção (Supabase, schema `laravel`):**
 
@@ -299,8 +302,7 @@ Atualizados: `CHANGELOG.md`, `docs/manual-do-usuario.md`, `docs/banco-de-dados.m
 
 | Item | Situação hoje | Por que não rodou | O que destrava |
 |---|---|---|---|
-| Envio real de e-mails (card #47) | Os e-mails ficam no log, e o Master vê os tokens de primeiro acesso na tela | Faltam o servidor, o usuário e a senha do SMTP da instituição | Variáveis `MAIL_*` na Vercel e o botão *Enviar e-mail de teste* |
-| Atestado na justificativa (card #43) | Justificativa só com texto, com aviso na tela | Disco da Vercel é somente leitura; o arquivo precisa do Supabase Storage | Bucket privado `justificativas`, `JUSTIFICATIVAS_DISK=s3` e as chaves `SUPABASE_S3_*` |
+| Envio real de e-mails (card #47) | Os e-mails ficam no log, e o Master vê os tokens de primeiro acesso na tela | O grupo escolheu o Gmail, mas a conta de envio e a senha de app ainda não existem | Criar a conta, gerar a senha de app e cadastrar as variáveis `MAIL_*` (seção 14) |
 | Teste dos fluxos com login em produção | Testado só localmente | Produção usa contas reais | Teste manual com as contas da avaliação |
 | Deploy de teste (preview) com banco separado | Não feito | A Vercel do projeto publica só em produção, e o plano gratuito do Supabase não cria cópias do banco | Não é necessário para a entrega |
 
@@ -324,14 +326,28 @@ Registrados por transparência:
 
 | Item | Responsável | Observação |
 |---|---|---|
-| Configurar o SMTP da instituição (`MAIL_*`) e testar | Equipe, com o TI da instituição | Fecha o card #47 |
-| Criar o bucket `justificativas` e cadastrar as chaves S3 | Equipe | Fecha o card #43 |
-| Ativar `SESSION_ENCRYPT=true` na Vercel | Equipe | Protege a sessão enquanto alguém configura o 2FA |
-| Fazer um teste manual em produção com as contas da avaliação | Equipe | Uma chamada, uma justificativa e uma exportação |
-| Sincronizar o fork e fechar o PR #1 do fork | Equipe | `gh repo sync jooaoleonardi/smart-attendance` |
-| Decidir se o 2FA volta a ser obrigatório para o Master | Equipe | Depois da avaliação |
-| Ajustes menores | Evolução futura | Duplo clique ao enviar justificativa (erro 500 e arquivo solto); o login limpa o token de primeiro acesso antes do 2FA; desmarcar presença abonada não muda a justificativa; "X de Y presentes" conta quem saiu da turma; duas consultas por matéria na tela de justificativas do aluno |
+| Configurar o envio pelo Gmail | Equipe | Fecha o card #47. Passo a passo abaixo |
+| Fazer um teste manual em produção com as contas da avaliação | Equipe | Uma chamada, uma justificativa com atestado e uma exportação |
+| Decidir se o 2FA volta a ser obrigatório para o Master | Equipe | Depois da avaliação (`TWO_FACTOR_MASTER_OBRIGATORIO`) |
 | App mobile para check-in (card #13) | Evolução futura | Fora desta entrega |
+
+**Configurar o Gmail** (a senha de app é um segredo: quem tem a conta cadastra):
+
+1. Na conta Google que vai enviar os e-mails, ligue a verificação em duas etapas e gere uma senha de app em `https://myaccount.google.com/apppasswords`.
+2. Na pasta do projeto, cadastre as variáveis em Production (cada comando pede o valor):
+
+```bash
+vercel env rm MAIL_MAILER production --yes
+vercel env add MAIL_MAILER production         # smtp
+vercel env add MAIL_HOST production           # smtp.gmail.com
+vercel env add MAIL_PORT production           # 587
+vercel env add MAIL_SCHEME production         # smtp
+vercel env add MAIL_USERNAME production       # o endereço Gmail
+vercel env add MAIL_PASSWORD production       # a senha de app, sem espaços
+vercel env add MAIL_FROM_ADDRESS production   # o mesmo endereço Gmail
+```
+
+3. Publique de novo (`vercel deploy --prod`, ou sincronize o fork) e, no painel do Master, clique em **Enviar e-mail de teste**.
 
 ---
 
@@ -339,7 +355,7 @@ Registrados por transparência:
 
 ```bash
 # Testes
-php artisan test                        # 333 passando
+php artisan test                        # 345 passando
 
 # Dependências
 composer audit                          # sem avisos
@@ -348,3 +364,27 @@ composer audit                          # sem avisos
 curl -s -o /dev/null -w "%{http_code}\n" https://smart-attendance-nine-alpha.vercel.app/login/professor   # 200
 curl -s -o /dev/null -w "%{http_code}\n" https://smart-attendance-nine-alpha.vercel.app/aluno/justificativas  # 302 (pede login)
 ```
+
+---
+
+## 16. Atualização de 22 de novembro de 2026
+
+As pendências de código dos relatórios da entrega foram resolvidas no PR #67, publicado em produção.
+
+| Pendência | O que foi feito |
+|---|---|
+| Atestado desligado em produção (card #43) | Atestado guardado no banco, criptografado com a `APP_KEY`; limite de 4 MB |
+| Duplo clique ao enviar justificativa dava erro 500 e deixava arquivo solto | Mensagem de duplicidade; o arquivo do envio recusado é descartado |
+| O login apagava o token de primeiro acesso antes do código do 2FA | O token só deixa de valer depois do código |
+| Desmarcar presença abonada não mudava a justificativa | A justificativa passa a *Recusada*, com o motivo do professor |
+| "X de Y presentes" contava alunos que saíram da turma | Conta só quem continua matriculado, também nos gráficos |
+| Tela de justificativas do aluno com 2 consultas por matéria | 2 consultas no total |
+| `SESSION_ENCRYPT` desligado | Ligado em Production |
+| Fork desatualizado e deploy automático nunca testado | Fork sincronizado; o deploy automático publicou em produção em menos de 1 minuto |
+
+**Publicação:** migration `2026_11_22_000001` aplicada antes (conferida: tabela com dono `smart_app`, 2 restrições, lote 3); variáveis `JUSTIFICATIVAS_DISK=banco` e `SESSION_ENCRYPT=true` criadas; merge do PR #67; deploy automático pelo fork, `Ready`, domínio de produção apontando para ele, sem erros nos logs. Com `SESSION_ENCRYPT`, quem estava logado precisou entrar de novo uma vez.
+
+**Revisões nesta etapa:** a revisão automática pediu criptografia do atestado guardado no banco (feita) e leitura em partes no download (não feita: com o limite de 4 MB, o arquivo cabe em memória; o download informa o `Content-Length`). A varredura de segredos acusou duas senhas fictícias nos testes novos, trocadas por variável e registradas no `.gitleaksignore`.
+
+**Testes novos:** `AnexoNoBancoTest` (7) e `PendenciasMenoresTest` (5); total de 345, todos passando em SQLite e PostgreSQL 17.
+

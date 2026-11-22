@@ -79,9 +79,13 @@ O Supabase gratuito pausa o banco depois de cerca de 7 dias sem uso. O `vercel.j
 
 ## Deploy automático pelo GitHub
 
-Hoje o projeto `smart-attendance` da Vercel (conta `jooaoleonardi's projects`) **não está ligado ao repositório**: os deploys saem pela CLI. Ligando, cada Pull Request ganha uma URL de *preview* e cada merge na `main` publica em produção.
+Hoje o projeto `smart-attendance` da Vercel (conta `jooaoleonardi's projects`) está ligado ao **fork** `jooaoleonardi/smart-attendance`, não ao repositório oficial. Um merge na `main` oficial **não** publica sozinho: é preciso sincronizar o fork, e a Vercel publica a `main` dele em produção.
 
-> **Situação em novembro de 2026:** `vercel git connect` foi tentado e a Vercel respondeu "Failed to connect": a conta `jooaoleonardi` da Vercel não tem acesso ao repositório `AtilaAlvesRodrigues/smart-attendance`. O passo 1 abaixo precisa ser feito primeiro.
+```bash
+gh repo sync jooaoleonardi/smart-attendance --branch main   # dispara o deploy de produção
+```
+
+> **Situação em novembro de 2026:** `vercel git connect` no repositório oficial respondeu "Failed to connect", porque a conta `jooaoleonardi` da Vercel não tem acesso a `AtilaAlvesRodrigues/smart-attendance`. O caminho pelo fork foi testado em 22/11/2026: a sincronização disparou o deploy de produção, que ficou `Ready` em menos de 1 minuto. A alternativa continua sendo `vercel deploy --prod` pela CLI. Para ligar o repositório oficial, siga os passos abaixo.
 
 1. **O dono do repositório** (`AtilaAlvesRodrigues`) instala o [app da Vercel no GitHub](https://github.com/apps/vercel) com acesso a `smart-attendance`. Um *fork* só aparece se o app tiver acesso a ele.
 2. Na Vercel: *Project → Settings → Git → Connect Git Repository* e escolha `AtilaAlvesRodrigues/smart-attendance`. Pela CLI: `vercel git connect https://github.com/AtilaAlvesRodrigues/smart-attendance`.
