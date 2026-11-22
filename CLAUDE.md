@@ -83,7 +83,7 @@ Before making any UI changes, consult `.cursorrules` — it documents known bugs
 
 | Role | Email | Password |
 |------|-------|----------|
-| Master | `master@admin.com` | `senha123` |
+| Master | `master@admin.com` | `senha123` (só no banco local criado pelo seed; em produção a senha do Master é outra e não fica no repositório) |
 | Professor | `professor@teste.com` | `senha123` |
 | Aluno | `aluno.teste@site.com` | `senha123` |
 
