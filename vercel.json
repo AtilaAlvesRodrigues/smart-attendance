@@ -29,6 +29,10 @@
         {
             "path": "/cron/manter-banco-ativo",
             "schedule": "0 12 * * *"
+        },
+        {
+            "path": "/cron/avisos-frequencia",
+            "schedule": "0 22 * * *"
         }
     ],
     "git": {

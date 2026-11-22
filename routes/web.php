@@ -71,6 +71,15 @@ Route::get('/cron/manter-banco-ativo', function (Request $request) {
 
     return response()->noContent();
 })->middleware('throttle:5,1')->name('cron.manter-banco');
+
+// Agendado na Vercel (vercel.json → crons), 1x por dia: avisa por e-mail os alunos
+// em Atenção por faltas (issue #10). Mesma proteção do cron acima.
+Route::get('/cron/avisos-frequencia', function (Request $request) {
+    $segredo = config('services.cron.secret');
+    abort_unless($segredo && hash_equals('Bearer ' . $segredo, (string) $request->header('Authorization')), 404);
+
+    return response()->json(['avisos' => \App\Support\AvisosFrequencia::enviar()]);
+})->middleware('throttle:5,1')->name('cron.avisos-frequencia');
 Route::get('/login', [LoginRouterController::class, 'showLoginForm'])->name('login_form');
 
 Route::get('/login/aluno', [AlunoLoginController::class, 'showLoginForm'])->name('login.aluno.form');

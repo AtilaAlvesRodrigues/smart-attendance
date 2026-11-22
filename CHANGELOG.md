@@ -5,6 +5,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 ## Não lançado
 
 ### Adicionado
+- **Aviso de baixa frequência por e-mail** (issue #10): quando uma matéria entra em *Atenção* por faltas ou frequência, o aluno recebe um e-mail com a mesma explicação do painel. Verificação diária pelo cron da Vercel (`/cron/avisos-frequencia`, 19h em Brasília) ou por `php artisan frequencia:avisar`; no máximo um aviso por matéria a cada 7 dias (tabela `avisos_frequencia`).
 - **Justificativa de faltas:** o aluno escolhe a aula, explica o motivo e anexa atestado (PDF/JPG/PNG até 4 MB; em produção, guardado no próprio banco com `JUSTIFICATIVAS_DISK=banco`). O professor aprova (a falta é abonada) ou recusa, e o aluno recebe e-mail.
 - **Correção de presença:** tela "Chamadas" do professor para marcar/desmarcar presença numa aula já feita, com motivo obrigatório e histórico (`presenca_ajustes`). Coluna `presencas.origem` (`qr`, `correcao`, `justificativa`).
 - **Verificação em duas etapas (TOTP):** obrigatória para o Master (`TWO_FACTOR_MASTER_OBRIGATORIO`), opcional para professor e aluno; 8 códigos de recuperação; o Master pode remover o 2FA de um usuário.

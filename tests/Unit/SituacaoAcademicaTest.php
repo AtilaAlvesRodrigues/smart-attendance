@@ -76,4 +76,36 @@ class SituacaoAcademicaTest extends TestCase
         $this->assertSame('atencao', $s->status);
         $this->assertStringContainsString('abaixo dos 75%', $s->explicacao());
     }
+
+    public function test_alerta_de_frequencia_quando_perto_do_limite(): void
+    {
+        // 40 previstas → limite 10; 8 faltas = 80% do limite
+        $s = new SituacaoAcademica(aulasRealizadas: 20, presencas: 12, aulasPrevistas: 40);
+
+        $this->assertSame('atencao', $s->status);
+        $this->assertTrue($s->alertaDeFrequencia());
+    }
+
+    public function test_alerta_de_frequencia_quando_frequencia_abaixo_de_75(): void
+    {
+        // 4 aulas dadas, 2 presenças: 50% de frequência, ainda longe do limite de 10 faltas
+        $s = new SituacaoAcademica(aulasRealizadas: 4, presencas: 2, aulasPrevistas: 40);
+
+        $this->assertSame('atencao', $s->status);
+        $this->assertTrue($s->alertaDeFrequencia());
+    }
+
+    public function test_sem_alerta_de_frequencia_quando_a_atencao_e_so_pela_media(): void
+    {
+        $s = new SituacaoAcademica(aulasRealizadas: 10, presencas: 10, aulasPrevistas: 40, notas: [3.0, 4.0, null, null]);
+
+        $this->assertSame('atencao', $s->status);
+        $this->assertFalse($s->alertaDeFrequencia());
+    }
+
+    public function test_sem_alerta_de_frequencia_em_dia_ou_ja_reprovado(): void
+    {
+        $this->assertFalse((new SituacaoAcademica(aulasRealizadas: 10, presencas: 10, aulasPrevistas: 40))->alertaDeFrequencia());
+        $this->assertFalse((new SituacaoAcademica(aulasRealizadas: 21, presencas: 10, aulasPrevistas: 40))->alertaDeFrequencia());
+    }
 }
