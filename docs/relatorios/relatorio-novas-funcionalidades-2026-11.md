@@ -1,7 +1,7 @@
 # Relatório das novas funcionalidades · Smart Attendance
 
 **Período:** 15 a 22 de novembro de 2026 (entrega em 15/11, pendências resolvidas em 22/11)  
-**Base:** commit `88185c8` (merge do PR #61), branch `main` · **Resultado:** commit `d2e6392` (merge do PR #67)  
+**Base:** commit `88185c8` (merge do PR #61), branch `main` · **Resultado:** commit `37ccdeb` (merge do PR #73)  
 **Repositório oficial:** `AtilaAlvesRodrigues/smart-attendance` · **Fork de deploy:** `jooaoleonardi/smart-attendance`  
 **Produção:** `https://smart-attendance-nine-alpha.vercel.app`
 
@@ -13,14 +13,15 @@ Das sete demandas do quadro, seis estão entregues e em produção. A sétima, o
 
 | Indicador | Valor |
 |---|---|
-| Pull Requests | 4 mergeados: #64 e #65 (entrega), #66 (este relatório) e #67 (pendências) |
-| Commits (sem merges) | 23 |
-| Arquivos alterados | 101 (60 novos, 41 modificados) |
-| Linhas | +7.676 / −374 (inclui a biblioteca Chart.js e o PDF deste relatório) |
-| Testes automatizados | 238 → **359** (todos passando em SQLite e PostgreSQL 17) |
+| Pull Requests | 10 mergeados: #64 e #65 (entrega), #67 (pendências), #69 (aviso de frequência), #71 (pooler), #73 (exportação da Central) e #66, #68, #70 e #72 (documentação) |
+| Commits (sem merges) | 29 |
+| Arquivos alterados | 114 (67 novos, 47 modificados) |
+| Linhas | +8.354 / −445 (inclui a biblioteca Chart.js e o PDF deste relatório) |
+| Testes automatizados | 238 → **362** (todos passando em SQLite e PostgreSQL 17) |
 | Problemas achados nas revisões | 17: 16 corrigidos antes da publicação e 1 aceito com justificativa (seção 16) |
+| Defeitos achados na bateria de testes | 1, corrigido e publicado (seção 18) |
 | Migrations novas | 7, aplicadas no banco de produção sem perda de dados |
-| Deploys de produção | 2: pela CLI em 15/11 e pelo deploy automático do fork em 22/11, ambos `Ready` e sem erros nos logs |
+| Deploys de produção | 7, todos `Ready` e sem erros nos logs: 2 pela CLI (15/11 e a troca da porta do pooler em 22/11) e 5 pelo deploy automático do fork em 22/11 |
 
 ### As sete demandas
 
@@ -421,4 +422,32 @@ Conferido no banco de produção: **as 28 contas (1 Master, 6 professores e 21 a
 | Configurar o Gmail (card #47) | Sem ele, "Esqueci minha senha", o primeiro acesso por e-mail e o aviso de frequência não chegam a ninguém |
 | Fazer um backup do banco (`pg_dump`) | O plano gratuito do Supabase não tem backup para baixar |
 | Teste manual com celular real | Uma chamada, uma justificativa com atestado, uma correção e uma exportação |
+
+---
+
+## 18. Bateria de testes e correção da exportação (22 de novembro de 2026)
+
+Antes do uso ao vivo, o sistema passou por uma bateria de testes em seis frentes. Ela encontrou **um defeito**, corrigido e publicado no PR #73.
+
+### 18.1 O que foi testado
+
+| Frente | Como | Resultado |
+|---|---|---|
+| Suíte automática | `php artisan test` em SQLite e em PostgreSQL 17 (com a emulação do pooler ligada) | 359 testes passando nos dois bancos |
+| Código e dependências | Sintaxe de todo o PHP, compilação de todas as telas Blade, lista de rotas, `composer audit`, `npm audit`, build do front-end | Sem erros e sem vulnerabilidades; 89 rotas |
+| Todas as rotas, com cada perfil | Um robô entrou como visitante, aluno, professor e Master e abriu todas as rotas GET com ids reais do banco, inclusive o acesso cruzado (um perfil abrindo rotas de outro) | **Nenhum erro 500** e nenhuma exceção no `laravel.log`. Os 7 casos 4xx eram o esperado: anexo inexistente (404), matéria de outro professor (403), chamada sem QR ativo (404) e limite de tentativas (429) |
+| Telas no navegador | 25 telas dos três perfis, lendo os erros do console a cada uma | Nenhum erro de JavaScript nem de CSP |
+| Fluxos de ponta a ponta | Chamada completa (professor abre o QR, aluno escaneia antes do login, faz login e a presença é confirmada); cadastro pelo Master e primeiro acesso com o token; justificativa com upload de PDF real e download; solicitar acesso; esqueci a senha; página 404; formulário com CSRF inválido | Todos funcionando. A presença ficou registrada uma única vez, com origem `qr`, e a lista ao vivo do professor mostrou o aluno no horário de Brasília |
+| Produção (sem login) | Cabeçalhos de segurança, rotas de cron, arquivos estáticos e redirecionamento para HTTPS | CSP com nonce, HSTS, proteção contra iframe e `nosniff` em todas as páginas, inclusive a de 404; crons respondem 404 sem o segredo; HTTP redireciona para HTTPS |
+
+### 18.2 O defeito encontrado
+
+**Na Central de Presenças do Master, "Exportar planilha" ignorava os filtros da tela.** Os filtros (professor, matéria e aluno) buscam por JavaScript, sem recarregar a página, e o link de exportar era fixo: a planilha vinha **com todas as presenças**, mesmo com a tela filtrada. Além disso, a busca e a exportação filtravam de formas diferentes. A busca encontrava a matéria também pela sala e o aluno também pelo e-mail; a exportação, não.
+
+**Correção (PR #73):**
+
+- O link de exportar passa a acompanhar os filtros digitados (`?materia=…&aluno=…`) e volta ao normal quando eles são apagados.
+- A busca da tela e a exportação usam uma única regra de filtro (`DashboardController::filtrarPresencasMaster`): professor por nome, CPF ou e-mail; matéria por parte do nome ou da sala; aluno por nome, RA, CPF ou e-mail.
+
+**Verificação:** três testes novos em `ExportacaoTest`, que falhavam antes da correção (filtro pela sala, aluno pelo e-mail e o link que acompanha os filtros); 362 testes passando em SQLite e PostgreSQL; no navegador, o link mudou para `…/exportar?materia=Banco` ao filtrar (com a tabela reduzida para 18 linhas) e voltou ao normal ao limpar, sem erros no console. Em produção, o deploy ficou `Ready` e sem erros nos logs. A tela só abre com login de Master, que não foi usado em produção: vale conferir manualmente filtrando uma matéria e exportando.
 
