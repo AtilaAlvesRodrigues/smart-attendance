@@ -1,7 +1,7 @@
 # Relatório das novas funcionalidades · Smart Attendance
 
 **Período:** 15 a 22 de novembro de 2026 (entrega em 15/11, pendências resolvidas em 22/11)  
-**Base:** commit `88185c8` (merge do PR #61), branch `main` · **Resultado:** commit `37ccdeb` (merge do PR #73)  
+**Base:** commit `88185c8` (merge do PR #61), branch `main` · **Resultado:** commit `93fc6be` (merge do PR #75)  
 **Repositório oficial:** `AtilaAlvesRodrigues/smart-attendance` · **Fork de deploy:** `jooaoleonardi/smart-attendance`  
 **Produção:** `https://smart-attendance-nine-alpha.vercel.app`
 
@@ -13,15 +13,16 @@ Das sete demandas do quadro, seis estão entregues e em produção. A sétima, o
 
 | Indicador | Valor |
 |---|---|
-| Pull Requests | 10 mergeados: #64 e #65 (entrega), #67 (pendências), #69 (aviso de frequência), #71 (pooler), #73 (exportação da Central) e #66, #68, #70 e #72 (documentação) |
-| Commits (sem merges) | 29 |
-| Arquivos alterados | 114 (67 novos, 47 modificados) |
-| Linhas | +8.354 / −445 (inclui a biblioteca Chart.js e o PDF deste relatório) |
-| Testes automatizados | 238 → **362** (todos passando em SQLite e PostgreSQL 17) |
+| Pull Requests | 12 mergeados: #64 e #65 (entrega), #67 (pendências), #69 (aviso de frequência), #71 (pooler), #73 (exportação da Central), #75 (layout no celular) e #66, #68, #70, #72 e #74 (documentação) |
+| Commits (sem merges) | 31 |
+| Arquivos alterados | 122 (69 novos, 53 modificados) |
+| Linhas | +8.685 / −509 (inclui a biblioteca Chart.js e o PDF deste relatório) |
+| Testes automatizados | 238 → **365** (todos passando em SQLite e PostgreSQL 17) |
 | Problemas achados nas revisões | 17: 16 corrigidos antes da publicação e 1 aceito com justificativa (seção 16) |
 | Defeitos achados na bateria de testes | 1, corrigido e publicado (seção 18) |
+| Problemas de layout no celular | 11, corrigidos e publicados (seção 19) |
 | Migrations novas | 7, aplicadas no banco de produção sem perda de dados |
-| Deploys de produção | 7, todos `Ready` e sem erros nos logs: 2 pela CLI (15/11 e a troca da porta do pooler em 22/11) e 5 pelo deploy automático do fork em 22/11 |
+| Deploys de produção | 9, todos `Ready` e sem erros nos logs: 2 pela CLI (15/11 e a troca da porta do pooler em 22/11) e 7 pelo deploy automático do fork em 22/11 |
 
 ### As sete demandas
 
@@ -421,7 +422,7 @@ Conferido no banco de produção: **as 28 contas (1 Master, 6 professores e 21 a
 | Trocar a senha do Master em produção | Senha pública; qualquer pessoa vira administrador |
 | Configurar o Gmail (card #47) | Sem ele, "Esqueci minha senha", o primeiro acesso por e-mail e o aviso de frequência não chegam a ninguém |
 | Fazer um backup do banco (`pg_dump`) | O plano gratuito do Supabase não tem backup para baixar |
-| Teste manual com celular real | Uma chamada, uma justificativa com atestado, uma correção e uma exportação |
+| Teste manual com celular real | Uma chamada, uma justificativa com atestado, uma correção e uma exportação; conferir também a barra de baixo e as tabelas em cartões (seção 19) |
 
 ---
 
@@ -450,4 +451,44 @@ Antes do uso ao vivo, o sistema passou por uma bateria de testes em seis frentes
 - A busca da tela e a exportação usam uma única regra de filtro (`DashboardController::filtrarPresencasMaster`): professor por nome, CPF ou e-mail; matéria por parte do nome ou da sala; aluno por nome, RA, CPF ou e-mail.
 
 **Verificação:** três testes novos em `ExportacaoTest`, que falhavam antes da correção (filtro pela sala, aluno pelo e-mail e o link que acompanha os filtros); 362 testes passando em SQLite e PostgreSQL; no navegador, o link mudou para `…/exportar?materia=Banco` ao filtrar (com a tabela reduzida para 18 linhas) e voltou ao normal ao limpar, sem erros no console. Em produção, o deploy ficou `Ready` e sem erros nos logs. A tela só abre com login de Master, que não foi usado em produção: vale conferir manualmente filtrando uma matéria e exportando.
+
+---
+
+## 19. Layout no celular (22 de novembro de 2026)
+
+Um teste da equipe no celular mostrou a barra de navegação do professor com os nomes sobrepostos ("Presença / QR" em cima de "Minhas Turmas", "Relatórios" em cima de "Justificativas"). A partir daí, **todas as telas dos três perfis foram auditadas em 360 px de largura**, o tamanho de um celular pequeno. A auditoria achou 11 problemas, todos corrigidos e publicados no PR #75.
+
+### 19.1 Como foi auditado
+
+- Login com cada perfil (professor, Master e aluno) no banco local, abrindo todas as telas em 360 × 780 px e tirando screenshots.
+- Em cada tela, um script procurou elementos saindo da largura da tela e itens da barra de baixo sobrepostos.
+- Depois da correção, o mesmo script não achou nenhum elemento fora da tela. As telas foram conferidas também em 1280 px, para garantir que o computador continuou igual.
+
+### 19.2 Problemas encontrados e correções
+
+| Tela | Problema | Correção |
+|---|---|---|
+| Barra de baixo (professor e Master) | Os nomes dos 7 itens do professor e dos 9 do Master se sobrepunham | Cada item tem largura própria e a barra rola para o lado. Nomes curtos no celular (QR Code, Turmas, Evento, Segurança, Início, Frequência); o item da tela atual fica centralizado e uma sombra na borda indica que há mais itens |
+| Barra de baixo (Master) | Os grupos "Usuários" e "Conteúdo" empilhavam itens e quebravam a barra | Os grupos viram itens soltos na barra |
+| Alunos, Professores e Matérias (Master) | A coluna **Ações** (Editar) ficava fora da tela, sem indicação de que dava para arrastar | As tabelas viram cartões: cada linha é um bloco com o nome do campo ao lado do valor e o botão visível |
+| Alunos, Professores e Matérias (Master) | A busca era `hidden md:block`: no celular **não existia** | A busca aparece em largura total no celular; os resultados da busca ao vivo também saem como cartões |
+| Notas da turma (professor) | As colunas de notas, média e situação ficavam fora da tela | Um cartão por aluno, com 1ª Prova, 1º Trab., 2º Trab., 2ª Prova, média e situação |
+| Corrigir chamada (professor) | O campo de motivo e o botão Salvar ficavam cortados | Cartão por aluno com a chave de presença, o motivo e o Salvar |
+| Central de Presenças, Relatórios, Justificativas e Gráficos | Tabelas largas com colunas fora da tela | Mesmo padrão de cartões |
+| Selecionar matéria (professor) | O selo "Ativo" ficava por cima do nome da matéria | O selo vai para a linha de cima quando não cabe |
+| Relatórios (professor) e Central de Presenças (Master) | Botões "Exportar planilha" e "Gerar PDF" espremidos no topo ou saindo do card | Botões movidos para o conteúdo, quebrando linha quando preciso |
+| Solicitações (Master) e cabeçalho da turma (professor) | O formulário de rejeitar e os selos "Previstas/Realizadas" saíam do card | Os elementos quebram linha dentro do card |
+| Telas do aluno | O cronômetro da sessão ficava fixo e cobria o conteúdo ao rolar | No celular ele fica no topo da página e rola junto |
+
+Também foi corrigido o texto "1 alunos" para "1 aluno" na lista de turmas.
+
+### 19.3 Como ficou o código
+
+- **Padrão de tabela em cartões:** a classe `rc-tabela-cartoes` (em `public/css/recursos.css`) e o script `public/js/tabela-cartoes.js`, que copia o nome de cada coluna para as células. Uma tela nova só precisa da classe na `<table>`; o padrão foi registrado em `docs/design-e-acessibilidade.md` (seção "Celular" e checklist).
+- **Barra de baixo:** prop `curto` no componente `x-ui.sidebar-item`, com `aria-label` e `aria-current` para leitores de tela.
+- **Testes:** 3 testes novos em `LayoutCelularTest` (nomes curtos na barra, busca do Master presente no celular, tabelas e script carregados); 365 testes passando.
+
+### 19.4 Verificação em produção
+
+Deploy automático do fork `Ready` (commit `93fc6be`), com o arquivo `js/tabela-cartoes.js` publicado e a tela de login sem rolagem horizontal em 360 px. As telas logadas não foram abertas em produção, porque o teste não usa contas reais: vale a equipe conferir num celular de verdade a barra de baixo, as notas da turma, a correção da chamada e a lista de alunos com o botão Editar.
 
