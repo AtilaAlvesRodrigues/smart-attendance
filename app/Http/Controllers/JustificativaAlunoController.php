@@ -27,11 +27,14 @@ class JustificativaAlunoController extends BaseController
             ->get();
         $jaJustificadas = $justificativas->map(fn ($j) => $j->materia_id . '|' . $j->codigo_aula)->flip();
 
-        // Faltas ainda sem justificativa, agrupadas por matéria
-        $faltasPorMateria = $aluno->materias()->orderBy('nome')->get()
+        // Faltas ainda sem justificativa, agrupadas por matéria (2 consultas, não 2 por matéria)
+        $materias = $aluno->materias()->orderBy('nome')->get();
+        $faltas = AulasDaMateria::faltasDoAlunoPorMateria($aluno->id, $materias->pluck('id'));
+
+        $faltasPorMateria = $materias
             ->map(fn ($materia) => [
                 'materia' => $materia,
-                'faltas'  => AulasDaMateria::faltasDoAluno($materia->id, $aluno->id)
+                'faltas'  => ($faltas[$materia->id] ?? collect())
                     ->reject(fn ($aula) => isset($jaJustificadas[$materia->id . '|' . $aula->codigo_aula]))
                     ->values(),
             ])

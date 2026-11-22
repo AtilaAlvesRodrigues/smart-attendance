@@ -75,7 +75,7 @@ As principais, com os valores do [`.env.example`](../.env.example):
 | `SESSION_DRIVER` / `CACHE_STORE` | `database`: sessões e códigos de chamada ficam no banco |
 | `MAIL_*` | Envio dos e-mails de primeiro acesso, recuperação de senha e decisão das justificativas |
 | `TWO_FACTOR_MASTER_OBRIGATORIO` | `true` (padrão) obriga o Master a usar verificação em duas etapas; `false` só em desenvolvimento |
-| `JUSTIFICATIVAS_DISK` | `local` (pasta privada `storage/app/private/justificativas`) ou `s3` (Supabase Storage, com as variáveis `SUPABASE_S3_*`) |
+| `JUSTIFICATIVAS_DISK` | `local` (pasta privada `storage/app/private/justificativas`), `banco` (tabela `justificativa_anexos`, usado em produção) ou `s3` (Supabase Storage, com as variáveis `SUPABASE_S3_*`) |
 | `CRON_SECRET` | Só em produção: protege a rota da tarefa diária |
 
 ## Testar pelo celular

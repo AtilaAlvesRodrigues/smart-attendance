@@ -25,7 +25,7 @@
         <div class="mb-8 animate-reveal">
             <p class="pal-eyebrow" style="margin-bottom:0.55rem">{{ $materia->nome }}</p>
             <h1 class="pal-title">Chamada de {{ $dataAula }}</h1>
-            <p class="pal-subtitle">{{ $presencas->count() }} de {{ $alunos->count() }} presentes. Para corrigir, mude a chave, escreva o motivo e salve. Toda correção fica registrada.</p>
+            <p class="pal-subtitle">{{ $presentes }} de {{ $alunos->count() }} presentes. Para corrigir, mude a chave, escreva o motivo e salve. Toda correção fica registrada.</p>
         </div>
 
         @if(session('status'))

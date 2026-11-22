@@ -68,6 +68,7 @@ Cada situação vem com uma explicação curta no painel:
 
 Uma falta **abonada** (justificativa aprovada pelo professor) e uma presença **marcada pelo professor** viram registros comuns na tabela `presencas`, só com outra origem (`justificativa` ou `correcao`). Por isso entram na conta como presença em todas as telas, sem regra extra no `SituacaoAcademica`.
 
-- Desmarcar uma presença apaga o registro, e a falta volta a contar.
+- Desmarcar uma presença apaga o registro, e a falta volta a contar. Se era uma falta abonada, a justificativa passa a *Recusada*, com o motivo do professor.
+- Nas telas de chamada e nos gráficos, "presentes" conta só quem continua matriculado; quem saiu da turma não entra na porcentagem.
 - A única presença de uma aula não pode ser removida: a aula só existe enquanto houver ao menos uma presença com o código dela, e apagá-la mudaria as *aulas realizadas* da turma inteira.
 - Toda alteração fica em `presenca_ajustes` (quem, quando, o quê e por quê).

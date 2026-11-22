@@ -56,7 +56,7 @@ Código TOTP de 6 números (RFC 6238) gerado por app autenticador, com a bibliot
 
 - **Obrigatória para o Master** (`TWO_FACTOR_MASTER_OBRIGATORIO=true`, padrão): o middleware `exigir-2fa` leva à configuração antes de abrir o painel. Opcional para professor e aluno.
 - Depois da senha correta, **nada é autenticado** até o código: só o guard, o id e o destino ficam na sessão por 5 minutos (`App\Support\LoginPendente`). O cookie de "permanecer conectado" só é emitido depois do segundo fator.
-- O fluxo de token (primeiro acesso / esqueci a senha) também passa pelo desafio: redefinir a senha pelo e-mail não substitui o segundo fator.
+- O fluxo de token (primeiro acesso / esqueci a senha) também passa pelo desafio: redefinir a senha pelo e-mail não substitui o segundo fator. Com 2FA ativo, a senha certa sozinha não apaga o token de primeiro acesso pendente; ele só deixa de valer depois do código.
 - Cada código vale **uma vez**: o timestep do último código aceito fica gravado, e a verificação relê o usuário com lock da linha, então duas requisições simultâneas com o mesmo código não passam as duas.
 - Segredo e códigos de recuperação (8, uso único, guardados como hash SHA-256) ficam criptografados no banco e fora de qualquer serialização.
 - O rótulo do QR usa o nome, nunca o e-mail.
@@ -141,7 +141,7 @@ O formulário público de check-in tem um campo oculto, `hp_field`, que pessoas 
 ## Justificativas, correções e exportação
 
 - Professores só veem, decidem e baixam anexos de justificativas das **próprias matérias**; o aluno só baixa o próprio anexo (403 nos outros casos).
-- Atestados: `pdf`, `jpg`, `jpeg` ou `png` (extensão e tipo MIME), até 5 MB, gravados com nome aleatório no disco privado `justificativas`; o download passa por rota autenticada com `X-Content-Type-Options: nosniff`.
+- Atestados: `pdf`, `jpg`, `jpeg` ou `png` (extensão e tipo MIME), até 4 MB (a Vercel recusa requisições acima de 4,5 MB), gravados na tabela `justificativa_anexos` (`JUSTIFICATIVAS_DISK=banco`) ou com nome aleatório no disco privado `justificativas`; dois envios simultâneos da mesma justificativa devolvem a mensagem de duplicidade e não deixam arquivo solto; o download passa por rota autenticada com `X-Content-Type-Options: nosniff`.
 - Toda correção de presença exige motivo e fica em `presenca_ajustes`.
 - Planilhas: só nome e RA (nunca CPF ou e-mail); todo texto é gravado como texto, e valores que começam com `=`, `+`, `-` ou `@` recebem um apóstrofo, para nenhum nome virar fórmula no Excel. O resumo do professor se limita às matérias que ele leciona hoje, e um filtro de matéria alheia recebe 403.
 - E-mail de teste: o texto devolvido pelo servidor SMTP nunca é exibido nem gravado (pode conter credenciais ou endereços). A tela mostra só o código SMTP (ex.: 535) e uma dica do que conferir; o log guarda só a classe da exceção.

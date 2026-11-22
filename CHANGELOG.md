@@ -5,7 +5,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 ## Não lançado
 
 ### Adicionado
-- **Justificativa de faltas:** o aluno escolhe a aula, explica o motivo e anexa atestado (PDF/JPG/PNG até 5 MB, disco privado `justificativas`; Supabase Storage em produção via `JUSTIFICATIVAS_DISK=s3`). O professor aprova (a falta é abonada) ou recusa, e o aluno recebe e-mail.
+- **Justificativa de faltas:** o aluno escolhe a aula, explica o motivo e anexa atestado (PDF/JPG/PNG até 4 MB; em produção, guardado no próprio banco com `JUSTIFICATIVAS_DISK=banco`). O professor aprova (a falta é abonada) ou recusa, e o aluno recebe e-mail.
 - **Correção de presença:** tela "Chamadas" do professor para marcar/desmarcar presença numa aula já feita, com motivo obrigatório e histórico (`presenca_ajustes`). Coluna `presencas.origem` (`qr`, `correcao`, `justificativa`).
 - **Verificação em duas etapas (TOTP):** obrigatória para o Master (`TWO_FACTOR_MASTER_OBRIGATORIO`), opcional para professor e aluno; 8 códigos de recuperação; o Master pode remover o 2FA de um usuário.
 - **Gráficos de presença** por matéria (professor) e por turma (Master), com Chart.js 4.4.1 vendorizado.
@@ -14,6 +14,12 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - **E-mail institucional:** exemplos de SMTP (Microsoft 365, Google Workspace, servidor próprio) no `.env.example` e botão "Enviar e-mail de teste" no Master.
 
 ### Corrigido (deste pacote)
+- Atestados das justificativas guardados no banco (tabela `justificativa_anexos`), para o anexo funcionar na Vercel; limite de 4 MB, abaixo do limite de 4,5 MB por requisição da Vercel.
+- Duplo clique ao enviar justificativa não dá mais erro 500 nem deixa arquivo solto.
+- Com 2FA ativo, a senha certa sozinha não apaga mais o token de primeiro acesso: ele só deixa de valer depois do código.
+- Desmarcar uma presença abonada passa a justificativa para *Recusada*, com o motivo do professor.
+- "X de Y presentes" e a porcentagem por aula contam só quem continua matriculado.
+- Tela de justificativas do aluno com 2 consultas no total, em vez de 2 por matéria.
 - `laravel/framework` atualizado para a 12.72.0: corrige o alerta CVE-2026-128083 (baixo) que fazia o `composer audit` do CI falhar.
 - Índice único `presencas(aluno_id, materia_id, codigo_aula)`: duas requisições simultâneas não duplicam mais a presença. A migration remove só as cópias exatas (mesmo aluno, matéria e código); o mesmo código em matérias diferentes, comum nos dados de demonstração antigos, é mantido.
 - Registros de presença e justificativas continuam legíveis depois que o aluno, o professor ou a matéria é excluído.

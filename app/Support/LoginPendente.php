@@ -62,6 +62,11 @@ class LoginPendente
             }
         }
 
+        // A senha já valeu e o código também: o token de primeiro acesso pendente deixa de valer
+        if (! is_null($usuario->remember_token)) {
+            $usuario->forceFill(['remember_token' => null])->save();
+        }
+
         Auth::guard($pendente['guard'])->login($usuario, (bool) $pendente['lembrar']);
         self::cancelar($request);
         $request->session()->regenerate();

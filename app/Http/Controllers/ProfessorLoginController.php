@@ -51,15 +51,16 @@ class ProfessorLoginController extends BaseController
             Auth::guard('alunos')->logout();
             Auth::guard('masters')->logout();
 
+            // Com 2FA, o token de primeiro acesso só é apagado depois do código (LoginPendente::concluir)
+            if ($professor->temDoisFatores()) {
+                LoginPendente::iniciar($request, 'professores', $professor->id, $remember, route('dashboard.professor'));
+                return redirect()->route('dois-fatores.desafio');
+            }
+
             // Invalidar token pendente se o usuário logou com senha normal
             if (!is_null($professor->remember_token)) {
                 $professor->remember_token = null;
                 $professor->save();
-            }
-
-            if ($professor->temDoisFatores()) {
-                LoginPendente::iniciar($request, 'professores', $professor->id, $remember, route('dashboard.professor'));
-                return redirect()->route('dois-fatores.desafio');
             }
 
             Auth::guard('professores')->login($professor, $remember);
@@ -84,15 +85,16 @@ class ProfessorLoginController extends BaseController
             Auth::guard('professores')->logout();
             Auth::guard('alunos')->logout();
 
+            // Com 2FA, o token de primeiro acesso só é apagado depois do código (LoginPendente::concluir)
+            if ($master->temDoisFatores()) {
+                LoginPendente::iniciar($request, 'masters', $master->id, $remember, route('dashboard.master'));
+                return redirect()->route('dois-fatores.desafio');
+            }
+
             // Invalidar token pendente se o usuário logou com senha normal
             if (!is_null($master->remember_token)) {
                 $master->remember_token = null;
                 $master->save();
-            }
-
-            if ($master->temDoisFatores()) {
-                LoginPendente::iniciar($request, 'masters', $master->id, $remember, route('dashboard.master'));
-                return redirect()->route('dois-fatores.desafio');
             }
 
             Auth::guard('masters')->login($master, $remember);

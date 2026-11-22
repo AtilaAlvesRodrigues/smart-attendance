@@ -20,8 +20,9 @@ class AulasDaMateria
      */
     public static function listar(int $materiaId): Collection
     {
+        // Presentes = presenças de quem continua matriculado (quem saiu da turma não conta)
         return self::consulta($materiaId)
-            ->addSelect(DB::raw('COUNT(*) as presentes'))
+            ->selectRaw('SUM(CASE WHEN aluno_id IN (SELECT aluno_id FROM aluno_materia WHERE materia_id = ?) THEN 1 ELSE 0 END) as presentes', [$materiaId])
             ->orderByDesc(DB::raw('MIN(data_aula)'))
             ->orderByDesc(DB::raw('MIN(created_at)'))
             ->get()
@@ -45,6 +46,49 @@ class AulasDaMateria
             ->get()
             ->map(fn ($aula) => self::normalizar($aula))
             ->values();
+    }
+
+    /**
+     * Faltas do aluno em várias matérias de uma vez (2 consultas no total),
+     * agrupadas por matéria.
+     *
+     * @param  iterable<int>  $materiaIds
+     * @return array<int, Collection<int, object>>
+     */
+    public static function faltasDoAlunoPorMateria(int $alunoId, iterable $materiaIds): array
+    {
+        $ids = collect($materiaIds)->map(fn ($id) => (int) $id)->values();
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        $presentes = Presenca::whereIn('materia_id', $ids)
+            ->where('aluno_id', $alunoId)
+            ->get(['materia_id', 'codigo_aula'])
+            ->mapWithKeys(fn ($p) => [$p->materia_id . '|' . $p->codigo_aula => true]);
+
+        $aulas = Presenca::query()
+            ->whereIn('materia_id', $ids)
+            ->select(
+                'materia_id',
+                'codigo_aula',
+                DB::raw('MIN(data_aula) as data_aula'),
+                DB::raw('MIN(horario) as horario'),
+                DB::raw('MIN(semestre) as semestre'),
+                DB::raw('MIN(professor_id) as professor_id'),
+            )
+            ->groupBy('materia_id', 'codigo_aula')
+            ->orderByDesc(DB::raw('MIN(data_aula)'))
+            ->get();
+
+        $porMateria = array_fill_keys($ids->all(), collect());
+        foreach ($aulas as $aula) {
+            if (! isset($presentes[$aula->materia_id . '|' . $aula->codigo_aula])) {
+                $porMateria[(int) $aula->materia_id]->push(self::normalizar($aula));
+            }
+        }
+
+        return $porMateria;
     }
 
     public static function aula(int $materiaId, string $codigo): ?object
