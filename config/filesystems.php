@@ -28,6 +28,10 @@ return [
     |
     */
 
+    // JUSTIFICATIVAS_DISK=banco guarda os atestados na tabela justificativa_anexos
+    // (sem serviço externo). Veja App\Support\AnexosJustificativa.
+    'justificativas_no_banco' => env('JUSTIFICATIVAS_DISK') === 'banco',
+
     'disks' => [
 
         'local' => [
