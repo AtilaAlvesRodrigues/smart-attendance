@@ -25,8 +25,8 @@
 
         <!-- Glass Navbar -->
         <nav class="glass mx-6 mt-6 p-4 rounded-sm border border-white/10 relative z-20 backdrop-blur-xl animate-reveal">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
+            <div class="max-w-7xl mx-auto flex flex-wrap gap-4 justify-between items-center">
+                <div class="flex items-center gap-4 min-w-0">
                     <a href="{{ route('dashboard.master') }}" class="w-10 h-10 bg-white/5 border border-white/10 rounded-sm flex items-center justify-center text-white font-black text-sm hover:border-white/30 transition">
                         P
                     </a>
@@ -36,10 +36,10 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <div class="hidden md:block mr-2">
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div class="w-full md:w-auto md:mr-2">
                         <input type="text" id="search-professores" placeholder="Pesquisar..."
-                            class="pal-filter-input w-48 text-[11px]">
+                            class="pal-filter-input w-full md:w-48 text-[11px]" aria-label="Pesquisar">
                     </div>
                 </div>
             </div>
@@ -58,14 +58,14 @@
             <!-- Professores Section -->
             <div class="glass rounded-sm border border-white/10 overflow-hidden animate-reveal [animation-delay:400ms]">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse rc-tabela-cartoes">
                         <thead>
                             <tr class="text-xs font-black text-white/80 uppercase tracking-[0.2em] border-b border-white/10">
-                                <th class="py-4 px-6">Professor</th>
+                                <th class="py-4 px-6" data-sem-rotulo>Professor</th>
                                 <th class="py-4 px-6">Email</th>
                                 <th class="py-4 px-6">CPF</th>
                                 <th class="py-4 px-6 text-center">Disciplinas</th>
-                                <th class="py-4 px-6 text-right">Ações</th>
+                                <th class="py-4 px-6 text-right" data-sem-rotulo>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="professores-body" class="divide-y divide-white/5">

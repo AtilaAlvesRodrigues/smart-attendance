@@ -87,6 +87,16 @@
     border: 1px solid rgba(168, 85, 247, 0.3);
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
+
+/* Celular: o cronômetro fica no topo da página e rola junto, sem cobrir o conteúdo */
+@media (max-width: 767px) {
+    #session-timer-widget.fallback-fixed {
+        position: absolute;
+        top: calc(var(--pal-nav-h, 60px) + 0.5rem);
+        right: 1rem;
+        z-index: 40;
+    }
+}
 </style>
 
 <script @nonce>

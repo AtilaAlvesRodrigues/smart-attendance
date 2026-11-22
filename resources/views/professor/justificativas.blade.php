@@ -72,8 +72,8 @@
             <section class="rc-card mt-8 animate-reveal pal-card-delay-2" aria-labelledby="titulo-decididas">
                 <div class="rc-card-header"><h2 id="titulo-decididas" class="rc-card-title">Decididas recentemente</h2></div>
                 <div class="overflow-x-auto">
-                    <table class="rc-table">
-                        <thead><tr><th scope="col">Aluno</th><th scope="col">Aula</th><th scope="col">Decisão</th><th scope="col">Em</th></tr></thead>
+                    <table class="rc-table rc-tabela-cartoes">
+                        <thead><tr><th scope="col" data-sem-rotulo>Aluno</th><th scope="col">Aula</th><th scope="col">Decisão</th><th scope="col">Em</th></tr></thead>
                         <tbody>
                             @foreach($decididas as $j)
                                 <tr>

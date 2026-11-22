@@ -22,6 +22,12 @@ O visual do Smart Attendance é escuro por padrão, com tema claro opcional, car
 
 Novas correções globais de legibilidade vão no `usability.css`, e não espalhadas pelos arquivos de cada perfil.
 
+## Celular
+
+- **Barra de baixo (professor e Master):** abaixo de 768 px o menu lateral vira uma barra fixa embaixo. Cada item tem largura própria e a barra rola para o lado; o item da tela atual aparece centralizado e uma sombra na borda indica que há mais itens. Rótulos longos usam o nome curto do `x-ui.sidebar-item` (prop `curto`, por exemplo "Presença / QR" vira "QR Code"). Os grupos do Master (Usuários, Conteúdo) viram itens soltos.
+- **Tabelas largas viram cartões:** a classe `rc-tabela-cartoes` (em `public/css/recursos.css`) empilha cada linha em um bloco abaixo de 640 px, com o nome da coluna ao lado de cada valor. O `public/js/tabela-cartoes.js` copia o texto do `<th>` para o `data-rotulo` das células, inclusive nas linhas que a busca ao vivo recria. Use `data-sem-rotulo` no `<th>` da coluna que dá nome à linha e na coluna de ações. Assim nenhum botão (como Editar) fica escondido fora da tela.
+- **Busca e botões de ação** ficam no conteúdo ou quebram linha; nada fica com `hidden md:block` se for a única forma de usar a função.
+
 ## Acessibilidade
 
 Referência: WCAG 2.2, nível AA.
@@ -53,7 +59,8 @@ Os textos são escritos para quem usa o sistema, e não para quem o programou:
 
 - [ ] Estende `layouts.theme` e define um `@section('title')` específico.
 - [ ] Usa `.pal-title`, `.pal-subtitle` e `.pal-eyebrow` nos títulos.
-- [ ] Funciona em 390 px de largura, sem rolagem horizontal.
+- [ ] Funciona em 360 px de largura, sem rolagem horizontal e sem função escondida no celular.
+- [ ] Tabela com mais de 3 colunas usa `rc-tabela-cartoes`.
 - [ ] Funciona nos temas escuro e claro.
 - [ ] Botões só com ícone têm `aria-label`.
 - [ ] Estados comunicados por texto, e não só por cor.

@@ -3,15 +3,6 @@
 @section('title', 'Relatórios de Presença - Smart Attendance')
 
 @section('body-class', 'gradient-bg relative min-h-screen flex flex-col')
-@section('nav-left')
-    <a href="{{ route('professor.relatorios.exportar', request()->only(['materia_id', 'data_inicio', 'data_fim'])) }}" class="pal-nav-btn pal-nav-btn-ghost no-print" title="Baixar as presenças filtradas em Excel (.xlsx)">
-        ⬇ Exportar planilha
-    </a>
-    <button onclick="window.print()" class="pal-nav-btn pal-nav-btn-solid no-print">
-        📄 Gerar PDF
-    </button>
-@endsection
-
 @section('nav-user')
     <div class="pal-nav-user">
         <span class="pal-nav-user-role">Professor</span>
@@ -209,10 +200,21 @@
 
         <main class="max-w-7xl mx-auto w-full p-6 mt-8 relative z-10 flex-grow">
             
-            <div class="mb-12 animate-reveal [animation-delay:200ms] no-print">
-                <p class="pal-eyebrow" style="margin-bottom:0.5rem">Módulo Relatórios</p>
-                <h2 class="pal-title">Histórico de Presenças</h2>
-                <p class="pal-subtitle">Filtre por matéria e período para gerar seu relatório de frequências.</p>
+            <div class="mb-12 animate-reveal [animation-delay:200ms] no-print flex flex-wrap items-end justify-between gap-6">
+                <div class="min-w-0">
+                    <p class="pal-eyebrow" style="margin-bottom:0.5rem">Módulo Relatórios</p>
+                    <h2 class="pal-title">Histórico de Presenças</h2>
+                    <p class="pal-subtitle">Filtre por matéria e período para gerar seu relatório de frequências.</p>
+                </div>
+                {{-- Ações ficam no conteúdo (e não no topo) para caberem no celular --}}
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('professor.relatorios.exportar', request()->only(['materia_id', 'data_inicio', 'data_fim'])) }}" class="rc-btn rc-btn-neutro rc-btn-sm" title="Baixar as presenças filtradas em Excel (.xlsx)">
+                        ⬇ Exportar planilha
+                    </a>
+                    <button type="button" onclick="window.print()" class="rc-btn rc-btn-neutro rc-btn-sm">
+                        📄 Gerar PDF
+                    </button>
+                </div>
             </div>
 
             <!-- Filtros -->
@@ -260,10 +262,10 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse rc-tabela-cartoes">
                         <thead>
                             <tr class="pal-subtitle font-black uppercase tracking-[0.2em] border-b border-white/10" style="font-size:0.65rem">
-                                <th class="py-4 px-6">Data / Hora</th>
+                                <th class="py-4 px-6" data-sem-rotulo>Data / Hora</th>
                                 <th class="py-4 px-6">Aluno</th>
                                 <th class="py-4 px-6">Matéria</th>
                                 <th class="py-4 px-6 text-right">Status</th>
