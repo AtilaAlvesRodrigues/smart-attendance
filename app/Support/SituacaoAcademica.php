@@ -80,11 +80,30 @@ class SituacaoAcademica
             return $this->media >= self::MEDIA_MINIMA ? 'aprovado' : 'reprovado';
         }
 
-        $pertoDoLimite = $this->limiteFaltas > 0 && $this->faltas >= ceil($this->limiteFaltas * 0.75);
         $mediaBaixa = $this->media !== null && $this->media < self::MEDIA_MINIMA;
-        $frequenciaBaixa = $this->aulasRealizadas >= 3 && $this->frequencia < 75;
 
-        return ($pertoDoLimite || $mediaBaixa || $frequenciaBaixa) ? 'atencao' : 'regular';
+        return ($this->pertoDoLimite() || $mediaBaixa || $this->frequenciaBaixa()) ? 'atencao' : 'regular';
+    }
+
+    /** Faltas em 75% ou mais do limite. */
+    private function pertoDoLimite(): bool
+    {
+        return $this->limiteFaltas > 0 && $this->faltas >= ceil($this->limiteFaltas * 0.75);
+    }
+
+    /** Frequência abaixo de 75% depois de pelo menos 3 aulas. */
+    private function frequenciaBaixa(): bool
+    {
+        return $this->aulasRealizadas >= 3 && $this->frequencia < 75;
+    }
+
+    /**
+     * Atenção por faltas ou frequência (não só pela média): é o caso que
+     * gera o aviso por e-mail ao aluno.
+     */
+    public function alertaDeFrequencia(): bool
+    {
+        return $this->status === 'atencao' && ($this->pertoDoLimite() || $this->frequenciaBaixa());
     }
 
     public function rotulo(): string

@@ -64,6 +64,10 @@ Cada situação vem com uma explicação curta no painel:
 | Reprovado por nota | "Média final 4,0, abaixo de 5,0." |
 | Reprovado por falta | "Você passou do limite de 10 faltas." |
 
+## Aviso por e-mail
+
+`SituacaoAcademica::alertaDeFrequencia()` é verdadeiro quando a situação é *Atenção* **por faltas ou frequência**: faltas em 75% ou mais do limite, ou frequência abaixo de 75% depois de pelo menos 3 aulas. Nesse caso, a verificação diária (`App\Support\AvisosFrequencia`) manda ao aluno um e-mail com a `explicacao()` do painel. A tabela `avisos_frequencia` garante no máximo um aviso por aluno e matéria a cada 7 dias. *Atenção* só pela média não gera aviso, e *Reprovado por falta* também não.
+
 ## Faltas abonadas e correções
 
 Uma falta **abonada** (justificativa aprovada pelo professor) e uma presença **marcada pelo professor** viram registros comuns na tabela `presencas`, só com outra origem (`justificativa` ou `correcao`). Por isso entram na conta como presença em todas as telas, sem regra extra no `SituacaoAcademica`.

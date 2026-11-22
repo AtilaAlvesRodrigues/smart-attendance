@@ -83,6 +83,10 @@ O botão de perfil (ícone de pessoa, no topo) mostra seus dados: nome, e-mail, 
 
 ---
 
+### Aviso de faltas por e-mail
+
+Quando uma matéria entra em *Atenção* por faltas (perto do limite, ou frequência abaixo de 75% depois de 3 aulas), o aluno recebe um e-mail com a mesma explicação do painel, as faltas e a frequência. O sistema confere uma vez por dia, às 19h, e manda no máximo um aviso por matéria a cada 7 dias. *Atenção* só pela média não gera aviso.
+
 ### Justificar uma falta
 
 No painel, clique em **Justificar uma falta**.
