@@ -15,6 +15,7 @@ Mudanças relevantes do Smart Attendance, da mais recente para a mais antiga. O 
 - **E-mail institucional:** exemplos de SMTP (Microsoft 365, Google Workspace, servidor próprio) no `.env.example` e botão "Enviar e-mail de teste" no Master.
 
 ### Corrigido (deste pacote)
+- **Exportar planilha da Central de Presenças ignorava os filtros da tela:** os filtros rodam por JavaScript e o link era fixo, então a planilha vinha com todas as presenças. O link agora acompanha os filtros, e a busca da tela e a exportação usam a mesma regra (matéria pelo nome ou pela sala; aluno também pelo e-mail).
 - **Erro 500 com muitos acessos simultâneos:** no pooler do Supabase em modo sessão, o 16º acesso ao mesmo tempo falhava (`EMAXCONNSESSION`; 25 de 40 requisições simultâneas deram 500 no teste de carga de 22/11/2026). Suporte ao modo transação (`DB_PORT=6543` com `DB_EMULATE_PREPARES=true`).
 - Atestados das justificativas guardados no banco (tabela `justificativa_anexos`), para o anexo funcionar na Vercel; limite de 4 MB, abaixo do limite de 4,5 MB por requisição da Vercel.
 - Duplo clique ao enviar justificativa não dá mais erro 500 nem deixa arquivo solto.

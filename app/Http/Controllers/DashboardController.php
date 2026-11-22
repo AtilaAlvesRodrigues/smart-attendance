@@ -177,28 +177,28 @@ class DashboardController extends BaseController
     {
         $query = Presenca::query();
 
+        // Professor: nome, CPF ou e-mail exatos (campos criptografados → blind index)
         if ($request->filled('professor')) {
-            $query->whereHas('professor', function ($q) use ($request) {
-                $hash = ProfessorModel::generateBlindIndex($request->professor);
-                $q->where('nome_search', $hash)
-                  ->orWhere('cpf_search', $hash)
-                  ->orWhere('email_search', $hash);
-            });
+            $hash = ProfessorModel::generateBlindIndex(trim($request->professor));
+            $ids = ProfessorModel::withTrashed()
+                ->where(fn ($q) => $q->where('nome_search', $hash)->orWhere('cpf_search', $hash)->orWhere('email_search', $hash))
+                ->pluck('id');
+            $query->whereIn('professor_id', $ids);
         }
 
+        // Matéria: parte do nome ou da sala
         if ($request->filled('materia')) {
-            $query->whereHas('materia', function ($q) use ($request) {
-                $q->where('nome', 'like', "%{$request->materia}%");
-            });
+            $termo = '%' . trim($request->materia) . '%';
+            $query->whereHas('materia', fn ($q) => $q->where('nome', 'like', $termo)->orWhere('sala', 'like', $termo));
         }
 
+        // Aluno: nome, RA, CPF ou e-mail exatos (blind index)
         if ($request->filled('aluno')) {
-            $query->whereHas('aluno', function ($q) use ($request) {
-                $hash = AlunoModel::generateBlindIndex($request->aluno);
-                $q->where('nome_search', $hash)
-                  ->orWhere('ra_search', $hash)
-                  ->orWhere('cpf_search', $hash);
-            });
+            $hash = AlunoModel::generateBlindIndex(trim($request->aluno));
+            $ids = AlunoModel::withTrashed()
+                ->where(fn ($q) => $q->where('nome_search', $hash)->orWhere('ra_search', $hash)->orWhere('cpf_search', $hash)->orWhere('email_search', $hash))
+                ->pluck('id');
+            $query->whereIn('aluno_id', $ids);
         }
 
         return $query->orderBy('created_at', 'desc');

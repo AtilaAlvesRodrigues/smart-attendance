@@ -225,7 +225,7 @@ Em **Solicitações**, os pedidos pendentes aparecem primeiro. **Aprovar** cria 
 
 <img src="img/central-presencas.jpg" alt="Central de presenças" width="720">
 
-Todos os registros de presença, com filtros por professor (nome ou CPF), matéria e aluno (nome ou RA). A coluna **Faltas** mostra as faltas do aluno naquela matéria em relação ao limite permitido. **Exportar planilha** baixa os registros em Excel (.xlsx).
+Todos os registros de presença, com filtros por professor (nome ou CPF), matéria e aluno (nome ou RA). A coluna **Faltas** mostra as faltas do aluno naquela matéria em relação ao limite permitido. **Exportar planilha** baixa em Excel (.xlsx) os registros com os mesmos filtros digitados na tela (professor, matéria ou sala, aluno).
 
 ### Gráficos de presença
 

@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('master.presenca.exportar', request()->only(['professor', 'materia', 'aluno'])) }}" class="rc-btn rc-btn-neutro rc-btn-sm" title="Baixar as presenças em Excel (.xlsx)">⬇ Exportar planilha</a>
+                    <a id="exportar-planilha" href="{{ route('master.presenca.exportar', request()->only(['professor', 'materia', 'aluno'])) }}" data-base="{{ route('master.presenca.exportar') }}" class="rc-btn rc-btn-neutro rc-btn-sm" title="Baixar em Excel (.xlsx) as presenças com os filtros da tela">⬇ Exportar planilha</a>
                     <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-sm text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex items-center gap-2">
                         📄 Gerar PDF
                     </button>
@@ -291,6 +291,12 @@
                         hasQuery = true;
                     }
                 });
+
+                // O "Exportar planilha" leva os mesmos filtros da tela
+                const exportar = document.getElementById('exportar-planilha');
+                if (exportar) {
+                    exportar.href = exportar.dataset.base + (hasQuery ? '?' + queryParams.toString() : '');
+                }
 
                 // Se nenhum filtro preenchido, restaurar conteudo original do Blade
                 if (!hasQuery) {

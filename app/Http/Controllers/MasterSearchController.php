@@ -81,53 +81,12 @@ class MasterSearchController extends BaseController
 
     public function searchPresencas(Request $request)
     {
-        $presencas = Presenca::with(['aluno', 'aluno.materias', 'materia', 'professor']);
-
-        if ($request->filled('professor')) {
-            $term = trim($request->professor);
-            $hash = ProfessorModel::generateBlindIndex($term);
-
-            // First try to find matching professor IDs via all blind index columns
-            $professorIds = ProfessorModel::where('nome_search', $hash)
-                ->orWhere('cpf_search', $hash)
-                ->orWhere('email_search', $hash)
-                ->pluck('id');
-
-            if ($professorIds->isNotEmpty()) {
-                $presencas->whereIn('professor_id', $professorIds);
-            } else {
-                // No match found — return empty result
-                $presencas->whereRaw('1 = 0');
-            }
-        }
-
-        if ($request->filled('materia')) {
-            $presencas->whereHas('materia', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->materia . '%')
-                  ->orWhere('sala', 'like', '%' . $request->materia . '%');
-            });
-        }
-
-        if ($request->filled('aluno')) {
-            $term = trim($request->aluno);
-            $hash = AlunoModel::generateBlindIndex($term);
-
-            // First try to find matching aluno IDs via all blind index columns
-            $alunoIds = AlunoModel::where('nome_search', $hash)
-                ->orWhere('ra_search', $hash)
-                ->orWhere('cpf_search', $hash)
-                ->orWhere('email_search', $hash)
-                ->pluck('id');
-
-            if ($alunoIds->isNotEmpty()) {
-                $presencas->whereIn('aluno_id', $alunoIds);
-            } else {
-                $presencas->whereRaw('1 = 0');
-            }
-        }
+        // Mesma regra de filtro da exportação em planilha (DashboardController::filtrarPresencasMaster)
+        $presencas = DashboardController::filtrarPresencasMaster($request)
+            ->with(['aluno', 'aluno.materias', 'materia', 'professor']);
 
         // Limitamos para evitar sobrecarga no front e mantemos a data
-        $presencas = $presencas->orderBy('created_at', 'desc')->limit(50)->get();
+        $presencas = $presencas->limit(50)->get();
 
         $results = $presencas->map(function ($p) {
             $materiaPivot = $p->aluno ? $p->aluno->materias->where('id', $p->materia_id)->first()->pivot ?? null : null;
