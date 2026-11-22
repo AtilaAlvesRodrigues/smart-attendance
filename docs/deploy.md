@@ -74,9 +74,16 @@ Para recriar os dados de demonstração, use `migrate:fresh --seed --force`. Iss
 > [!WARNING]
 > A `APP_KEY` também é a chave dos *blind indexes*. Se o seed rodar com uma chave diferente da configurada na Vercel, os logins param de funcionar. As variáveis *sensitive* não podem ser lidas de volta pela Vercel (`vercel env pull` devolve `[Sensitive]`); guarde a chave num gerenciador de senhas ao criá-la.
 
-## Tarefa diária
+## Tarefas diárias
 
-O Supabase gratuito pausa o banco depois de cerca de 7 dias sem uso. O `vercel.json` agenda uma chamada diária, às 12:00 UTC (9:00 em Brasília), para `/cron/manter-banco-ativo`, que faz uma consulta simples. A Vercel envia `Authorization: Bearer <CRON_SECRET>`; sem esse cabeçalho, a rota devolve 404.
+O `vercel.json` agenda duas chamadas por dia. A Vercel envia `Authorization: Bearer <CRON_SECRET>`; sem esse cabeçalho, as rotas devolvem 404.
+
+| Rota | Horário | O que faz |
+|---|---|---|
+| `/cron/manter-banco-ativo` | 12:00 UTC (9:00 em Brasília) | Consulta simples: o Supabase gratuito pausa o banco depois de cerca de 7 dias sem uso |
+| `/cron/avisos-frequencia` | 22:00 UTC (19:00 em Brasília) | Avisa por e-mail os alunos em *Atenção* por faltas (no máximo 1 aviso por matéria a cada 7 dias); devolve `{"avisos": N}` |
+
+Localmente, o aviso roda com `php artisan frequencia:avisar`.
 
 ## Deploy automático pelo GitHub
 
