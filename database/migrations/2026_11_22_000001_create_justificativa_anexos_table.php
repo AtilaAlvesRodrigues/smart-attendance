@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Schema;
  * Atestados guardados no próprio banco (JUSTIFICATIVAS_DISK=banco).
  *
  * Na Vercel o disco é somente leitura; guardar o arquivo aqui evita depender
- * de um serviço externo. O conteúdo vai em base64 (texto), que funciona igual
- * no PostgreSQL e no SQLite dos testes. Atestados têm no máximo 4 MB.
+ * de um serviço externo. O conteúdo vai criptografado com a APP_KEY (texto
+ * base64 do Laravel), igual no PostgreSQL e no SQLite dos testes. Atestados
+ * têm no máximo 4 MB.
  */
 return new class extends Migration
 {
@@ -18,7 +19,7 @@ return new class extends Migration
         Schema::create('justificativa_anexos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('justificativa_id')->unique()->constrained('justificativas')->cascadeOnDelete();
-            $table->longText('conteudo'); // base64
+            $table->longText('conteudo'); // criptografado (Crypt::encryptString)
             $table->unsignedInteger('tamanho'); // bytes do arquivo original
             $table->timestamp('created_at')->useCurrent();
         });

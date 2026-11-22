@@ -141,4 +141,22 @@ class AnexoNoBancoTest extends TestCase
 
         $this->assertSame([], Storage::disk('justificativas')->allFiles());
     }
+
+    public function test_atestado_fica_criptografado_no_banco(): void
+    {
+        [, $materia, , $faltou, $codigo] = $this->cenario();
+        $conteudo = "%PDF-1.4\nCID J45 paciente Fulano de Tal\n" . random_bytes(512);
+
+        $this->enviar($faltou, $materia, $codigo, UploadedFile::fake()->createWithContent('atestado.pdf', $conteudo));
+
+        $guardado = DB::table('justificativa_anexos')->value('conteudo');
+        $this->assertStringNotContainsString('Fulano de Tal', $guardado);
+        $this->assertStringNotContainsString(base64_encode($conteudo), $guardado);
+        $this->assertStringNotContainsString('Fulano de Tal', (string) base64_decode($guardado, true));
+
+        $j = Justificativa::first();
+        $resposta = $this->actingAs($faltou, 'alunos')->get("/aluno/justificativas/{$j->id}/anexo");
+        $this->assertSame($conteudo, $resposta->streamedContent());
+        $this->assertSame((string) strlen($conteudo), $resposta->headers->get('Content-Length'));
+    }
 }

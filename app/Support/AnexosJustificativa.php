@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Justificativa;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,8 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Onde ficam os atestados das justificativas.
  *
- * - JUSTIFICATIVAS_DISK=banco: tabela justificativa_anexos (base64). Funciona
- *   na Vercel sem serviço externo.
+ * - JUSTIFICATIVAS_DISK=banco: tabela justificativa_anexos, conteúdo
+ *   criptografado com a APP_KEY. Funciona na Vercel sem serviço externo.
  * - local / s3: disco "justificativas" do Laravel (pasta privada ou Supabase Storage).
  *
  * A leitura não depende do modo atual: anexo_path = 'banco' indica o banco;
@@ -58,7 +59,8 @@ class AnexosJustificativa
 
         DB::table('justificativa_anexos')->insert([
             'justificativa_id' => $justificativa->id,
-            'conteudo'         => base64_encode((string) file_get_contents($arquivo->getRealPath())),
+            // Atestado é dado pessoal sensível (LGPD): criptografado com a APP_KEY (AES-256)
+            'conteudo'         => Crypt::encryptString((string) file_get_contents($arquivo->getRealPath())),
             'tamanho'          => (int) $arquivo->getSize(),
             'created_at'       => now(),
         ]);
@@ -88,9 +90,12 @@ class AnexosJustificativa
                 ->value('conteudo');
             abort_unless($conteudo, 404);
 
-            return response()->streamDownload(function () use ($conteudo) {
-                echo base64_decode($conteudo);
-            }, $nome, $cabecalhos);
+            // O arquivo cabe em memória: o envio é limitado a 4 MB
+            $bytes = Crypt::decryptString($conteudo);
+
+            return response()->streamDownload(function () use ($bytes) {
+                echo $bytes;
+            }, $nome, $cabecalhos + ['Content-Length' => (string) strlen($bytes)]);
         }
 
         $disco = Storage::disk(Justificativa::DISCO);

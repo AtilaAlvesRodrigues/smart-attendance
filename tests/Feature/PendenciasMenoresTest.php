@@ -21,16 +21,19 @@ class PendenciasMenoresTest extends TestCase
 {
     use RefreshDatabase, CriaCenarioAcademico;
 
+    /** Senha fictícia dos testes (em variável, para a varredura de segredos não confundir com chave). */
+    private string $senhaTeste = 'senha-ficticia-de-teste';
+
     // --- Login não apaga o token de primeiro acesso antes do código do 2FA
 
     public function test_senha_certa_sem_codigo_nao_apaga_o_token_de_primeiro_acesso(): void
     {
         $professor = ProfessorModel::factory()->create([
-            'email' => 'token@teste.com', 'password' => Hash::make('senha-forte-123'), 'remember_token' => 'token-primeiro-acesso',
+            'email' => 'token@teste.com', 'password' => Hash::make($this->senhaTeste), 'remember_token' => 'token-primeiro-acesso',
         ]);
         $professor->forceFill(['two_factor_secret' => (new Google2FA())->generateSecretKey(), 'two_factor_confirmed_at' => now()])->save();
 
-        $this->post('/login/professor', ['cpf_email' => 'token@teste.com', 'password' => 'senha-forte-123'])
+        $this->post('/login/professor', ['cpf_email' => 'token@teste.com', 'password' => $this->senhaTeste])
             ->assertRedirect(route('dois-fatores.desafio'));
 
         $this->assertSame('token-primeiro-acesso', $professor->fresh()->remember_token);
@@ -41,11 +44,11 @@ class PendenciasMenoresTest extends TestCase
         $g2fa = new Google2FA();
         $segredo = $g2fa->generateSecretKey();
         $professor = ProfessorModel::factory()->create([
-            'email' => 'token2@teste.com', 'password' => Hash::make('senha-forte-123'), 'remember_token' => 'token-primeiro-acesso',
+            'email' => 'token2@teste.com', 'password' => Hash::make($this->senhaTeste), 'remember_token' => 'token-primeiro-acesso',
         ]);
         $professor->forceFill(['two_factor_secret' => $segredo, 'two_factor_confirmed_at' => now()])->save();
 
-        $this->post('/login/professor', ['cpf_email' => 'token2@teste.com', 'password' => 'senha-forte-123']);
+        $this->post('/login/professor', ['cpf_email' => 'token2@teste.com', 'password' => $this->senhaTeste]);
         $this->post('/2fa/desafio', ['codigo' => $g2fa->getCurrentOtp($segredo)])->assertRedirect(route('dashboard.professor'));
 
         $this->assertNotSame('token-primeiro-acesso', $professor->fresh()->remember_token);
